@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using TVS.Void.Service.Website.Utility;
 
 namespace TVS.Void.Service.Website
 {
@@ -17,15 +18,21 @@ namespace TVS.Void.Service.Website
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddRazorPages();
+            services.AddControllers();
+            services.RegisterFanexData(Configuration);
+            services.RegisterFanexExceptionHandler();
+            services.RegisterSentry(Configuration);
+            services.RegisterONEbookUM(Configuration);
+            services.RegisterCoreServices(Configuration);
+            services.AddHostedService<CustomLifetimeService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public static void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseDeveloperExceptionPage();
             app.UseHttpsRedirection();
-            //  app.ConfigureExceptionHandler();
+            app.UseMiddleware<ExceptionHandlerMiddleware>();
             app.UseRouting();
 
             app.UseEndpoints(endpoints =>
