@@ -1,7 +1,6 @@
 FROM hub.nexdev.net/base/dotnet/core/sdk:5.0.102-ca-patch-buster-slim AS builder
 WORKDIR /src
 
-COPY ./Sources/TVS.Void.Service.Core ./Sources/TVS.Void.Service.Core
 COPY ./Sources/TVS.Void.Service ./Sources/TVS.Void.Service
 COPY ./TVS.Void.Service.Website/TVS.Void.Service.Website.csproj ./TVS.Void.Service.Website/TVS.Void.Service.Website.csproj
 

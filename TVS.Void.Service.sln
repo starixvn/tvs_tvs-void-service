@@ -7,9 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TVS.Void.Service.Website", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sources", "Sources", "{123503A4-A16B-41D5-BF7E-A2A6C8657463}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TVS.Void.Service.Core", "Sources\TVS.Void.Service.Core\TVS.Void.Service.Core.csproj", "{8137134A-8B6F-4003-9E26-6F53591D2F9B}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TVS.Void.Service", "Sources\TVS.Void.Service\TVS.Void.Service.csproj", "{0AD92ED4-EC51-4B49-9873-D7AAD54B9C56}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TVS.Void.Service", "Sources\TVS.Void.Service\TVS.Void.Service.csproj", "{0AD92ED4-EC51-4B49-9873-D7AAD54B9C56}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,10 +19,6 @@ Global
 		{1763DA1B-A442-46FD-81BE-0B448A6FCC80}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1763DA1B-A442-46FD-81BE-0B448A6FCC80}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1763DA1B-A442-46FD-81BE-0B448A6FCC80}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8137134A-8B6F-4003-9E26-6F53591D2F9B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8137134A-8B6F-4003-9E26-6F53591D2F9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8137134A-8B6F-4003-9E26-6F53591D2F9B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8137134A-8B6F-4003-9E26-6F53591D2F9B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0AD92ED4-EC51-4B49-9873-D7AAD54B9C56}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0AD92ED4-EC51-4B49-9873-D7AAD54B9C56}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0AD92ED4-EC51-4B49-9873-D7AAD54B9C56}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -34,7 +28,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{8137134A-8B6F-4003-9E26-6F53591D2F9B} = {123503A4-A16B-41D5-BF7E-A2A6C8657463}
 		{0AD92ED4-EC51-4B49-9873-D7AAD54B9C56} = {123503A4-A16B-41D5-BF7E-A2A6C8657463}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution

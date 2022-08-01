@@ -8,7 +8,6 @@ using Fanex.Logging.Extensions;
 using Fanex.Logging.Extensions.AspNetCore;
 using Fanex.Logging.Extensions.Database;
 using Fanex.Logging.Sentry;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ONEbook.UM.AspNetCore;
@@ -16,13 +15,23 @@ using ONEbook.UM.Configurations;
 using ONEbook.UM.Helpers;
 using ONEbook.UM.Services;
 using ONEbook.UM.Transport;
+using Quartz;
 using Sentry;
+using TVS.Void.Service.Models;
+using TVS.Void.Service.Services;
+using TVS.Void.Service.Website.Jobs;
+using TVS.Void.Service.Website.Jobs.Listener;
 
 namespace TVS.Void.Service.Website.Utility
 {
     [ExcludeFromCodeCoverage]
     public static class ServiceCollectionExtension
     {
+        public static void LoadConfig(this IServiceCollection services)
+        {
+            AppConfigService.AppConfig = new ConfigSettingModel();
+        }
+
         public static void RegisterFanexData(this IServiceCollection services, IConfiguration configuration)
         {
             var connections = configuration.GetSection("ConnectionStrings")
@@ -69,13 +78,72 @@ namespace TVS.Void.Service.Website.Utility
             services.AddSingleton<IUMCacheService, UMCacheService>();
             services.AddSingleton<IUMRestClient, UMRestClient>();
             services.AddSingleton<IPHelper, IPHelperImpl>();
-            services.AddSingleton<IHttpContextHelper, HttpContextHelper>();
+            services.AddSingleton<IHttpContextHelper, CustomHttpContextHelper>();
             services.AddSingleton<IMaintenanceService, MaintenanceService>();
         }
 
         public static void RegisterCoreServices(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            //  services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+        }
+
+        public static void RegisterBusinessService(this IServiceCollection services)
+        {
+            services.AddSingleton<LoggingService, LoggingServiceImp>();
+        }
+
+        public static void RegisterQuartzScheduler(this IServiceCollection services)
+        {
+            services.AddTransient<ScanningAutoVoidRequestJob>();
+            services.AddTransient<VoidJob>();
+            services.AddTransient<CheckingVoidStatusJob>();
+            services.AddQuartz(q =>
+            {
+                // handy when part of cluster or you want to otherwise identify multiple schedulers
+                q.SchedulerId = "Scheduler-TVS-Void-Service";
+                q.UseMicrosoftDependencyInjectionJobFactory();
+
+                // these are the defaults
+                q.UseSimpleTypeLoader();
+                q.UseInMemoryStore();
+                q.UseDefaultThreadPool(tp =>
+                {
+                    tp.MaxConcurrency = 10;
+                });
+
+                q.ScheduleJob<ScanningAutoVoidRequestJob>(trigger => trigger
+                    .WithIdentity("ScanningAutoVoidRequestJob Trigger")
+                    .StartNow()
+                    .WithSimpleSchedule(x => x.WithIntervalInSeconds(1).RepeatForever())
+               );
+
+                q.ScheduleJob<VoidJob>(trigger => trigger
+                    .WithIdentity("VoidJob Trigger")
+                    .StartNow()
+                    .WithSimpleSchedule(x => x.WithIntervalInSeconds(1).RepeatForever())
+                );
+
+                q.ScheduleJob<CheckingVoidStatusJob>(trigger => trigger
+                    .WithIdentity("CheckingVoidStatusJob Trigger")
+                    .StartNow()
+                    .WithSimpleSchedule(x => x.WithIntervalInSeconds(1).RepeatForever())
+                );
+
+                q.AddSchedulerListener<CustomSchedulerListener>();
+
+                // auto-interrupt long-running job
+                // q.UseJobAutoInterrupt(options =>
+                // {
+                //    // this is the default
+                //    options.DefaultMaxRunTime = TimeSpan.FromMinutes(5);
+                // });
+            });
+
+            services.AddQuartzHostedService(options =>
+            {
+                // when shutting down we want jobs to complete gracefully
+                options.WaitForJobsToComplete = true;
+            });
         }
     }
 }

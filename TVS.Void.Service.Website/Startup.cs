@@ -18,13 +18,15 @@ namespace TVS.Void.Service.Website
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.LoadConfig();
             services.AddControllers();
             services.RegisterFanexData(Configuration);
             services.RegisterFanexExceptionHandler();
             services.RegisterSentry(Configuration);
             services.RegisterONEbookUM(Configuration);
             services.RegisterCoreServices(Configuration);
-            services.AddHostedService<CustomLifetimeService>();
+            services.RegisterBusinessService();
+            services.RegisterQuartzScheduler();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -34,7 +36,6 @@ namespace TVS.Void.Service.Website
             app.UseHttpsRedirection();
             app.UseMiddleware<ExceptionHandlerMiddleware>();
             app.UseRouting();
-
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
