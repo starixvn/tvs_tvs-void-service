@@ -2,6 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Fanex.Data;
+using Fanex.Data.Repository;
 using Fanex.Data.SqlServer;
 using Fanex.Logging;
 using Fanex.Logging.Extensions;
@@ -19,6 +20,7 @@ using Quartz;
 using Sentry;
 using TVS.Void.Service.Models;
 using TVS.Void.Service.Services;
+using TVS.Void.Service.Services.Main;
 using TVS.Void.Service.Website.Jobs;
 using TVS.Void.Service.Website.Jobs.Listener;
 
@@ -84,12 +86,15 @@ namespace TVS.Void.Service.Website.Utility
 
         public static void RegisterCoreServices(this IServiceCollection services, IConfiguration configuration)
         {
-            //  services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddSingleton<IDynamicRepository, DynamicRepository>();
         }
 
         public static void RegisterBusinessService(this IServiceCollection services)
         {
             services.AddSingleton<LoggingService, LoggingServiceImp>();
+            services.AddSingleton<ScanningAutoVoidRequestService, ScanningAutoVoidRequestServiceImp>();
+            services.AddSingleton<AutoVoidRequestQueueService, AutoVoidRequestQueueServiceImp>();
+            services.AddSingleton<RequestDetailService, RequestDetailServiceImp>();
         }
 
         public static void RegisterQuartzScheduler(this IServiceCollection services)

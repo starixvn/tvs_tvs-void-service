@@ -1,0 +1,25 @@
+﻿using System.Collections.Generic;
+using TVS.Void.Service.Models;
+
+namespace TVS.Void.Service.Constants
+{
+    public static class SiteDbGroupConstant
+    {
+        public const int CentralDb = 0;
+        public const int SiteDb1 = 1;
+
+        public static readonly List<SiteDbGroupModel> ServerList = new()
+        {
+            new SiteDbGroupModel
+            {
+                Id = CentralDb,
+                ServerName = nameof(CentralDb)
+            },
+            new SiteDbGroupModel
+            {
+                Id = SiteDb1,
+                ServerName = nameof(SiteDb1)
+            }
+        };
+    }
+}

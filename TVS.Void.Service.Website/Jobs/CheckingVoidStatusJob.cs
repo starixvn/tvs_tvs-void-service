@@ -31,7 +31,7 @@ namespace TVS.Void.Service.Website.Jobs
                     if (!await maintenanceService.IsUnderMaintenanceAsync())
                     {
                         await Task.Delay(4000);
-                        logger.LogInformation("CheckingVoidStatusJob running: " + DateTime.Now);
+                        // logger.LogInformation("CheckingVoidStatusJob running: " + DateTime.Now);
                     }
 
                     AppConfigService.AppConfig.IsCheckingVoidStatusJobExecuting = false;
