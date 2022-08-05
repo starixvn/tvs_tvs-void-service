@@ -23,5 +23,22 @@ namespace TVS.Void.Service.Extensions
 
             return $"<Tickets>{stringBuilder.ToString().Trim()}</Tickets>";
         }
+
+        public static string ToRequestIdXml(this IEnumerable<RequestDetailModel> requests)
+        {
+            if (requests == null || !requests.Any())
+            {
+                return string.Empty;
+            }
+
+            var stringBuilder = new StringBuilder();
+            foreach (var request in requests)
+            {
+                var line = $"<Request RequestId='{request.RequestId}'/>";
+                stringBuilder.AppendLine(line);
+            }
+
+            return $"<Requests>{stringBuilder.ToString().Trim()}</Requests>";
+        }
     }
 }

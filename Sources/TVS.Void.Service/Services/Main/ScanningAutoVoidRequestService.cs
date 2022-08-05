@@ -30,15 +30,15 @@ namespace TVS.Void.Service.Services.Main
                 return;
             }
 
-            var (requests, singleTickets, parlayTickets) =
-                await requestDetailService.GetTicketsBySiteDbGroupId(siteDbGroupId, queue.MatchId);
-            var (validSingleTickets, validParlayTickets) =
-                await requestDetailService.CheckTicketsAllowToVoid(siteDbGroupId, singleTickets, parlayTickets);
+            var (validSingleTickets, validParlayTickets, validRequests) =
+                await requestDetailService.CheckTicketsAllowToVoid(siteDbGroupId, queue.MatchId);
 
-            if ((validSingleTickets == null || !validSingleTickets.Any()) && (validParlayTickets == null || !validParlayTickets.Any()))
+            if (validRequests == null || !validRequests.Any())
             {
                 await autoVoidRequestQueueService.UpdateQueueStatus(siteDbGroupId, queue.QueueId, ExecuteStatus.Done);
             }
+
+            var voidServiceData = await requestDetailService.InsertVoidServiceData(queue.BroadcastSessionId, siteDbGroupId, validRequests);
 
             Debug.WriteLine($"SiteDB - {siteDbGroupId} - {DateTime.Now:hh.mm.ss.ffffff}");
         }
