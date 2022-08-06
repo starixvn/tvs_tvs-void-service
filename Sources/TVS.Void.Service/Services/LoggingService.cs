@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Threading.Tasks;
 using Fanex.Logging;
 using Fanex.Logging.Extensions;
 using Fanex.Logging.Extensions.Database;
@@ -8,47 +9,47 @@ namespace TVS.Void.Service.Services
 {
     public interface LoggingService
     {
-        void Error(string message, Exception exception);
+        Task ErrorAsync(string message, Exception exception);
 
-        void Error(Exception exception);
+        Task ErrorAsync(Exception exception);
 
-        void Error(string message);
+        Task ErrorAsync(string message);
 
-        void Info(string message);
+        Task InfoAsync(string message);
     }
 
     [ExcludeFromCodeCoverage]
     public class LoggingServiceImp : LoggingService
     {
-        public void Error(string message, Exception exception)
+        public async Task ErrorAsync(string message, Exception exception)
         {
             var logException = new Exception(message, exception);
-            HandleException(logException);
+            await HandleException(logException);
         }
 
-        public void Error(Exception exception)
+        public async Task ErrorAsync(Exception exception)
         {
-            HandleException(exception);
+            await HandleException(exception);
         }
 
-        public void Error(string message)
+        public async Task ErrorAsync(string message)
         {
-            LogService.Error(message);
+            await LogService.ErrorAsync(message);
         }
 
-        public void Info(string message)
+        public async Task InfoAsync(string message)
         {
-            LogService.Info(message);
+            await LogService.InfoAsync(message);
         }
 
-        private static void HandleException(Exception exception)
+        private async Task HandleException(Exception exception)
         {
             var logMessage = new LogMessage(exception.Message)
                 .AddSection("Database Info", DatabaseInfoGetters.GetDbExceptionInfo(exception))
                 .AddSection("Server Info", CommonInfoGetters.GetServerInfo())
                 .AddSection("Exception Info", CommonInfoGetters.GetExceptionInfo(exception.InnerException))
                 .ToString();
-            LogService.Error(logMessage);
+            await LogService.ErrorAsync(logMessage);
         }
     }
 }

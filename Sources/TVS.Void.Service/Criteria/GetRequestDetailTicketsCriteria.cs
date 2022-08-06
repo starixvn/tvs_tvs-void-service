@@ -1,4 +1,5 @@
-﻿using Fanex.Data.Repository;
+﻿using System.ComponentModel;
+using Fanex.Data.Repository;
 
 namespace TVS.Void.Service.Criteria
 {
@@ -6,7 +7,10 @@ namespace TVS.Void.Service.Criteria
     {
         public int SiteDbGroupId { get; set; }
 
+        public int RequestId { get; set; }
         public int MatchId { get; set; }
+
+        public string Action { get; set; }
 
         public override string GetSettingKey() => "TicketVoiding_RequestDetailTickets_Select";
 

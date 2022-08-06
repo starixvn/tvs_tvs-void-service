@@ -17,14 +17,14 @@ namespace TVS.Void.Service.Extensions
             var stringBuilder = new StringBuilder();
             foreach (var ticket in tickets)
             {
-                var line = $"<Ticket TransId='{ticket.TransId}' MainTransId='{ticket.MainTransId}'/>";
+                var line = $"<Ticket TransId='{ticket.TransId}' MainTransId='{ticket.MainTransId}' IssueTypeId='{ticket.IssueTypeId}'/>";
                 stringBuilder.AppendLine(line);
             }
 
             return $"<Tickets>{stringBuilder.ToString().Trim()}</Tickets>";
         }
 
-        public static string ToRequestIdXml(this IEnumerable<RequestDetailModel> requests)
+        public static string ToRequestInfoXml(this IEnumerable<RequestDetailModel> requests)
         {
             if (requests == null || !requests.Any())
             {
@@ -34,7 +34,7 @@ namespace TVS.Void.Service.Extensions
             var stringBuilder = new StringBuilder();
             foreach (var request in requests)
             {
-                var line = $"<Request RequestId='{request.RequestId}'/>";
+                var line = $"<Request RequestId='{request.RequestId}' IssueTypeId='{request.IssueTypeId}'/>";
                 stringBuilder.AppendLine(line);
             }
 

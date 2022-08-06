@@ -40,7 +40,7 @@ namespace TVS.Void.Service.Website.Jobs
             catch (Exception ex)
             {
                 AppConfigService.AppConfig.IsVoidJobExecuting = false;
-                loggingService.Error("VoidJob execute failed!", ex);
+                await loggingService.ErrorAsync("VoidJob execute failed!", ex);
             }
         }
     }

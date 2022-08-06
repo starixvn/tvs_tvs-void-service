@@ -9,7 +9,7 @@ namespace TVS.Void.Service.Services
     {
         Task<AutoVoidRequestQueueModel> GetValidQueue(int siteDbGroupId);
 
-        Task UpdateQueueStatus(int siteDbGroupId, int queueId, int statusId);
+        Task UpdateQueueStatus(int siteDbGroupId, int queueId, int statusId, string message);
     }
 
     public class AutoVoidRequestQueueServiceImp : AutoVoidRequestQueueService
@@ -32,13 +32,14 @@ namespace TVS.Void.Service.Services
             return result;
         }
 
-        public async Task UpdateQueueStatus(int siteDbGroupId, int queueId, int statusId)
+        public async Task UpdateQueueStatus(int siteDbGroupId, int queueId, int statusId, string message)
         {
             var criteria = new UpdateAutoVoidRequestQueueCriteria
             {
                 SiteDbGroupId = siteDbGroupId,
                 QueueId = queueId,
-                StatusId = statusId
+                StatusId = statusId,
+                Message = message
             };
 
             await repository.ExecuteAsync(criteria);

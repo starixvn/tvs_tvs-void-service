@@ -3,6 +3,7 @@
     public class RequestDetailModel
     {
         public int RequestId { get; set; }
+        public int IssueTypeId { get; set; }
     }
 
     //public class RequestSiteDbGroupModel
@@ -14,6 +15,7 @@
     public class RequestDetailTicketModel
     {
         public int RequestId { get; set; }
+        public int IssueTypeId { get; set; }
         public int SiteDbGroupId { get; set; }
         public int TransId { get; set; }
         public int MatchId { get; set; }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using ONEbook.UM.Services;
@@ -36,15 +35,10 @@ namespace TVS.Void.Service.Website.Jobs
 
                     if (!await maintenanceService.IsUnderMaintenanceAsync())
                     {
-                        var tasks = new List<Task>
+                        foreach (var server in SiteDbGroupConstant.ServerList)
                         {
-                            scanningService.Execute(SiteDbGroupConstant.CentralDb, 3000),
-                            scanningService.Execute(SiteDbGroupConstant.SiteDb1, 1000),
-                            scanningService.Execute(3, 1000),
-                        };
-
-                        await Task.WhenAll(tasks);
-                        logger.LogInformation("ScanningAutoVoidRequestJob executed: " + DateTime.Now);
+                            await scanningService.Execute(server.Id);
+                        }
                     }
 
                     AppConfigService.AppConfig.IsScanningAutoVoidRequestJobExecuting = false;
@@ -53,7 +47,7 @@ namespace TVS.Void.Service.Website.Jobs
             catch (Exception ex)
             {
                 AppConfigService.AppConfig.IsScanningAutoVoidRequestJobExecuting = false;
-                loggingService.Error("ScanningAutoVoidRequestJob execute failed!", ex);
+                await loggingService.ErrorAsync("ScanningAutoVoidRequestJob execute failed!", ex);
             }
         }
     }

@@ -12,6 +12,8 @@ namespace TVS.Void.Service.Criteria.MultiSiteDb
         public int QueueId { get; set; }
         public int StatusId { get; set; }
 
+        public string Message { get; set; }
+
         [SpParam(Ignored = true)]
         public int SiteDbGroupId { get; set; }
 

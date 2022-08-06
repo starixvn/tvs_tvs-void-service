@@ -14,10 +14,13 @@ namespace TVS.Void.Service.Services
     public interface RequestDetailService
     {
         Task<(IEnumerable<RequestDetailTicketModel>, IEnumerable<RequestDetailTicketModel>,
-            IEnumerable<RequestDetailModel>)> CheckTicketsAllowToVoid(int siteDbGroupId, int matchId);
+            IEnumerable<RequestDetailModel>)> CheckTicketsAllowToVoid(int siteDbGroupId, AutoVoidRequestQueueModel autoVoidRequestQueue);
 
         Task<IEnumerable<VoidServiceModel>> InsertVoidServiceData(string broadcastSessionId, int siteDbGroupId,
             IEnumerable<RequestDetailModel> requests);
+
+        Task InsertTicketVoidingQueue(int voidingHistoryId, int matchId, int requestId, int issueTypeId,
+            IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets);
     }
 
     public class RequestDetailServiceImp : RequestDetailService
@@ -29,12 +32,14 @@ namespace TVS.Void.Service.Services
             this.repository = repository;
         }
 
-        private async Task<(IEnumerable<RequestDetailTicketModel>, IEnumerable<RequestDetailTicketModel>)> GetTicketsBySiteDbGroupId(int siteDbGroupId, int matchId)
+        private async Task<(IEnumerable<RequestDetailTicketModel>, IEnumerable<RequestDetailTicketModel>)> GetTicketsBySiteDbGroupId(int siteDbGroupId, AutoVoidRequestQueueModel autoVoidRequestQueue)
         {
             var criteria = new GetRequestDetailTicketsCriteria
             {
                 SiteDbGroupId = siteDbGroupId,
-                MatchId = matchId
+                RequestId = autoVoidRequestQueue.RequestId,
+                MatchId = autoVoidRequestQueue.MatchId,
+                Action = autoVoidRequestQueue.Action
             };
 
             var (singleTickets, parlayTickets) =
@@ -42,14 +47,19 @@ namespace TVS.Void.Service.Services
             return (singleTickets, parlayTickets);
         }
 
-        public async Task<(IEnumerable<RequestDetailTicketModel>, IEnumerable<RequestDetailTicketModel>, IEnumerable<RequestDetailModel>)> CheckTicketsAllowToVoid(int siteDbGroupId, int matchId)
+        public async Task<(IEnumerable<RequestDetailTicketModel>, IEnumerable<RequestDetailTicketModel>, IEnumerable<RequestDetailModel>)>
+            CheckTicketsAllowToVoid(int siteDbGroupId, AutoVoidRequestQueueModel autoVoidRequestQueue)
         {
-            var (singleTickets, parlayTickets) = await GetTicketsBySiteDbGroupId(siteDbGroupId, matchId);
+            var (singleTickets, parlayTickets) = await GetTicketsBySiteDbGroupId(siteDbGroupId, autoVoidRequestQueue);
+            if ((singleTickets == null || !singleTickets.Any()) && (parlayTickets == null || !parlayTickets.Any()))
+            {
+                return (null, null, null);
+            }
             var criteria = new CheckTicketsAllowToVoidCriteria
             {
                 SiteDbGroupId = siteDbGroupId,
-                SingleTickets = singleTickets.ToTicketsXml(),
-                ParlayTickets = parlayTickets.ToTicketsXml()
+                SingleTicketsXml = singleTickets.ToTicketsXml(),
+                ParlayTicketsXml = parlayTickets.ToTicketsXml()
             };
 
             var (validSingleTickets, validParlayTickets, validRequests) =
@@ -64,14 +74,14 @@ namespace TVS.Void.Service.Services
                 BroadcastSessionId = broadcastSessionId,
                 SiteDbGroupId = siteDbGroupId,
                 IsAutoVoid = true,
-                RequestIdXml = requests.ToRequestIdXml()
+                RequestInfoXml = requests.ToRequestInfoXml()
             };
 
             var voidServiceData = await repository.FetchAsync<VoidServiceModel>(criteria);
             return voidServiceData;
         }
 
-        public async Task InsertTicketVoidingQueue(int voidingHistoryId, int matchId, int requestId,
+        public async Task InsertTicketVoidingQueue(int voidingHistoryId, int matchId, int requestId, int issueTypeId,
             IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets)
         {
             var criteria = new InsertTicketVoidingQueueCriteria
@@ -83,39 +93,33 @@ namespace TVS.Void.Service.Services
                 RequestId = requestId
             };
 
-            //await InsertQueueCommand(criteria, singleTickets, VoidingTypeConstant.Single);
-            //if (query.IssueTypeId == IssueTypeConstant.AbnormalAccount)
-            //{
-            //    var commandParlayAbnormalAccount = command;
-            //    commandParlayAbnormalAccount.MatchId = 29;
-            //    await InsertQueueCommand(commandParlayAbnormalAccount, query.ParlayTransIds, VoidingTypeConstant.Parlay);
-            //}
-            //else
-            //{
-            //    await InsertQueueCommand(command, query.ParlayTransIds, VoidingTypeConstant.Parlay);
-            //}
-        }
-
-        private async Task InsertQueueCommand(InsertTicketVoidingQueueCriteria command, string transIds, byte type)
-        {
-            if (!string.IsNullOrWhiteSpace(transIds))
+            await InsertQueueByBatch(criteria, singleTickets, VoidingTypeConstant.Single);
+            if (issueTypeId == IssueTypeConstant.AbnormalAccount)
             {
-                command.VoidingTypeId = type;
-                await InsertQueueByBatch(command, transIds);
+                criteria.MatchId = 29;
+                await InsertQueueByBatch(criteria, parlayTickets, VoidingTypeConstant.Parlay);
+            }
+            else
+            {
+                await InsertQueueByBatch(criteria, parlayTickets, VoidingTypeConstant.Parlay);
             }
         }
 
-        private async Task InsertQueueByBatch(InsertTicketVoidingQueueCriteria command, string transIds)
+        private async Task InsertQueueByBatch(InsertTicketVoidingQueueCriteria command, IEnumerable<RequestDetailTicketModel> tickets, byte voidingType)
         {
-            var transList = transIds.Split(',').ToList();
-            const int size = 3000;
-            var number = Math.Ceiling((double)transList.Count / size);
-            for (var i = 0; i < number; i++)
+            if (tickets.Any())
             {
-                var temp = transList.Skip(i * size).Take(size).ToArray();
-                command.TransIds = string.Join(",", temp);
-                command.TotalTicket = temp.Length;
-                await repository.ExecuteAsync(command);
+                command.VoidingTypeId = voidingType;
+
+                const int size = 3000;
+                var number = Math.Ceiling((double)tickets.Count() / size);
+                for (var i = 0; i < number; i++)
+                {
+                    var temp = tickets.Skip(i * size).Take(size).ToArray();
+                    command.TransIds = string.Join(",", temp.Select(x => x.TransId));
+                    command.TotalTicket = temp.Length;
+                    await repository.ExecuteAsync(command);
+                }
             }
         }
     }
