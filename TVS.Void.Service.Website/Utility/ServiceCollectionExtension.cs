@@ -95,6 +95,7 @@ namespace TVS.Void.Service.Website.Utility
             services.AddSingleton<ScanningAutoVoidRequestService, ScanningAutoVoidRequestServiceImp>();
             services.AddSingleton<AutoVoidRequestQueueService, AutoVoidRequestQueueServiceImp>();
             services.AddSingleton<RequestDetailService, RequestDetailServiceImp>();
+            services.AddSingleton<TicketVoidingQueueService, TicketVoidingQueueServiceImp>();
         }
 
         public static void RegisterQuartzScheduler(this IServiceCollection services)

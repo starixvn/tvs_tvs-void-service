@@ -19,12 +19,15 @@ namespace TVS.Void.Service.Services.Main
     {
         private readonly AutoVoidRequestQueueService autoVoidRequestQueueService;
         private readonly RequestDetailService requestDetailService;
+        private readonly TicketVoidingQueueService ticketVoidingQueueService;
         private readonly LoggingService loggingService;
 
-        public ScanningAutoVoidRequestServiceImp(AutoVoidRequestQueueService autoVoidRequestQueueService, RequestDetailService requestDetailService, LoggingService loggingService)
+        public ScanningAutoVoidRequestServiceImp(AutoVoidRequestQueueService autoVoidRequestQueueService, RequestDetailService requestDetailService,
+            TicketVoidingQueueService ticketVoidingQueueService, LoggingService loggingService)
         {
             this.autoVoidRequestQueueService = autoVoidRequestQueueService;
             this.requestDetailService = requestDetailService;
+            this.ticketVoidingQueueService = ticketVoidingQueueService;
             this.loggingService = loggingService;
         }
 
@@ -37,6 +40,7 @@ namespace TVS.Void.Service.Services.Main
             {
                 return;
             }
+            // check abnormal account matchid = 0
 
             var (validSingleTickets, validParlayTickets, validRequests) =
                 await requestDetailService.CheckTicketsAllowToVoid(siteDbGroupId, queue);
@@ -52,7 +56,7 @@ namespace TVS.Void.Service.Services.Main
             {
                 var singleTicketsInCurrentRequest = validSingleTickets.Where(x => x.RequestId == voidService.RequestId);
                 var parlayTicketsInCurrentRequest = validParlayTickets.Where(x => x.RequestId == voidService.RequestId);
-                await requestDetailService.InsertTicketVoidingQueue(voidService.VoidingHistoryId, queue.MatchId, voidService.RequestId, voidService.IssueTypeId,
+                await ticketVoidingQueueService.InsertQueue(siteDbGroupId, voidService.VoidingHistoryId, queue.MatchId, voidService.RequestId, voidService.IssueTypeId,
                     singleTicketsInCurrentRequest, parlayTicketsInCurrentRequest);
             }
 
@@ -60,6 +64,8 @@ namespace TVS.Void.Service.Services.Main
 
             timer.Stop();
             await WriteLog(timer.ElapsedMilliseconds, siteDbGroupId, queue, voidServiceList);
+            // update status ticketvoiding queue = 99
+            // try catch exception
         }
 
         private async Task WriteLog(long elapsedMilliseconds, int siteDbGroupId, AutoVoidRequestQueueModel queue, IEnumerable<VoidServiceModel> voidServiceList)

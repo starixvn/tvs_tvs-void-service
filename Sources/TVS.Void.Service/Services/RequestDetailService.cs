@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Fanex.Data.Repository;
-using TVS.Void.Service.Constants;
 using TVS.Void.Service.Criteria;
 using TVS.Void.Service.Criteria.MultiSiteDb;
 using TVS.Void.Service.Extensions;
@@ -19,8 +17,7 @@ namespace TVS.Void.Service.Services
         Task<IEnumerable<VoidServiceModel>> InsertVoidServiceData(string broadcastSessionId, int siteDbGroupId,
             IEnumerable<RequestDetailModel> requests);
 
-        Task InsertTicketVoidingQueue(int voidingHistoryId, int matchId, int requestId, int issueTypeId,
-            IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets);
+        Task UpdateVoidService(int siteDbGroupId, int requestId, int voidingHistoryId, int statusId);
     }
 
     public class RequestDetailServiceImp : RequestDetailService
@@ -81,46 +78,17 @@ namespace TVS.Void.Service.Services
             return voidServiceData;
         }
 
-        public async Task InsertTicketVoidingQueue(int voidingHistoryId, int matchId, int requestId, int issueTypeId,
-            IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets)
+        public async Task UpdateVoidService(int siteDbGroupId, int requestId, int voidingHistoryId, int statusId)
         {
-            var criteria = new InsertTicketVoidingQueueCriteria
+            var criteria = new UpdateVoidServiceCriteria
             {
+                SiteDbGroupId = siteDbGroupId,
+                RequestId = requestId,
                 VoidingHistoryId = voidingHistoryId,
-                UserId = AutoVoidConstant.ActorId,
-                IP = AutoVoidConstant.IPAddress,
-                MatchId = matchId,
-                RequestId = requestId
+                StatusId = statusId
             };
 
-            await InsertQueueByBatch(criteria, singleTickets, VoidingTypeConstant.Single);
-            if (issueTypeId == IssueTypeConstant.AbnormalAccount)
-            {
-                criteria.MatchId = 29;
-                await InsertQueueByBatch(criteria, parlayTickets, VoidingTypeConstant.Parlay);
-            }
-            else
-            {
-                await InsertQueueByBatch(criteria, parlayTickets, VoidingTypeConstant.Parlay);
-            }
-        }
-
-        private async Task InsertQueueByBatch(InsertTicketVoidingQueueCriteria command, IEnumerable<RequestDetailTicketModel> tickets, byte voidingType)
-        {
-            if (tickets.Any())
-            {
-                command.VoidingTypeId = voidingType;
-
-                const int size = 3000;
-                var number = Math.Ceiling((double)tickets.Count() / size);
-                for (var i = 0; i < number; i++)
-                {
-                    var temp = tickets.Skip(i * size).Take(size).ToArray();
-                    command.TransIds = string.Join(",", temp.Select(x => x.TransId));
-                    command.TotalTicket = temp.Length;
-                    await repository.ExecuteAsync(command);
-                }
-            }
+            await repository.ExecuteAsync(criteria);
         }
     }
 }
