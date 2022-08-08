@@ -22,6 +22,7 @@ namespace TVS.Void.Service.Services.Main
         public async Task Execute(int siteDbGroupId)
         {
             await ticketVoidingQueueService.GetQueues(siteDbGroupId);
+
             // TODO: Process void
             // TODO: Update status ticket voiding queue
             await requestDetailService.UpdateVoidService(siteDbGroupId, 1, 1, ExecuteStatus.ExecuteVoidDone);

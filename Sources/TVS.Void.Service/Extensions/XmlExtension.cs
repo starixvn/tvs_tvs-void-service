@@ -17,7 +17,7 @@ namespace TVS.Void.Service.Extensions
             var stringBuilder = new StringBuilder();
             foreach (var ticket in tickets)
             {
-                var line = $"<Ticket TransId='{ticket.TransId}' MainTransId='{ticket.MainTransId}' IssueTypeId='{ticket.IssueTypeId}'/>";
+                var line = $"<Ticket TransId='{ticket.TransId}' MainTransId='{ticket.MainTransId}' IssueTypeId='{ticket.IssueTypeId}' MatchId='{ticket.MatchId}'/>";
                 stringBuilder.AppendLine(line);
             }
 

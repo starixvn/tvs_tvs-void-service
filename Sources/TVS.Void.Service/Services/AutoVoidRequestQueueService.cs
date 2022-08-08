@@ -9,7 +9,9 @@ namespace TVS.Void.Service.Services
     {
         Task<AutoVoidRequestQueueModel> GetValidQueue(int siteDbGroupId);
 
-        Task UpdateQueueStatus(int siteDbGroupId, int queueId, int statusId, string message);
+        Task UpdateQueue(int siteDbGroupId, int queueId, int? statusId, string message, int? createdDateMinuteOffset);
+
+        Task InsertQueue(int siteDbGroupId, string broadcastSessionId, int requestId, int matchId, int statusId, string action);
     }
 
     public class AutoVoidRequestQueueServiceImp : AutoVoidRequestQueueService
@@ -32,14 +34,30 @@ namespace TVS.Void.Service.Services
             return result;
         }
 
-        public async Task UpdateQueueStatus(int siteDbGroupId, int queueId, int statusId, string message)
+        public async Task UpdateQueue(int siteDbGroupId, int queueId, int? statusId, string message, int? createdDateMinuteOffset)
         {
             var criteria = new UpdateAutoVoidRequestQueueCriteria
             {
                 SiteDbGroupId = siteDbGroupId,
                 QueueId = queueId,
                 StatusId = statusId,
-                Message = message
+                Message = message,
+                CreatedDateMinuteOffset = createdDateMinuteOffset
+            };
+
+            await repository.ExecuteAsync(criteria);
+        }
+
+        public async Task InsertQueue(int siteDbGroupId, string broadcastSessionId, int requestId, int matchId, int statusId, string action)
+        {
+            var criteria = new InsertAutoVoidRequestQueueCriteria
+            {
+                SiteDbGroupId = siteDbGroupId,
+                BroadcastSessionId = broadcastSessionId,
+                RequestId = requestId,
+                MatchId = matchId,
+                StatusId = statusId,
+                Action = action
             };
 
             await repository.ExecuteAsync(criteria);

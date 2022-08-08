@@ -13,11 +13,10 @@ namespace TVS.Void.Service.Criteria.MultiSiteDb
     public class InsertTicketVoidingQueueCriteria : NonQueryCommand
     {
         public int RequestId { get; set; }
-        public int MatchId { get; set; }
         public int VoidingHistoryId { get; set; }
-        public byte VoidingTypeId { get; set; }
-        public int TotalTicket { get; set; }
-        public string TransIds { get; set; }
+        public int IssueTypeId { get; set; }
+        public string SingleTicketsXml { get; set; }
+        public string ParlayTicketsXml { get; set; }
         public int UserId { get; set; }
         public string IP { get; set; }
 
