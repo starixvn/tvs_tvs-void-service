@@ -14,16 +14,10 @@ namespace TVS.Void.Service.Services
         Task<(IEnumerable<RequestDetailTicketModel>, IEnumerable<RequestDetailTicketModel>)> GetTicketsBySiteDbGroupId(
             int siteDbGroupId, AutoVoidRequestQueueModel autoVoidRequestQueue);
 
-        Task<(IEnumerable<RequestDetailTicketModel>, IEnumerable<RequestDetailTicketModel>,
-                IEnumerable<RequestDetailTicketModel>, IEnumerable<RequestDetailTicketModel>, IEnumerable<RequestDetailModel>)>
-            CheckStatusTickets(int siteDbGroupId, IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets);
-
         Task<IEnumerable<VoidServiceModel>> InsertVoidServiceData(string broadcastSessionId, int siteDbGroupId,
             IEnumerable<RequestDetailModel> requests);
 
         Task UpdateVoidService(int siteDbGroupId, int requestId, int voidingHistoryId, int statusId);
-
-        Task ReCalculateTickets(int siteDbGroupId, IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets);
     }
 
     public class RequestDetailServiceImp : RequestDetailService
@@ -50,36 +44,6 @@ namespace TVS.Void.Service.Services
             return (singleTickets, parlayTickets);
         }
 
-        public async Task<(IEnumerable<RequestDetailTicketModel>, IEnumerable<RequestDetailTicketModel>,
-                IEnumerable<RequestDetailTicketModel>, IEnumerable<RequestDetailTicketModel>, IEnumerable<RequestDetailModel>)>
-            CheckStatusTickets(int siteDbGroupId, IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets)
-        {
-            var criteria = new CheckTicketsAllowToVoidCriteria
-            {
-                SiteDbGroupId = siteDbGroupId,
-                SingleTicketsXml = singleTickets.ToTicketsXml(),
-                ParlayTicketsXml = parlayTickets.ToTicketsXml()
-            };
-
-            var mappingTypes = new[]
-            {
-                typeof (RequestDetailTicketModel),
-                typeof (RequestDetailTicketModel),
-                typeof(RequestDetailTicketModel),
-                typeof(RequestDetailTicketModel),
-                typeof(RequestDetailModel)
-            };
-
-            var objectsArray = await repository.FetchMultipleAsync(criteria, mappingTypes);
-            var validVoidSingleTickets = objectsArray[0].Cast<RequestDetailTicketModel>();
-            var validVoidParlayTickets = objectsArray[1].Cast<RequestDetailTicketModel>();
-            var singleTicketsResettle = objectsArray[2].Cast<RequestDetailTicketModel>();
-            var parlayTicketsResettle = objectsArray[3].Cast<RequestDetailTicketModel>();
-            var mixParlayRequestsNoStatusWinLossButAllChildMatchesCompleted = objectsArray[4].Cast<RequestDetailModel>();
-
-            return (validVoidSingleTickets, validVoidParlayTickets, singleTicketsResettle, parlayTicketsResettle, mixParlayRequestsNoStatusWinLossButAllChildMatchesCompleted);
-        }
-
         public async Task<IEnumerable<VoidServiceModel>> InsertVoidServiceData(string broadcastSessionId, int siteDbGroupId, IEnumerable<RequestDetailModel> requests)
         {
             var criteria = new InsertVoidServiceDataCriteria
@@ -102,18 +66,6 @@ namespace TVS.Void.Service.Services
                 RequestId = requestId,
                 VoidingHistoryId = voidingHistoryId,
                 StatusId = statusId
-            };
-
-            await repository.ExecuteAsync(criteria);
-        }
-
-        public async Task ReCalculateTickets(int siteDbGroupId, IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets)
-        {
-            var criteria = new ReCalculateTicketsCriteria
-            {
-                SiteDbGroupId = siteDbGroupId,
-                SingleTicketsXml = singleTickets.ToTicketsXml(),
-                ParlayTicketsXml = parlayTickets.ToTicketsXml()
             };
 
             await repository.ExecuteAsync(criteria);

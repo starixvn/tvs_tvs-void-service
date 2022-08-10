@@ -5,7 +5,7 @@ using ONEbook.UM.Services;
 using Quartz;
 using TVS.Void.Service.Constants;
 using TVS.Void.Service.Services;
-using TVS.Void.Service.Services.Main;
+using TVS.Void.Service.Services.ScanningAutoVoidRequest;
 
 namespace TVS.Void.Service.Website.Jobs
 {

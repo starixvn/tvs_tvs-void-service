@@ -20,7 +20,7 @@ using Quartz;
 using Sentry;
 using TVS.Void.Service.Models;
 using TVS.Void.Service.Services;
-using TVS.Void.Service.Services.Main;
+using TVS.Void.Service.Services.ScanningAutoVoidRequest;
 using TVS.Void.Service.Website.Jobs;
 using TVS.Void.Service.Website.Jobs.Listener;
 
@@ -92,10 +92,16 @@ namespace TVS.Void.Service.Website.Utility
         public static void RegisterBusinessService(this IServiceCollection services)
         {
             services.AddSingleton<LoggingService, LoggingServiceImp>();
-            services.AddSingleton<ScanningAutoVoidRequestService, ScanningAutoVoidRequestServiceImp>();
             services.AddSingleton<AutoVoidRequestQueueService, AutoVoidRequestQueueServiceImp>();
             services.AddSingleton<RequestDetailService, RequestDetailServiceImp>();
             services.AddSingleton<TicketVoidingQueueService, TicketVoidingQueueServiceImp>();
+
+            services.AddSingleton<ScanningAutoVoidRequestService, ScanningAutoVoidRequestServiceImp>();
+            services.AddSingleton<GetTicketsStage, GetTicketsStageImp>();
+            services.AddSingleton<CheckStatusTicketsStage, CheckStatusTicketsStageImp>();
+            services.AddSingleton<ProcessMixParlayStage, ProcessMixParlayStageImp>();
+            services.AddSingleton<ReCalculateTicketsStage, ReCalculateTicketsStageImp>();
+            services.AddSingleton<InsertPreVoidingDataStage, InsertPreVoidingDataStageImp>();
         }
 
         public static void RegisterQuartzScheduler(this IServiceCollection services)
