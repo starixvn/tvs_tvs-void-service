@@ -18,6 +18,8 @@ namespace TVS.Void.Service.Services
         Task UpdateVoidService(int siteDbGroupId, int requestId, int voidingHistoryId, int statusId);
 
         Task<IEnumerable<VoidServiceModel>> GetVoidServiceDataForCheckStatus();
+
+        Task<IEnumerable<AfterVoidServiceModel>> InsertAfterVoidServiceData(bool isAutoVoid, IEnumerable<AfterVoidServiceModel> afterVoidData);
     }
 
     public class RequestDetailServiceImp : RequestDetailService
@@ -76,6 +78,18 @@ namespace TVS.Void.Service.Services
             var criteria = new GetVoidServiceDataForCheckStatusCriteria();
             var voidServiceData = await repository.FetchAsync<VoidServiceModel>(criteria);
             return voidServiceData;
+        }
+
+        public async Task<IEnumerable<AfterVoidServiceModel>> InsertAfterVoidServiceData(bool isAutoVoid, IEnumerable<AfterVoidServiceModel> afterVoidData)
+        {
+            var criteria = new InsertAfterVoidServiceDataCriteria
+            {
+                IsAutoVoid = isAutoVoid,
+                AfterVoidDataXml = afterVoidData.ToAfterVoidDataXml()
+            };
+
+            var result = await repository.FetchAsync<AfterVoidServiceModel>(criteria);
+            return result;
         }
     }
 }

@@ -7,6 +7,7 @@
         public int RequestId { get; set; }
         public int VoidingHistoryId { get; set; }
         public int StatusId { get; set; }
+        public bool IsAutoVoid { get; set; }
         public int IssueTypeId { get; set; }
     }
 }

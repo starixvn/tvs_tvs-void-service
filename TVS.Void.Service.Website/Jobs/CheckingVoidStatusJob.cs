@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using ONEbook.UM.Services;
 using Quartz;
 using TVS.Void.Service.Services;
+using TVS.Void.Service.Services.CheckingVoidStatus;
 
 namespace TVS.Void.Service.Website.Jobs
 {
@@ -11,12 +12,15 @@ namespace TVS.Void.Service.Website.Jobs
     {
         private readonly LoggingService loggingService;
         private readonly IMaintenanceService maintenanceService;
+        private readonly CheckingVoidStatusService checkingVoidStatusService;
         private readonly ILogger<CheckingVoidStatusJob> logger;
 
-        public CheckingVoidStatusJob(IMaintenanceService maintenanceService, LoggingService loggingService, ILogger<CheckingVoidStatusJob> logger)
+        public CheckingVoidStatusJob(IMaintenanceService maintenanceService, LoggingService loggingService, CheckingVoidStatusService checkingVoidStatusService,
+            ILogger<CheckingVoidStatusJob> logger)
         {
             this.maintenanceService = maintenanceService;
             this.loggingService = loggingService;
+            this.checkingVoidStatusService = checkingVoidStatusService;
             this.logger = logger;
         }
 
@@ -30,8 +34,7 @@ namespace TVS.Void.Service.Website.Jobs
 
                     if (!await maintenanceService.IsUnderMaintenanceAsync())
                     {
-                        await Task.Delay(4000);
-                        // logger.LogInformation("CheckingVoidStatusJob running: " + DateTime.Now);
+                        await checkingVoidStatusService.Execute();
                     }
 
                     AppConfigService.AppConfig.IsCheckingVoidStatusJobExecuting = false;

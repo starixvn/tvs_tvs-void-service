@@ -40,5 +40,22 @@ namespace TVS.Void.Service.Extensions
 
             return $"<Requests>{stringBuilder.ToString().Trim()}</Requests>";
         }
+
+        public static string ToAfterVoidDataXml(this IEnumerable<AfterVoidServiceModel> afterVoidData)
+        {
+            if (afterVoidData == null || !afterVoidData.Any())
+            {
+                return string.Empty;
+            }
+
+            var stringBuilder = new StringBuilder();
+            foreach (var item in afterVoidData)
+            {
+                var line = $"<r RequestId='{item.RequestId}' VoidingHistoryId='{item.VoidingHistoryId}'/>";
+                stringBuilder.AppendLine(line);
+            }
+
+            return $"<root>{stringBuilder.ToString().Trim()}</root>";
+        }
     }
 }

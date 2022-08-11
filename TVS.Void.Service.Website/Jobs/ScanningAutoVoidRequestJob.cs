@@ -13,16 +13,17 @@ namespace TVS.Void.Service.Website.Jobs
     {
         private readonly LoggingService loggingService;
         private readonly IMaintenanceService maintenanceService;
-        private readonly ILogger<ScanningAutoVoidRequestJob> logger;
         private readonly ScanningAutoVoidRequestService scanningService;
+        private readonly ILogger<ScanningAutoVoidRequestJob> logger;
 
-        public ScanningAutoVoidRequestJob(IMaintenanceService maintenanceService, LoggingService loggingService, ILogger<ScanningAutoVoidRequestJob> logger,
-            ScanningAutoVoidRequestService scanningService)
+        public ScanningAutoVoidRequestJob(IMaintenanceService maintenanceService, LoggingService loggingService, ScanningAutoVoidRequestService scanningService,
+            ILogger<ScanningAutoVoidRequestJob> logger
+)
         {
             this.maintenanceService = maintenanceService;
             this.loggingService = loggingService;
-            this.logger = logger;
             this.scanningService = scanningService;
+            this.logger = logger;
         }
 
         public async Task Execute(IJobExecutionContext context)

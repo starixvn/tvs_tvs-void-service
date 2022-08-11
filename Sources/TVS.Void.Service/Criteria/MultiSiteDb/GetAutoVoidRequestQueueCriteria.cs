@@ -9,6 +9,8 @@ namespace TVS.Void.Service.Criteria.MultiSiteDb
 {
     public class GetAutoVoidRequestQueueCriteria : CriteriaBase
     {
+        public string BroadcastSessionId { get; set; }
+
         [SpParam(Ignored = true)]
         public int SiteDbGroupId { get; set; }
 

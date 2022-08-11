@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using ONEbook.UM.Services;
 using Quartz;
+using TVS.Void.Service.Constants;
 using TVS.Void.Service.Services;
+using TVS.Void.Service.Services.Void;
 
 namespace TVS.Void.Service.Website.Jobs
 {
@@ -11,12 +14,14 @@ namespace TVS.Void.Service.Website.Jobs
     {
         private readonly LoggingService loggingService;
         private readonly IMaintenanceService maintenanceService;
+        private readonly VoidService voidService;
         private readonly ILogger<VoidJob> logger;
 
-        public VoidJob(IMaintenanceService maintenanceService, LoggingService loggingService, ILogger<VoidJob> logger)
+        public VoidJob(IMaintenanceService maintenanceService, LoggingService loggingService, VoidService voidService, ILogger<VoidJob> logger)
         {
             this.maintenanceService = maintenanceService;
             this.loggingService = loggingService;
+            this.voidService = voidService;
             this.logger = logger;
         }
 
@@ -30,8 +35,8 @@ namespace TVS.Void.Service.Website.Jobs
 
                     if (!await maintenanceService.IsUnderMaintenanceAsync())
                     {
-                        await Task.Delay(3000);
-                        //logger.LogInformation("VoidJob running: " + DateTime.Now);
+                        var tasks = SiteDbGroupConstant.ServerList.Select(x => voidService.Execute(x.Id));
+                        await Task.WhenAll(tasks);
                     }
 
                     AppConfigService.AppConfig.IsVoidJobExecuting = false;

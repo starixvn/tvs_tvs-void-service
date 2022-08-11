@@ -7,7 +7,7 @@ namespace TVS.Void.Service.Services
 {
     public interface AutoVoidRequestQueueService
     {
-        Task<AutoVoidRequestQueueModel> GetValidQueue(int siteDbGroupId);
+        Task<AutoVoidRequestQueueModel> GetQueue(int siteDbGroupId, string broadcastSessionId);
 
         Task UpdateQueue(int siteDbGroupId, int queueId, int? statusId, string message, int? createdDateMinuteOffset);
 
@@ -23,11 +23,18 @@ namespace TVS.Void.Service.Services
             this.repository = repository;
         }
 
-        public async Task<AutoVoidRequestQueueModel> GetValidQueue(int siteDbGroupId)
+        /// <summary>
+        /// If broadcastSessionId == null, only get valid queue
+        /// </summary>
+        /// <param name="siteDbGroupId"></param>
+        /// <param name="broadcastSessionId"></param>
+        /// <returns></returns>
+        public async Task<AutoVoidRequestQueueModel> GetQueue(int siteDbGroupId, string broadcastSessionId)
         {
             var criteria = new GetAutoVoidRequestQueueCriteria
             {
-                SiteDbGroupId = siteDbGroupId
+                SiteDbGroupId = siteDbGroupId,
+                BroadcastSessionId = broadcastSessionId
             };
 
             var result = await repository.GetAsync<AutoVoidRequestQueueModel>(criteria);

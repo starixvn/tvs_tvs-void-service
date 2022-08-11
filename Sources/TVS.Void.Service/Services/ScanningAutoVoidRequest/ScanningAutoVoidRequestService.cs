@@ -44,7 +44,7 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
             logData = new StringBuilder();
             Stopwatch timer = new();
             timer.Start();
-            var queue = await autoVoidRequestQueueService.GetValidQueue(siteDbGroupId);
+            var queue = await autoVoidRequestQueueService.GetQueue(siteDbGroupId, null);
             if (queue == null)
             {
                 return;

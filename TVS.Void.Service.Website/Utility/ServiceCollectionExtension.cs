@@ -20,6 +20,7 @@ using Quartz;
 using Sentry;
 using TVS.Void.Service.Models;
 using TVS.Void.Service.Services;
+using TVS.Void.Service.Services.CheckingVoidStatus;
 using TVS.Void.Service.Services.ScanningAutoVoidRequest;
 using TVS.Void.Service.Services.Void;
 using TVS.Void.Service.Website.Jobs;
@@ -105,6 +106,9 @@ namespace TVS.Void.Service.Website.Utility
             services.AddSingleton<InsertPreVoidingDataStage, InsertPreVoidingDataStageImp>();
 
             services.AddSingleton<VoidService, VoidServiceImp>();
+
+            services.AddSingleton<CheckingVoidStatusService, CheckingVoidStatusServiceImp>();
+            services.AddSingleton<CheckAutoVoidRequestQueueStage, CheckAutoVoidRequestQueueStageImp>();
         }
 
         public static void RegisterQuartzScheduler(this IServiceCollection services)
