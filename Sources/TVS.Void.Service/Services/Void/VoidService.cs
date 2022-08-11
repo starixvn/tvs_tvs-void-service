@@ -59,7 +59,7 @@ namespace TVS.Void.Service.Services.Void
                 await requestDetailService.UpdateVoidService(siteDbGroupId, firstVoidingQueue.RequestId, firstVoidingQueue.VoidingHistoryId, ExecuteStatus.VoidServiceExecuteVoidDone);
 
                 timer.Stop();
-                logData.AppendLine($"Server Time: {DateTime.Now:MM/dd/yyyy HH:mm:ss}");
+                logData.AppendLine($"Server Time: {DateTime.Now:MM/dd/yyyy HH:mm:ss.fff}");
                 logData.AppendLine($"Elapsed Time: {timer.ElapsedMilliseconds} ms");
                 await loggingService.InfoAsync(logData.ToString());
             }
@@ -70,7 +70,7 @@ namespace TVS.Void.Service.Services.Void
             }
         }
 
-        public async Task<IEnumerable<ProcessVoidQueueResult>> ProcessVoidQueues(int siteDbGroupId, IEnumerable<TicketVoidingQueueModel> voidingQueues)
+        private async Task<IEnumerable<ProcessVoidQueueResult>> ProcessVoidQueues(int siteDbGroupId, IEnumerable<TicketVoidingQueueModel> voidingQueues)
         {
             var processResult = new List<ProcessVoidQueueResult>();
             foreach (var queue in voidingQueues)

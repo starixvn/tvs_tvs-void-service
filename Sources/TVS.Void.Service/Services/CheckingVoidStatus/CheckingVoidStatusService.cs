@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using TVS.Void.Service.Constants;
 using TVS.Void.Service.Models;
 
 namespace TVS.Void.Service.Services.CheckingVoidStatus
@@ -53,9 +54,11 @@ namespace TVS.Void.Service.Services.CheckingVoidStatus
 
                 var afterVoidData = PrepareAfterVoidData(voidServiceList);
                 var insertAfterVoidResult = await requestDetailService.InsertAfterVoidServiceData(firstVoidService.IsAutoVoid, afterVoidData);
-
                 logData.AppendLine($"insertAfterVoidResult: {JsonSerializer.Serialize(insertAfterVoidResult)}");
-                logData.AppendLine($"Server Time: {DateTime.Now:MM/dd/yyyy HH:mm:ss}");
+
+                await requestDetailService.UpdateVoidServiceByBroadcastSessionId(firstVoidService.BroadcastSessionId, ExecuteStatus.Done);
+
+                logData.AppendLine($"Server Time: {DateTime.Now:MM/dd/yyyy HH:mm:ss.fff}");
                 timer.Stop();
                 logData.AppendLine($"Elapsed Time: {timer.ElapsedMilliseconds} ms");
                 await loggingService.InfoAsync(logData.ToString());
@@ -67,7 +70,7 @@ namespace TVS.Void.Service.Services.CheckingVoidStatus
             }
         }
 
-        private IEnumerable<AfterVoidServiceModel> PrepareAfterVoidData(IEnumerable<VoidServiceModel> voidServiceList)
+        private static IEnumerable<AfterVoidServiceModel> PrepareAfterVoidData(IEnumerable<VoidServiceModel> voidServiceList)
         {
             var afterVoidData = voidServiceList.Select(x => new AfterVoidServiceModel
             { RequestId = x.RequestId, VoidingHistoryId = x.VoidingHistoryId }).Distinct();

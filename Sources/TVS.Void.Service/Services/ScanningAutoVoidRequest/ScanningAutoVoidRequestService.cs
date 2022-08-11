@@ -63,7 +63,7 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
                 }
 
                 timer.Stop();
-                logData.AppendLine($"Server Time: {DateTime.Now:MM/dd/yyyy HH:mm:ss}");
+                logData.AppendLine($"Server Time: {DateTime.Now:MM/dd/yyyy HH:mm:ss.fff}");
                 logData.AppendLine($"Elapsed Time: {timer.ElapsedMilliseconds} ms");
                 await loggingService.InfoAsync(logData.ToString());
             }

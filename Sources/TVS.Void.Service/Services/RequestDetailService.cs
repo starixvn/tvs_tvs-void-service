@@ -17,6 +17,8 @@ namespace TVS.Void.Service.Services
 
         Task UpdateVoidService(int siteDbGroupId, int requestId, int voidingHistoryId, int statusId);
 
+        Task UpdateVoidServiceByBroadcastSessionId(string broadcastSessionId, int statusId);
+
         Task<IEnumerable<VoidServiceModel>> GetVoidServiceDataForCheckStatus();
 
         Task<IEnumerable<AfterVoidServiceModel>> InsertAfterVoidServiceData(bool isAutoVoid, IEnumerable<AfterVoidServiceModel> afterVoidData);
@@ -60,17 +62,28 @@ namespace TVS.Void.Service.Services
             return voidServiceData;
         }
 
-        public async Task UpdateVoidService(int siteDbGroupId, int requestId, int voidingHistoryId, int statusId)
+        private async Task UpdateVoidService(int? siteDbGroupId, int? requestId, int? voidingHistoryId, int statusId, string broadcastSessionId)
         {
             var criteria = new UpdateVoidServiceCriteria
             {
                 SiteDbGroupId = siteDbGroupId,
                 RequestId = requestId,
                 VoidingHistoryId = voidingHistoryId,
-                StatusId = statusId
+                StatusId = statusId,
+                BroadcastSessionId = broadcastSessionId
             };
 
             await repository.ExecuteAsync(criteria);
+        }
+
+        public async Task UpdateVoidService(int siteDbGroupId, int requestId, int voidingHistoryId, int statusId)
+        {
+            await UpdateVoidService(siteDbGroupId, requestId, voidingHistoryId, statusId, null);
+        }
+
+        public async Task UpdateVoidServiceByBroadcastSessionId(string broadcastSessionId, int statusId)
+        {
+            await UpdateVoidService(null, null, null, statusId, broadcastSessionId);
         }
 
         public async Task<IEnumerable<VoidServiceModel>> GetVoidServiceDataForCheckStatus()
