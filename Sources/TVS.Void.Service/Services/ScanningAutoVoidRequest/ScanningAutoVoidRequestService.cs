@@ -70,7 +70,7 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
             catch (Exception e)
             {
                 await loggingService.InfoAsync(logData.ToString());
-                await loggingService.ErrorAsync("ScanningAutoVoidRequestService Error", e);
+                await loggingService.ErrorAsync($"{nameof(ScanningAutoVoidRequestService)} Error", e);
                 await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, ExecuteStatus.Failed, null, null);
             }
         }

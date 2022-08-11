@@ -10,10 +10,12 @@ namespace TVS.Void.Service.Services
 {
     public interface TicketVoidingQueueService
     {
-        Task GetQueues(int siteDbGroupId);
+        Task<IEnumerable<TicketVoidingQueueModel>> GetQueues(int siteDbGroupId);
 
         Task InsertQueue(int siteDbGroupId, int voidingHistoryId, int requestId, int issueTypeId,
             IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets);
+
+        Task<ProcessVoidQueueResult> ProcessVoidQueue(int siteDbGroupId, int queueId);
     }
 
     public class TicketVoidingQueueServiceImp : TicketVoidingQueueService
@@ -25,12 +27,15 @@ namespace TVS.Void.Service.Services
             this.repository = repository;
         }
 
-        public async Task GetQueues(int siteDbGroupId)
+        public async Task<IEnumerable<TicketVoidingQueueModel>> GetQueues(int siteDbGroupId)
         {
             var criteria = new GetTicketVoidingQueueCriteria
             {
                 SiteDbGroupId = siteDbGroupId
             };
+
+            var result = await repository.FetchAsync<TicketVoidingQueueModel>(criteria);
+            return result;
         }
 
         public async Task InsertQueue(int siteDbGroupId, int voidingHistoryId, int requestId, int issueTypeId,
@@ -48,6 +53,18 @@ namespace TVS.Void.Service.Services
                 IP = AutoVoidConstant.IPAddress,
             };
             await repository.ExecuteAsync(criteria);
+        }
+
+        public async Task<ProcessVoidQueueResult> ProcessVoidQueue(int siteDbGroupId, int queueId)
+        {
+            var criteria = new ProcessVoidQueueCriteria
+            {
+                SiteDbGroupId = siteDbGroupId,
+                QueueId = queueId
+            };
+
+            var result = await repository.GetAsync<ProcessVoidQueueResult>(criteria);
+            return result;
         }
     }
 }

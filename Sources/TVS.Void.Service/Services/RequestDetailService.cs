@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Fanex.Data.Repository;
 using TVS.Void.Service.Criteria;
-using TVS.Void.Service.Criteria.MultiSiteDb;
 using TVS.Void.Service.Extensions;
 using TVS.Void.Service.Models;
 
@@ -18,6 +16,8 @@ namespace TVS.Void.Service.Services
             IEnumerable<RequestDetailModel> requests);
 
         Task UpdateVoidService(int siteDbGroupId, int requestId, int voidingHistoryId, int statusId);
+
+        Task<IEnumerable<VoidServiceModel>> GetVoidServiceDataForCheckStatus();
     }
 
     public class RequestDetailServiceImp : RequestDetailService
@@ -69,6 +69,13 @@ namespace TVS.Void.Service.Services
             };
 
             await repository.ExecuteAsync(criteria);
+        }
+
+        public async Task<IEnumerable<VoidServiceModel>> GetVoidServiceDataForCheckStatus()
+        {
+            var criteria = new GetVoidServiceDataForCheckStatusCriteria();
+            var voidServiceData = await repository.FetchAsync<VoidServiceModel>(criteria);
+            return voidServiceData;
         }
     }
 }
