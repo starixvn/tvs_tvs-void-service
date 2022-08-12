@@ -113,6 +113,7 @@ namespace TVS.Void.Service.Website.Utility
 
         public static void RegisterQuartzScheduler(this IServiceCollection services)
         {
+            const int maxConcurrencyThread = 10;
             services.AddTransient<ScanningAutoVoidRequestJob>();
             services.AddTransient<VoidJob>();
             services.AddTransient<CheckingVoidStatusJob>();
@@ -127,7 +128,7 @@ namespace TVS.Void.Service.Website.Utility
                 q.UseInMemoryStore();
                 q.UseDefaultThreadPool(tp =>
                 {
-                    tp.MaxConcurrency = 10;
+                    tp.MaxConcurrency = maxConcurrencyThread;
                 });
 
                 q.ScheduleJob<ScanningAutoVoidRequestJob>(trigger => trigger
@@ -150,12 +151,12 @@ namespace TVS.Void.Service.Website.Utility
 
                 q.AddSchedulerListener<CustomSchedulerListener>();
 
-                // auto-interrupt long-running job
-                // q.UseJobAutoInterrupt(options =>
-                // {
-                //    // this is the default
-                //    options.DefaultMaxRunTime = TimeSpan.FromMinutes(5);
-                // });
+                //// auto-interrupt long-running job
+                //// q.UseJobAutoInterrupt(options =>
+                //// {
+                ////    // this is the default
+                ////    options.DefaultMaxRunTime = TimeSpan.FromMinutes(5);
+                //// });
             });
 
             services.AddQuartzHostedService(options =>

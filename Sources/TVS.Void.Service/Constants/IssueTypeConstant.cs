@@ -1,6 +1,6 @@
 ﻿namespace TVS.Void.Service.Constants
 {
-    public class IssueTypeConstant
+    public static class IssueTypeConstant
     {
         public const int EarlyKickOffTime = 8;
         public const int WrongKickOffTime = 9;

@@ -117,7 +117,7 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
             logData.AppendLine(insertPreVoidingDataResult.LogData);
         }
 
-        private bool IsVoidInstantQueue(string action)
+        private static bool IsVoidInstantQueue(string action)
         {
             return action.Equals(AutoVoidConstant.QueueActionVoidInstant, StringComparison.OrdinalIgnoreCase)
                    || action.Equals(AutoVoidConstant.QueueActionVoidInstant5m, StringComparison.OrdinalIgnoreCase)

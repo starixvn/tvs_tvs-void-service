@@ -34,7 +34,7 @@ namespace TVS.Void.Service.Extensions
             var stringBuilder = new StringBuilder();
             foreach (var request in requests)
             {
-                var line = $"<Request RequestId='{request.RequestId}' IssueTypeId='{request.IssueTypeId}'/>";
+                var line = $"<Request RequestId='{request.RequestId}' IssueTypeId='{request.IssueTypeId}' MatchId='{request.MatchId}'/>";
                 stringBuilder.AppendLine(line);
             }
 
@@ -51,7 +51,7 @@ namespace TVS.Void.Service.Extensions
             var stringBuilder = new StringBuilder();
             foreach (var item in afterVoidData)
             {
-                var line = $"<r RequestId='{item.RequestId}' VoidingHistoryId='{item.VoidingHistoryId}'/>";
+                var line = $"<r RequestId='{item.RequestId}' VoidingHistoryId='{item.VoidingHistoryId}' MatchId='{item.MatchId}'/>";
                 stringBuilder.AppendLine(line);
             }
 

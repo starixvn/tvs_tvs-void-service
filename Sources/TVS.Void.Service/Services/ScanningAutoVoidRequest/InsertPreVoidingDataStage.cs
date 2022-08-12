@@ -56,7 +56,22 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
             { RequestId = x.RequestId, IssueTypeId = x.IssueTypeId }).Distinct();
             var validVoidRequests = distinctRequestFirst.Union(distinctRequestSecond);
 
+            AssignMatchIdForRequests(validVoidRequests, validVoidSingleTickets, validVoidParlayTickets);
+
             return validVoidRequests;
+        }
+
+        private static void AssignMatchIdForRequests(IEnumerable<RequestDetailModel> requests, IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets)
+        {
+            const int mixParlayMatch = 29;
+            foreach (var request in requests)
+            {
+                var ticketsInRequest = singleTickets.Where(x => x.RequestId == request.RequestId)
+                    .Union(parlayTickets.Where(x => x.RequestId == request.RequestId));
+
+                request.MatchId = (request.IssueTypeId == IssueTypeConstant.AbnormalBet && !ticketsInRequest.Any(x => x.RequestId == request.RequestId && x.MatchId == mixParlayMatch))
+                    ? ticketsInRequest.First().MatchId : 0;
+            }
         }
 
         private async Task InsertTicketVoidingQueue(int siteDbGroupId, IEnumerable<VoidServiceModel> voidServiceList,

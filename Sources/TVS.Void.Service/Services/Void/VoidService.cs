@@ -49,11 +49,14 @@ namespace TVS.Void.Service.Services.Void
                 if (processVoidQueuesResult.Any(x => x.StatusId == ExecuteStatus.Failed))
                 {
                     await requestDetailService.UpdateVoidService(siteDbGroupId, firstVoidingQueue.RequestId, firstVoidingQueue.VoidingHistoryId, ExecuteStatus.Failed);
+                    await requestDetailService.UpdateTicketVoidingHistory(firstVoidingQueue.VoidingHistoryId, ExecuteStatus.Failed);
+                    await loggingService.InfoAsync(logData.ToString());
                     return;
                 }
 
                 if (processVoidQueuesResult.Any(x => x.StatusId == ExecuteStatus.Running))
                 {
+                    await loggingService.InfoAsync(logData.ToString());
                     return;
                 }
                 await requestDetailService.UpdateVoidService(siteDbGroupId, firstVoidingQueue.RequestId, firstVoidingQueue.VoidingHistoryId, ExecuteStatus.VoidServiceExecuteVoidDone);

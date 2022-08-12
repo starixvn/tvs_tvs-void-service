@@ -9,5 +9,6 @@
         public int StatusId { get; set; }
         public bool IsAutoVoid { get; set; }
         public int IssueTypeId { get; set; }
+        public int MatchId { get; set; }
     }
 }

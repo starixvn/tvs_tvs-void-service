@@ -49,6 +49,7 @@ namespace TVS.Void.Service.Services.CheckingVoidStatus
                 logData.AppendLine(checkAutoVoidRequestQueue.LogData);
                 if (!checkAutoVoidRequestQueue.IsContinueFlow)
                 {
+                    await loggingService.InfoAsync(logData.ToString());
                     return;
                 }
 
@@ -73,7 +74,7 @@ namespace TVS.Void.Service.Services.CheckingVoidStatus
         private static IEnumerable<AfterVoidServiceModel> PrepareAfterVoidData(IEnumerable<VoidServiceModel> voidServiceList)
         {
             var afterVoidData = voidServiceList.Select(x => new AfterVoidServiceModel
-            { RequestId = x.RequestId, VoidingHistoryId = x.VoidingHistoryId }).Distinct();
+            { RequestId = x.RequestId, VoidingHistoryId = x.VoidingHistoryId, MatchId = x.MatchId }).Distinct();
 
             return afterVoidData;
         }

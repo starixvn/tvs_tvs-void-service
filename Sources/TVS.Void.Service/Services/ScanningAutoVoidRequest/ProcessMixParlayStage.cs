@@ -24,7 +24,8 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
         {
             if (queue.StatusId == ExecuteStatus.QueueMixParlay && mixParlayRequests == null)
             {
-                await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, null, null, 10);
+                const int minuteOffset = 10;
+                await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, null, null, minuteOffset);
 
                 return (false, null);
             }

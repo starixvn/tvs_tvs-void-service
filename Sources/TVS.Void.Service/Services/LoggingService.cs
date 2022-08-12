@@ -42,7 +42,7 @@ namespace TVS.Void.Service.Services
             await LogService.InfoAsync(message);
         }
 
-        private async Task HandleException(Exception exception)
+        private static async Task HandleException(Exception exception)
         {
             var logMessage = new LogMessage(exception.Message)
                 .AddSection("Database Info", DatabaseInfoGetters.GetDbExceptionInfo(exception))

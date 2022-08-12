@@ -36,10 +36,7 @@ namespace TVS.Void.Service.Website.Jobs
 
                     if (!await maintenanceService.IsUnderMaintenanceAsync())
                     {
-                        foreach (var server in SiteDbGroupConstant.ServerList)
-                        {
-                            await scanningService.Execute(server.Id);
-                        }
+                        await ExecuteSiteDbSequential();
                     }
 
                     AppConfigService.AppConfig.IsScanningAutoVoidRequestJobExecuting = false;
@@ -49,6 +46,14 @@ namespace TVS.Void.Service.Website.Jobs
             {
                 AppConfigService.AppConfig.IsScanningAutoVoidRequestJobExecuting = false;
                 await loggingService.ErrorAsync("ScanningAutoVoidRequestJob execute failed!", ex);
+            }
+        }
+
+        private async Task ExecuteSiteDbSequential()
+        {
+            foreach (var server in SiteDbGroupConstant.ServerList)
+            {
+                await scanningService.Execute(server.Id);
             }
         }
     }
