@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using ONEbook.UM.Services;
 using Quartz;
-using TVS.Void.Service.Constants;
+using TicketVoidingSystem.Constants;
 using TVS.Void.Service.Services;
 using TVS.Void.Service.Services.ScanningAutoVoidRequest;
 

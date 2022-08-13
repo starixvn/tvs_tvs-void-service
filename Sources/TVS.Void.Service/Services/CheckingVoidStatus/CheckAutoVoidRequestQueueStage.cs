@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using TVS.Void.Service.Constants;
+using TicketVoidingSystem.Constants;
 using TVS.Void.Service.Models;
 
 namespace TVS.Void.Service.Services.CheckingVoidStatus

@@ -1,4 +1,4 @@
-﻿namespace TVS.Void.Service.Constants
+﻿namespace TicketVoidingSystem.Constants
 {
     public static class ExecuteStatus
     {

@@ -1,4 +1,4 @@
-﻿namespace TVS.Void.Service.Models
+﻿namespace TicketVoidingSystem.Models
 {
     public class SiteDbGroupModel
     {

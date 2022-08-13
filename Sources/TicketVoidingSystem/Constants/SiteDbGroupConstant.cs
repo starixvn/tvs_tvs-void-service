@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using TVS.Void.Service.Models;
+using TicketVoidingSystem.Models;
 
-namespace TVS.Void.Service.Constants
+namespace TicketVoidingSystem.Constants
 {
     public static class SiteDbGroupConstant
     {

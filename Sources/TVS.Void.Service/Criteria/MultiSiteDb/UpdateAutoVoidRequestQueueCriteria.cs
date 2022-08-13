@@ -2,8 +2,8 @@
 using System.Linq;
 using Fanex.Data;
 using Fanex.Data.Repository;
-using TVS.Void.Service.Constants;
-using TVS.Void.Service.Models;
+using TicketVoidingSystem.Constants;
+using TicketVoidingSystem.Models;
 
 namespace TVS.Void.Service.Criteria.MultiSiteDb
 {
