@@ -6,7 +6,7 @@ using Fanex.Logging.Extensions.AspNetCore;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 
-namespace TVS.Void.Service.Website.Utility
+namespace TVS.Void.Service.Website.Utilities
 {
     [ExcludeFromCodeCoverage]
     public class ExceptionHandlerMiddleware

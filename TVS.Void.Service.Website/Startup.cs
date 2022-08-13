@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using TVS.Void.Service.Website.Utility;
+using TVS.Void.Service.Website.Utilities;
 
 namespace TVS.Void.Service.Website
 {
@@ -24,7 +24,6 @@ namespace TVS.Void.Service.Website
             services.RegisterFanexExceptionHandler();
             services.RegisterSentry(Configuration);
             services.RegisterONEbookUM(Configuration);
-            services.RegisterCoreServices(Configuration);
             services.RegisterBusinessService();
             services.RegisterQuartzScheduler();
         }

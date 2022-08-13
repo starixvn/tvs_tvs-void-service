@@ -1,6 +1,6 @@
 ﻿using ONEbook.UM.Helpers;
 
-namespace TVS.Void.Service.Website.Utility
+namespace TVS.Void.Service.Website.Utilities
 {
     public class CustomHttpContextHelper : IHttpContextHelper
     {

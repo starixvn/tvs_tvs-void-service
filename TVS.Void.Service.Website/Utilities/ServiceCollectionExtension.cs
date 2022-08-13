@@ -26,7 +26,7 @@ using TVS.Void.Service.Services.Void;
 using TVS.Void.Service.Website.Jobs;
 using TVS.Void.Service.Website.Jobs.Listener;
 
-namespace TVS.Void.Service.Website.Utility
+namespace TVS.Void.Service.Website.Utilities
 {
     [ExcludeFromCodeCoverage]
     public static class ServiceCollectionExtension
@@ -86,13 +86,10 @@ namespace TVS.Void.Service.Website.Utility
             services.AddSingleton<IMaintenanceService, MaintenanceService>();
         }
 
-        public static void RegisterCoreServices(this IServiceCollection services, IConfiguration configuration)
-        {
-            services.AddSingleton<IDynamicRepository, DynamicRepository>();
-        }
-
         public static void RegisterBusinessService(this IServiceCollection services)
         {
+            services.AddSingleton<IDynamicRepository, DynamicRepository>();
+
             services.AddSingleton<LoggingService, LoggingServiceImp>();
             services.AddSingleton<AutoVoidRequestQueueService, AutoVoidRequestQueueServiceImp>();
             services.AddSingleton<RequestDetailService, RequestDetailServiceImp>();
