@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using TicketVoidingSystem.SignalR;
 using TVS.Void.Service.Website.Utilities;
 
 namespace TVS.Void.Service.Website
@@ -24,6 +25,7 @@ namespace TVS.Void.Service.Website
             services.RegisterFanexExceptionHandler();
             services.RegisterSentry(Configuration);
             services.RegisterONEbookUM(Configuration);
+            services.RegisterSignalR(Configuration);
             services.RegisterBusinessService();
             services.RegisterQuartzScheduler();
         }
@@ -40,6 +42,7 @@ namespace TVS.Void.Service.Website
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapHub<NotificationHub>("/SignalR/NotificationHub");
             });
         }
     }

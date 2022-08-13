@@ -1,0 +1,89 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Net.Http;
+using System.Net.Mime;
+using System.Text;
+using System.Text.Json;
+using System.Threading.Tasks;
+using Fanex.Logging;
+using Microsoft.Extensions.Configuration;
+using TicketVoidingSystem.Models;
+
+namespace TicketVoidingSystem.Services
+{
+    public interface TicketVoidingSystemApiService
+    {
+        Task SignalRUpdateRequestStatusToAllUsers(IEnumerable<RequestStatus> status);
+
+        Task SignalRNotifyErrorMessageToUser(string userName, string message);
+
+        Task SignalRNotifyVoidResultToUser(string userName, IEnumerable<Result> results);
+    }
+
+    [ExcludeFromCodeCoverage]
+    public class TicketVoidingSystemApiServiceImp : TicketVoidingSystemApiService
+    {
+        private readonly HttpClient httpClient;
+        private readonly string ticketVoidingSystemUrl;
+
+        public TicketVoidingSystemApiServiceImp(HttpClient client, IConfiguration configuration)
+        {
+            ticketVoidingSystemUrl = configuration.GetSection("TicketVoidingSystemUrl").Value;
+            httpClient = client;
+            httpClient.BaseAddress = new Uri(ticketVoidingSystemUrl);
+            httpClient.Timeout = TimeSpan.FromMinutes(5);
+            httpClient.DefaultRequestHeaders.Clear();
+            httpClient.DefaultRequestHeaders.Add("Accept", MediaTypeNames.Application.Json);
+        }
+
+        private StringContent CreateRequestStringContent<T>(T data)
+        {
+            var dataJson = new StringContent(
+                JsonSerializer.Serialize(data, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }),
+                Encoding.UTF8,
+                MediaTypeNames.Application.Json);
+
+            return dataJson;
+        }
+
+        public async Task SignalRUpdateRequestStatusToAllUsers(IEnumerable<RequestStatus> status)
+        {
+            const string actionName = "SignalRApi/UpdateRequestStatusToAllUsers";
+            using var response = await httpClient.PostAsync(actionName, CreateRequestStringContent(new { status }));
+            if (response.IsSuccessStatusCode)
+            {
+                return;
+            }
+
+            await LogService.ErrorAsync($"{ticketVoidingSystemUrl}{actionName}" +
+                             $"{Environment.NewLine}Response:{Environment.NewLine}{response}");
+        }
+
+        public async Task SignalRNotifyErrorMessageToUser(string userName, string message)
+        {
+            const string actionName = "SignalRApi/NotifyErrorMessageToUser";
+            using var response = await httpClient.PostAsync(actionName, CreateRequestStringContent(new { userName, message }));
+            if (response.IsSuccessStatusCode)
+            {
+                return;
+            }
+
+            await LogService.ErrorAsync($"{ticketVoidingSystemUrl}{actionName}" +
+                                        $"{Environment.NewLine}Response:{Environment.NewLine}{response}");
+        }
+
+        public async Task SignalRNotifyVoidResultToUser(string userName, IEnumerable<Result> results)
+        {
+            const string actionName = "SignalRApi/NotifyVoidResultToUser";
+            using var response = await httpClient.PostAsync(actionName, CreateRequestStringContent(new { userName, results }));
+            if (response.IsSuccessStatusCode)
+            {
+                return;
+            }
+
+            await LogService.ErrorAsync($"{ticketVoidingSystemUrl}{actionName}" +
+                                        $"{Environment.NewLine}Response:{Environment.NewLine}{response}");
+        }
+    }
+}

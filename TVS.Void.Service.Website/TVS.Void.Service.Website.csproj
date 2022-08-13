@@ -41,6 +41,7 @@
     <PackageReference Include="Fanex.Logging.Extensions.AspNetCore" Version="1.0.1-beta1" />
     <PackageReference Include="Fanex.Logging.Extensions.Database" Version="1.0.8" />
     <PackageReference Include="Fanex.Logging.Sentry" Version="1.0.6" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.StackExchangeRedis" Version="5.0.17" />
     <PackageReference Include="ONEbook.UM.AspNetCore" Version="3.1.0" />
     <PackageReference Include="ONEbook.UM.Transport" Version="3.1.1" />
     <PackageReference Include="Quartz" Version="3.4.0" />
@@ -48,6 +49,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Sources\TicketVoidingSystem\TicketVoidingSystem.csproj" />
     <ProjectReference Include="..\Sources\TVS.Void.Service\TVS.Void.Service.csproj" />
   </ItemGroup>
 

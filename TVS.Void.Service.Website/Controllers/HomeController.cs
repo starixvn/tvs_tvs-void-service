@@ -23,7 +23,7 @@ namespace TVS.Void.Service.Website.Controllers
                 $" {nameof(ConfigSettingModel.IsVoidJobExecuting)}: {AppConfigService.AppConfig.IsVoidJobExecuting}," +
                 $" {nameof(ConfigSettingModel.IsCheckingVoidStatusJobExecuting)}: {AppConfigService.AppConfig.IsCheckingVoidStatusJobExecuting}}} - {DateTime.Now}";
             logger.LogInformation(jobStatus);
-            return Ok($"Ok-200-TVS.Void.Service");
+            return Ok("Ok-200-TVS.Void.Service");
         }
     }
 }
