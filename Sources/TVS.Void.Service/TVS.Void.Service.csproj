@@ -15,4 +15,8 @@
     <PackageReference Include="Fanex.Logging.Extensions.Database" Version="1.0.8" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\TicketVoidingSystem\TicketVoidingSystem.csproj" />
+  </ItemGroup>
+
 </Project>

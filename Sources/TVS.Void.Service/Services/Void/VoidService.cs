@@ -5,6 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.SignalR;
+using TicketVoidingSystem.Constants;
+using TicketVoidingSystem.Models;
+using TicketVoidingSystem.Services;
+using TicketVoidingSystem.SignalR;
 using TVS.Void.Service.Constants;
 using TVS.Void.Service.Models;
 
@@ -20,12 +25,17 @@ namespace TVS.Void.Service.Services.Void
         private StringBuilder logData;
         private readonly TicketVoidingQueueService ticketVoidingQueueService;
         private readonly RequestDetailService requestDetailService;
+        private readonly TicketVoidingSystemHttpClientService ticketVoidingSystemHttpClientService;
+        private readonly IHubContext<NotificationHub, ClientEvent> hubContext;
         private readonly LoggingService loggingService;
 
-        public VoidServiceImp(TicketVoidingQueueService ticketVoidingQueueService, RequestDetailService requestDetailService, LoggingService loggingService)
+        public VoidServiceImp(TicketVoidingQueueService ticketVoidingQueueService, RequestDetailService requestDetailService,
+            TicketVoidingSystemHttpClientService ticketVoidingSystemHttpClientService, IHubContext<NotificationHub, ClientEvent> hubContext, LoggingService loggingService)
         {
             this.ticketVoidingQueueService = ticketVoidingQueueService;
             this.requestDetailService = requestDetailService;
+            this.ticketVoidingSystemHttpClientService = ticketVoidingSystemHttpClientService;
+            this.hubContext = hubContext;
             this.loggingService = loggingService;
         }
 
@@ -50,6 +60,8 @@ namespace TVS.Void.Service.Services.Void
                 {
                     await requestDetailService.UpdateVoidService(siteDbGroupId, firstVoidingQueue.RequestId, firstVoidingQueue.VoidingHistoryId, ExecuteStatus.Failed);
                     await requestDetailService.UpdateTicketVoidingHistory(firstVoidingQueue.VoidingHistoryId, ExecuteStatus.Failed);
+                    await NotifyVoidFailedToUser(firstVoidingQueue.RequestId, processVoidQueuesResult);
+                    await NotifyRequestFailedToAllUser(firstVoidingQueue.RequestId);
                     await loggingService.InfoAsync(logData.ToString());
                     return;
                 }
@@ -91,6 +103,22 @@ namespace TVS.Void.Service.Services.Void
             logData.AppendLine($"{nameof(ProcessVoidQueueResult)}: {JsonSerializer.Serialize(processResult)}");
 
             return processResult;
+        }
+
+        private async Task NotifyVoidFailedToUser(int requestId, IEnumerable<ProcessVoidQueueResult> voidQueueResults)
+        {
+            var voidResultHasUserInfo = voidQueueResults.First(x => x.UserId > 0);
+            var errorMessage = $"Failed to void Request ID: {requestId}";
+            await ticketVoidingSystemHttpClientService.SignalRNotifyErrorMessageToUser(voidResultHasUserInfo.UserName, errorMessage);
+            await hubContext.Clients.User(voidResultHasUserInfo.UserName).showErrorMessage(errorMessage);
+        }
+
+        private async Task NotifyRequestFailedToAllUser(int requestId)
+        {
+            var failedRequests = new List<RequestStatus>
+                {new () {RequestId = requestId, Status = RequestStatusConstant.Failed}};
+            await ticketVoidingSystemHttpClientService.SignalRUpdateRequestStatusToAllUsers(failedRequests);
+            await hubContext.Clients.All.updateRequestStatus(failedRequests);
         }
     }
 }

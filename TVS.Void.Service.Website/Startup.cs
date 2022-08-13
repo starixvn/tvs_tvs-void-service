@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using TicketVoidingSystem.Services;
 using TicketVoidingSystem.SignalR;
 using TVS.Void.Service.Website.Utilities;
 
@@ -21,6 +22,7 @@ namespace TVS.Void.Service.Website
         {
             services.LoadConfig();
             services.AddControllers();
+            services.AddHttpClient<TicketVoidingSystemHttpClientService, TicketVoidingSystemHttpClientServiceImp>();
             services.RegisterFanexData(Configuration);
             services.RegisterFanexExceptionHandler();
             services.RegisterSentry(Configuration);

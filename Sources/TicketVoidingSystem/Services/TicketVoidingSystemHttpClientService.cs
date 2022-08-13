@@ -12,7 +12,7 @@ using TicketVoidingSystem.Models;
 
 namespace TicketVoidingSystem.Services
 {
-    public interface TicketVoidingSystemApiService
+    public interface TicketVoidingSystemHttpClientService
     {
         Task SignalRUpdateRequestStatusToAllUsers(IEnumerable<RequestStatus> status);
 
@@ -22,12 +22,12 @@ namespace TicketVoidingSystem.Services
     }
 
     [ExcludeFromCodeCoverage]
-    public class TicketVoidingSystemApiServiceImp : TicketVoidingSystemApiService
+    public class TicketVoidingSystemHttpClientServiceImp : TicketVoidingSystemHttpClientService
     {
         private readonly HttpClient httpClient;
         private readonly string ticketVoidingSystemUrl;
 
-        public TicketVoidingSystemApiServiceImp(HttpClient client, IConfiguration configuration)
+        public TicketVoidingSystemHttpClientServiceImp(HttpClient client, IConfiguration configuration)
         {
             ticketVoidingSystemUrl = configuration.GetSection("TicketVoidingSystemUrl").Value;
             httpClient = client;
@@ -35,16 +35,6 @@ namespace TicketVoidingSystem.Services
             httpClient.Timeout = TimeSpan.FromMinutes(5);
             httpClient.DefaultRequestHeaders.Clear();
             httpClient.DefaultRequestHeaders.Add("Accept", MediaTypeNames.Application.Json);
-        }
-
-        private StringContent CreateRequestStringContent<T>(T data)
-        {
-            var dataJson = new StringContent(
-                JsonSerializer.Serialize(data, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }),
-                Encoding.UTF8,
-                MediaTypeNames.Application.Json);
-
-            return dataJson;
         }
 
         public async Task SignalRUpdateRequestStatusToAllUsers(IEnumerable<RequestStatus> status)
@@ -84,6 +74,16 @@ namespace TicketVoidingSystem.Services
 
             await LogService.ErrorAsync($"{ticketVoidingSystemUrl}{actionName}" +
                                         $"{Environment.NewLine}Response:{Environment.NewLine}{response}");
+        }
+
+        private static StringContent CreateRequestStringContent<T>(T data)
+        {
+            var dataJson = new StringContent(
+                JsonSerializer.Serialize(data, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }),
+                Encoding.UTF8,
+                MediaTypeNames.Application.Json);
+
+            return dataJson;
         }
     }
 }
