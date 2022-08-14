@@ -21,24 +21,24 @@ namespace TVS.Void.Service.Extensions
                 stringBuilder.AppendLine(line);
             }
 
-            return $"<Tickets>{stringBuilder.ToString().Trim()}</Tickets>";
+            return $"<root>{stringBuilder.ToString().Trim()}</root>";
         }
 
-        public static string ToRequestInfoXml(this IEnumerable<RequestDetailModel> requests)
+        public static string ToVoidServiceXml(this IEnumerable<VoidServiceModel> models)
         {
-            if (requests == null || !requests.Any())
+            if (models == null || !models.Any())
             {
                 return string.Empty;
             }
 
             var stringBuilder = new StringBuilder();
-            foreach (var request in requests)
+            foreach (var model in models)
             {
-                var line = $"<Request RequestId='{request.RequestId}' IssueTypeId='{request.IssueTypeId}' MatchId='{request.MatchId}'/>";
+                var line = $"<r RequestId='{model.RequestId}' IssueTypeId='{model.IssueTypeId}' MatchId='{model.MatchId}' SiteDbGroupId='{model.SiteDbGroupId}'/>";
                 stringBuilder.AppendLine(line);
             }
 
-            return $"<Requests>{stringBuilder.ToString().Trim()}</Requests>";
+            return $"<root>{stringBuilder.ToString().Trim()}</root>";
         }
 
         public static string ToAfterVoidDataXml(this IEnumerable<AfterVoidServiceModel> afterVoidData)
@@ -51,7 +51,7 @@ namespace TVS.Void.Service.Extensions
             var stringBuilder = new StringBuilder();
             foreach (var item in afterVoidData)
             {
-                var line = $"<r RequestId='{item.RequestId}' VoidingHistoryId='{item.VoidingHistoryId}' MatchId='{item.MatchId}'/>";
+                var line = $"<r RequestId='{item.RequestId}' VoidingHistoryId='{item.VoidingHistoryId}' MatchId='{item.MatchId}' NegativeBalanceUsers='{item.NegativeBalanceUsers}'/>";
                 stringBuilder.AppendLine(line);
             }
 

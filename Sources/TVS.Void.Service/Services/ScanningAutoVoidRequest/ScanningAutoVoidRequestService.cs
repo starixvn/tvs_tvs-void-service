@@ -17,6 +17,7 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
     public class ScanningAutoVoidRequestServiceImp : ScanningAutoVoidRequestService
     {
         private StringBuilder logData;
+        private readonly Stopwatch timer = new();
         private readonly GetTicketsStage getTicketsStage;
         private readonly CheckStatusTicketsStage checkStatusTicketsStage;
         private readonly ProcessMixParlayStage processMixParlayStage;
@@ -43,7 +44,6 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
         public async Task Execute(int siteDbGroupId)
         {
             logData = new StringBuilder();
-            Stopwatch timer = new();
             timer.Start();
             var queue = await autoVoidRequestQueueService.GetQueue(siteDbGroupId, null);
             if (queue == null)
@@ -51,6 +51,11 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
                 return;
             }
 
+            await ExecuteWhenHaveData(siteDbGroupId, queue);
+        }
+
+        private async Task ExecuteWhenHaveData(int siteDbGroupId, AutoVoidRequestQueueModel queue)
+        {
             try
             {
                 logData.AppendLine($"Scanning[{siteDbGroupId}]: {JsonSerializer.Serialize(queue)}");
@@ -76,7 +81,7 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
             }
         }
 
-        public async Task ExecuteForVoidInstantGroup(int siteDbGroupId, AutoVoidRequestQueueModel queue)
+        private async Task ExecuteForVoidInstantGroup(int siteDbGroupId, AutoVoidRequestQueueModel queue)
         {
             var getTicketsResult = await getTicketsStage.Execute(siteDbGroupId, queue);
 
@@ -90,7 +95,7 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
             logData.AppendLine(insertPreVoidingResult.LogData);
         }
 
-        public async Task ExecuteForAutoVoidWinningGroup(int siteDbGroupId, AutoVoidRequestQueueModel queue)
+        private async Task ExecuteForAutoVoidWinningGroup(int siteDbGroupId, AutoVoidRequestQueueModel queue)
         {
             var getTicketsResult = await getTicketsStage.Execute(siteDbGroupId, queue);
             if (!getTicketsResult.IsContinueFlow)

@@ -12,8 +12,7 @@ namespace TVS.Void.Service.Services
         Task<(IEnumerable<RequestDetailTicketModel>, IEnumerable<RequestDetailTicketModel>)> GetTicketsBySiteDbGroupId(
             int siteDbGroupId, AutoVoidRequestQueueModel autoVoidRequestQueue);
 
-        Task<IEnumerable<VoidServiceModel>> InsertVoidServiceData(string broadcastSessionId, int siteDbGroupId,
-            IEnumerable<RequestDetailModel> requests);
+        Task<IEnumerable<VoidServiceModel>> InsertVoidingHistory(string broadcastSessionId, IEnumerable<VoidServiceModel> voidServiceModels);
 
         Task UpdateVoidService(int siteDbGroupId, int requestId, int voidingHistoryId, int statusId);
 
@@ -50,14 +49,13 @@ namespace TVS.Void.Service.Services
             return (singleTickets, parlayTickets);
         }
 
-        public async Task<IEnumerable<VoidServiceModel>> InsertVoidServiceData(string broadcastSessionId, int siteDbGroupId, IEnumerable<RequestDetailModel> requests)
+        public async Task<IEnumerable<VoidServiceModel>> InsertVoidingHistory(string broadcastSessionId, IEnumerable<VoidServiceModel> voidServiceModels)
         {
             var criteria = new InsertVoidServiceDataCriteria
             {
                 BroadcastSessionId = broadcastSessionId,
-                SiteDbGroupId = siteDbGroupId,
                 IsAutoVoid = true,
-                RequestInfoXml = requests.ToRequestInfoXml()
+                VoidServiceXml = voidServiceModels.ToVoidServiceXml()
             };
 
             var voidServiceData = await repository.FetchAsync<VoidServiceModel>(criteria);

@@ -18,6 +18,7 @@ namespace TVS.Void.Service.Services.CheckingVoidStatus
     public class CheckingVoidStatusServiceImp : CheckingVoidStatusService
     {
         private StringBuilder logData;
+        private readonly Stopwatch timer = new();
         private readonly CheckAutoVoidRequestQueueStage checkAutoVoidRequestQueueStage;
         private readonly RequestDetailService requestDetailService;
         private readonly LoggingService loggingService;
@@ -32,7 +33,6 @@ namespace TVS.Void.Service.Services.CheckingVoidStatus
         public async Task Execute()
         {
             logData = new StringBuilder();
-            Stopwatch timer = new();
             timer.Start();
             var voidServiceList = await requestDetailService.GetVoidServiceDataForCheckStatus();
             if (!voidServiceList.Any())
@@ -40,6 +40,11 @@ namespace TVS.Void.Service.Services.CheckingVoidStatus
                 return;
             }
 
+            await ExecuteWhenHaveData(voidServiceList);
+        }
+
+        private async Task ExecuteWhenHaveData(IEnumerable<VoidServiceModel> voidServiceList)
+        {
             try
             {
                 logData.AppendLine($"{nameof(CheckingVoidStatusService)}: {JsonSerializer.Serialize(voidServiceList)}");
@@ -53,6 +58,7 @@ namespace TVS.Void.Service.Services.CheckingVoidStatus
                     return;
                 }
 
+                // TODO: get negative balance users
                 var afterVoidData = PrepareAfterVoidData(voidServiceList);
                 var insertAfterVoidResult = await requestDetailService.InsertAfterVoidServiceData(firstVoidService.IsAutoVoid, afterVoidData);
                 logData.AppendLine($"insertAfterVoidResult: {JsonSerializer.Serialize(insertAfterVoidResult)}");
@@ -74,7 +80,7 @@ namespace TVS.Void.Service.Services.CheckingVoidStatus
         private static IEnumerable<AfterVoidServiceModel> PrepareAfterVoidData(IEnumerable<VoidServiceModel> voidServiceList)
         {
             var afterVoidData = voidServiceList.Select(x => new AfterVoidServiceModel
-            { RequestId = x.RequestId, VoidingHistoryId = x.VoidingHistoryId, MatchId = x.MatchId }).Distinct();
+            { RequestId = x.RequestId, VoidingHistoryId = x.VoidingHistoryId, MatchId = x.MatchId }).Distinct(new AfterVoidServiceModelEqualComparer());
 
             return afterVoidData;
         }

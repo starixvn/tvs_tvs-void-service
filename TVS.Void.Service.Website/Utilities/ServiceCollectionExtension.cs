@@ -115,6 +115,7 @@ namespace TVS.Void.Service.Website.Utilities
             services.AddSingleton<InsertPreVoidingDataStage, InsertPreVoidingDataStageImp>();
 
             services.AddSingleton<VoidService, VoidServiceImp>();
+            services.AddSingleton<ProcessVoidQueuesStage, ProcessVoidQueuesStageImp>();
 
             services.AddSingleton<CheckingVoidStatusService, CheckingVoidStatusServiceImp>();
             services.AddSingleton<CheckAutoVoidRequestQueueStage, CheckAutoVoidRequestQueueStageImp>();

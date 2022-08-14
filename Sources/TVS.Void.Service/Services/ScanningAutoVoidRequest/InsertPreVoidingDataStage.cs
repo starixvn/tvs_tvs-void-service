@@ -47,46 +47,48 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
                 return (false, null);
             }
 
-            var validVoidRequests = GetDistinctValidVoidRequest(validVoidSingleTickets, validVoidParlayTickets);
-            var voidServiceList = await requestDetailService.InsertVoidServiceData(queue.BroadcastSessionId, siteDbGroupId, validVoidRequests);
-            var logData = $"{nameof(InsertPreVoidingDataStage)}: {JsonSerializer.Serialize(new { validVoidRequests, voidServiceList })}";
+            var validVoidServiceList = InitVoidServiceData(siteDbGroupId, validVoidSingleTickets, validVoidParlayTickets);
+            var insertedVoidServiceList = await requestDetailService.InsertVoidingHistory(queue.BroadcastSessionId, validVoidServiceList);
+            var logData = $"{nameof(InsertPreVoidingDataStage)}: {JsonSerializer.Serialize(new { validVoidServiceList, insertedVoidServiceList })}";
 
-            await NotifyRequestRunningToAllUser(validVoidRequests);
-            await InsertTicketVoidingQueue(siteDbGroupId, voidServiceList, validVoidSingleTickets, validVoidParlayTickets);
+            await NotifyRequestRunningToAllUser(validVoidServiceList);
+            await InsertTicketVoidingQueue(siteDbGroupId, insertedVoidServiceList, validVoidSingleTickets, validVoidParlayTickets);
             await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, ExecuteStatus.Done, default, null);
             return (true, logData);
         }
 
-        private static IEnumerable<RequestDetailModel>
-            GetDistinctValidVoidRequest(IEnumerable<RequestDetailTicketModel> validVoidSingleTickets, IEnumerable<RequestDetailTicketModel> validVoidParlayTickets)
+        private static IEnumerable<VoidServiceModel>
+            InitVoidServiceData(int siteDbGroupId, IEnumerable<RequestDetailTicketModel> validVoidSingleTickets, IEnumerable<RequestDetailTicketModel> validVoidParlayTickets)
         {
-            var distinctRequestFirst = validVoidSingleTickets.Select(x => new RequestDetailModel
-            { RequestId = x.RequestId, IssueTypeId = x.IssueTypeId }).Distinct();
-            var distinctRequestSecond = validVoidParlayTickets.Select(x => new RequestDetailModel
-            { RequestId = x.RequestId, IssueTypeId = x.IssueTypeId }).Distinct();
-            var validVoidRequests = distinctRequestFirst.Union(distinctRequestSecond);
+            var distinctRequestFirst = validVoidSingleTickets.Select(x => new VoidServiceModel
+            { RequestId = x.RequestId, IssueTypeId = x.IssueTypeId, SiteDbGroupId = siteDbGroupId }).Distinct();
+            var distinctRequestSecond = validVoidParlayTickets.Select(x => new VoidServiceModel
+            { RequestId = x.RequestId, IssueTypeId = x.IssueTypeId, SiteDbGroupId = siteDbGroupId }).Distinct();
+            var validVoidServiceList = distinctRequestFirst.Union(distinctRequestSecond);
 
-            AssignMatchIdForRequests(validVoidRequests, validVoidSingleTickets, validVoidParlayTickets);
+            AssignMatchIdForRequests(validVoidServiceList, validVoidSingleTickets, validVoidParlayTickets);
 
-            return validVoidRequests;
+            return validVoidServiceList;
         }
 
-        private static void AssignMatchIdForRequests(IEnumerable<RequestDetailModel> requests, IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets)
+        private static void AssignMatchIdForRequests(IEnumerable<VoidServiceModel> voidServiceModels,
+            IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets)
         {
             const int mixParlayMatch = 29;
-            foreach (var request in requests)
+            foreach (var voidService in voidServiceModels)
             {
-                var ticketsInRequest = singleTickets.Where(x => x.RequestId == request.RequestId)
-                    .Union(parlayTickets.Where(x => x.RequestId == request.RequestId));
+                var ticketsInRequest = singleTickets.Where(x => x.RequestId == voidService.RequestId)
+                    .Union(parlayTickets.Where(x => x.RequestId == voidService.RequestId));
 
-                request.MatchId = (request.IssueTypeId == IssueTypeConstant.AbnormalBet && !ticketsInRequest.Any(x => x.RequestId == request.RequestId && x.MatchId == mixParlayMatch))
+                voidService.MatchId = (voidService.IssueTypeId is IssueTypeConstant.AbnormalBet or IssueTypeConstant.AbnormalBetRealMember
+                                       && !ticketsInRequest.Any(x => x.RequestId == voidService.RequestId && x.MatchId == mixParlayMatch))
                     ? ticketsInRequest.First().MatchId : 0;
             }
         }
 
-        private async Task NotifyRequestRunningToAllUser(IEnumerable<RequestDetailModel> requests)
+        private async Task NotifyRequestRunningToAllUser(IEnumerable<VoidServiceModel> voidServiceModels)
         {
-            var runningRequests = requests.Select(x => new RequestStatus
+            var runningRequests = voidServiceModels.Select(x => new RequestStatus
             { RequestId = x.RequestId, Status = RequestStatusConstant.Running });
             await ticketVoidingSystemHttpClientService.SignalRUpdateRequestStatusToAllUsers(runningRequests);
             await hubContext.Clients.All.updateRequestStatus(runningRequests);
