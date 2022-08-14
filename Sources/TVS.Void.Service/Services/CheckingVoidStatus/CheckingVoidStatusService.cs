@@ -35,7 +35,7 @@ namespace TVS.Void.Service.Services.CheckingVoidStatus
             Stopwatch timer = new();
             timer.Start();
             var voidServiceList = await requestDetailService.GetVoidServiceDataForCheckStatus();
-            if (voidServiceList == null)
+            if (!voidServiceList.Any())
             {
                 return;
             }

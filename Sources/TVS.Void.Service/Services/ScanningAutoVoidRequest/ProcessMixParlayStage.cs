@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using TicketVoidingSystem.Constants;
 using TVS.Void.Service.Constants;
@@ -23,7 +24,7 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
 
         public async Task<(bool IsContinueFlow, string LogData)> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue, IEnumerable<RequestDetailModel> mixParlayRequests)
         {
-            if (queue.StatusId == ExecuteStatus.QueueMixParlay && mixParlayRequests == null)
+            if (queue.StatusId == ExecuteStatus.QueueMixParlay && !mixParlayRequests.Any())
             {
                 const int minuteOffset = 10;
                 await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, null, null, minuteOffset);
@@ -38,7 +39,7 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
 
         private async Task<string> InsertNewAutoVoidRequestQueueForMixParlaySpecialCase(int queueStatusId, IEnumerable<RequestDetailModel> mixParlayRequests)
         {
-            if (queueStatusId != ExecuteStatus.QueueMixParlay && mixParlayRequests != null)
+            if (queueStatusId != ExecuteStatus.QueueMixParlay && mixParlayRequests.Any())
             {
                 var guid = Guid.NewGuid().ToString();
 

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using TicketVoidingSystem.Constants;
@@ -28,7 +29,7 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
         {
             var (singleTickets, parlayTickets) = await requestDetailService.GetTicketsBySiteDbGroupId(siteDbGroupId, queue);
             var logData = $"{nameof(GetTicketsStage)}: {JsonSerializer.Serialize(new { singleTickets, parlayTickets })}";
-            if (singleTickets == null && parlayTickets == null)
+            if (!singleTickets.Any() && !parlayTickets.Any())
             {
                 await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, ExecuteStatus.Done, "No ticket found.", null);
 

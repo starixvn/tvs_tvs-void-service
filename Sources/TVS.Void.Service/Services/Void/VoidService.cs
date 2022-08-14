@@ -45,7 +45,7 @@ namespace TVS.Void.Service.Services.Void
             Stopwatch timer = new();
             timer.Start();
             var voidingQueues = await ticketVoidingQueueService.GetQueues(siteDbGroupId);
-            if (voidingQueues == null)
+            if (!voidingQueues.Any())
             {
                 return;
             }

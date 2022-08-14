@@ -40,7 +40,7 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
         public async Task<(bool, string)> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue,
             IEnumerable<RequestDetailTicketModel> validVoidSingleTickets, IEnumerable<RequestDetailTicketModel> validVoidParlayTickets)
         {
-            if (validVoidSingleTickets == null && validVoidParlayTickets == null)
+            if (!validVoidSingleTickets.Any() && !validVoidParlayTickets.Any())
             {
                 await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, ExecuteStatus.Done, "No ticket found.", null);
 
