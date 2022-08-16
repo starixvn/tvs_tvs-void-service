@@ -60,11 +60,12 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
         private static IEnumerable<VoidServiceModel>
             InitVoidServiceData(int siteDbGroupId, IEnumerable<RequestDetailTicketModel> validVoidSingleTickets, IEnumerable<RequestDetailTicketModel> validVoidParlayTickets)
         {
+            var equalityComparer = new VoidServiceModelEqualityComparer();
             var distinctRequestFirst = validVoidSingleTickets.Select(x => new VoidServiceModel
-            { RequestId = x.RequestId, IssueTypeId = x.IssueTypeId, SiteDbGroupId = siteDbGroupId }).Distinct();
+            { RequestId = x.RequestId, IssueTypeId = x.IssueTypeId, SiteDbGroupId = siteDbGroupId }).Distinct(equalityComparer);
             var distinctRequestSecond = validVoidParlayTickets.Select(x => new VoidServiceModel
-            { RequestId = x.RequestId, IssueTypeId = x.IssueTypeId, SiteDbGroupId = siteDbGroupId }).Distinct();
-            var validVoidServiceList = distinctRequestFirst.Union(distinctRequestSecond);
+            { RequestId = x.RequestId, IssueTypeId = x.IssueTypeId, SiteDbGroupId = siteDbGroupId }).Distinct(equalityComparer);
+            var validVoidServiceList = distinctRequestFirst.Union(distinctRequestSecond, equalityComparer);
 
             AssignMatchIdForRequests(validVoidServiceList, validVoidSingleTickets, validVoidParlayTickets);
 
@@ -78,7 +79,7 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
             foreach (var voidService in voidServiceModels)
             {
                 var ticketsInRequest = singleTickets.Where(x => x.RequestId == voidService.RequestId)
-                    .Union(parlayTickets.Where(x => x.RequestId == voidService.RequestId));
+                    .Union(parlayTickets.Where(x => x.RequestId == voidService.RequestId), new RequestDetailTicketModelEqualityComparer());
 
                 voidService.MatchId = (voidService.IssueTypeId is IssueTypeConstant.AbnormalBet or IssueTypeConstant.AbnormalBetRealMember
                                        && !ticketsInRequest.Any(x => x.RequestId == voidService.RequestId && x.MatchId == mixParlayMatch))

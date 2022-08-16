@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Fanex.Data.Repository;
+using TVS.Void.Service.Constants;
 using TVS.Void.Service.Criteria;
 using TVS.Void.Service.Extensions;
 using TVS.Void.Service.Models;
@@ -51,10 +52,11 @@ namespace TVS.Void.Service.Services
 
         public async Task<IEnumerable<VoidServiceModel>> InsertVoidingHistory(string broadcastSessionId, IEnumerable<VoidServiceModel> voidServiceModels)
         {
-            var criteria = new InsertVoidServiceDataCriteria
+            var criteria = new InsertVoidingHistoryCriteria
             {
                 BroadcastSessionId = broadcastSessionId,
                 IsAutoVoid = true,
+                UserId = AutoVoidConstant.ActorId,
                 VoidServiceXml = voidServiceModels.ToVoidServiceXml()
             };
 
