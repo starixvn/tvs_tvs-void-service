@@ -10,7 +10,7 @@ namespace TVS.Void.Service.Services
 {
     public interface TicketVoidingQueueService
     {
-        Task<IEnumerable<TicketVoidingQueueModel>> GetQueues(int siteDbGroupId);
+        Task<IEnumerable<TicketVoidingQueueModel>> GetQueues(int siteDbGroupId, int? voidingHistoryId);
 
         Task InsertQueue(int siteDbGroupId, int voidingHistoryId, int requestId, int issueTypeId,
             IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets);
@@ -27,11 +27,12 @@ namespace TVS.Void.Service.Services
             this.repository = repository;
         }
 
-        public async Task<IEnumerable<TicketVoidingQueueModel>> GetQueues(int siteDbGroupId)
+        public async Task<IEnumerable<TicketVoidingQueueModel>> GetQueues(int siteDbGroupId, int? voidingHistoryId)
         {
             var criteria = new GetTicketVoidingQueueCriteria
             {
-                SiteDbGroupId = siteDbGroupId
+                SiteDbGroupId = siteDbGroupId,
+                VoidingHistoryId = voidingHistoryId
             };
 
             var result = await repository.FetchAsync<TicketVoidingQueueModel>(criteria);

@@ -45,7 +45,7 @@ namespace TVS.Void.Service.Services.Void
         {
             logData = new StringBuilder();
             timer.Start();
-            var voidingQueues = await ticketVoidingQueueService.GetQueues(siteDbGroupId);
+            var voidingQueues = await ticketVoidingQueueService.GetQueues(siteDbGroupId, null);
             if (!voidingQueues.Any())
             {
                 return;

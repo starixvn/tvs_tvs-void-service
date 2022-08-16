@@ -9,6 +9,8 @@ namespace TVS.Void.Service.Criteria.MultiSiteDb
 {
     public class GetTicketVoidingQueueCriteria : CriteriaBase
     {
+        public int? VoidingHistoryId { get; set; }
+
         [SpParam(Ignored = true)]
         public int SiteDbGroupId { get; set; }
 

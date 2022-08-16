@@ -7,6 +7,8 @@
         public int VoidingHistoryId { get; set; }
         public int RequestId { get; set; }
         public int MatchId { get; set; }
+
+        public string NegativeBalanceUsers { get; set; }
     }
 
     public class ProcessVoidQueueResult
