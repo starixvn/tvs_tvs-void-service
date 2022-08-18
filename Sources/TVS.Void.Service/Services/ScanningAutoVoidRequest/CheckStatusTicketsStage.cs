@@ -40,7 +40,7 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
                 typeof (RequestDetailTicketModel),
                 typeof(RequestDetailTicketModel),
                 typeof(RequestDetailTicketModel),
-                typeof(RequestDetailModel)
+                typeof(RequestModel)
             };
 
             var objectsArray = await repository.FetchMultipleAsync(criteria, mappingTypes);
@@ -51,7 +51,7 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
                 ValidVoidParlayTickets = objectsArray[1].Cast<RequestDetailTicketModel>(),
                 SingleTicketsResettle = objectsArray[2].Cast<RequestDetailTicketModel>(),
                 ParlayTicketsResettle = objectsArray[3].Cast<RequestDetailTicketModel>(),
-                MixParlayRequestsNoStatusWinLossButAllChildMatchesCompleted = objectsArray[4].Cast<RequestDetailModel>()
+                MixParlayRequestsNoStatusWinLossButAllChildMatchesCompleted = objectsArray[4].Cast<RequestModel>()
             };
 
             var logData = $"{nameof(CheckStatusTicketsStage)}: {JsonSerializer.Serialize(outputData)}";

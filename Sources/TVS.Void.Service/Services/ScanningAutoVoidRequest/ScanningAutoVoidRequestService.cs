@@ -18,6 +18,7 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
     {
         private StringBuilder logData;
         private readonly Stopwatch timer = new();
+        private readonly CheckRequestQueueValidStage checkRequestQueueValidStage;
         private readonly GetTicketsStage getTicketsStage;
         private readonly CheckStatusTicketsStage checkStatusTicketsStage;
         private readonly ProcessMixParlayStage processMixParlayStage;
@@ -27,10 +28,11 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
         private readonly AutoVoidRequestQueueService autoVoidRequestQueueService;
         private readonly LoggingService loggingService;
 
-        public ScanningAutoVoidRequestServiceImp(GetTicketsStage getTicketsStage, CheckStatusTicketsStage checkStatusTicketsStage, ProcessMixParlayStage processMixParlayStage,
-            ReCalculateTicketsStage reCalculateTicketsStage, InsertPreVoidingDataStage insertPreVoidingDataStage,
+        public ScanningAutoVoidRequestServiceImp(CheckRequestQueueValidStage checkRequestQueueValidStage, GetTicketsStage getTicketsStage, CheckStatusTicketsStage checkStatusTicketsStage,
+            ProcessMixParlayStage processMixParlayStage, ReCalculateTicketsStage reCalculateTicketsStage, InsertPreVoidingDataStage insertPreVoidingDataStage,
             AutoVoidRequestQueueService autoVoidRequestQueueService, LoggingService loggingService)
         {
+            this.checkRequestQueueValidStage = checkRequestQueueValidStage;
             this.getTicketsStage = getTicketsStage;
             this.checkStatusTicketsStage = checkStatusTicketsStage;
             this.processMixParlayStage = processMixParlayStage;
@@ -44,7 +46,7 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
         public async Task Execute(int siteDbGroupId)
         {
             logData = new StringBuilder();
-            timer.Start();
+            timer.Restart();
             var queue = await autoVoidRequestQueueService.GetQueue(siteDbGroupId, null);
             if (queue == null)
             {
@@ -83,8 +85,13 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
 
         private async Task ExecuteForVoidInstantGroup(int siteDbGroupId, AutoVoidRequestQueueModel queue)
         {
-            var getTicketsResult = await getTicketsStage.Execute(siteDbGroupId, queue);
+            var isRequestQueueValid = await checkRequestQueueValidStage.Execute(siteDbGroupId, queue);
+            if (!isRequestQueueValid)
+            {
+                return;
+            }
 
+            var getTicketsResult = await getTicketsStage.Execute(siteDbGroupId, queue);
             if (!getTicketsResult.IsContinueFlow)
             {
                 return;

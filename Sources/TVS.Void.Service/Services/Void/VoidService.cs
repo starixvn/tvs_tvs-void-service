@@ -44,7 +44,7 @@ namespace TVS.Void.Service.Services.Void
         public async Task Execute(int siteDbGroupId)
         {
             logData = new StringBuilder();
-            timer.Start();
+            timer.Restart();
             var voidingQueues = await ticketVoidingQueueService.GetQueues(siteDbGroupId, null);
             if (!voidingQueues.Any())
             {

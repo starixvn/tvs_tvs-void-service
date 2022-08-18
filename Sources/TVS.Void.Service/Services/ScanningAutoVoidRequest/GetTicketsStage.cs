@@ -23,8 +23,6 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
             this.requestDetailService = requestDetailService;
         }
 
-        public (IEnumerable<RequestDetailTicketModel>, IEnumerable<RequestDetailTicketModel>) OutputData { get; private set; }
-
         public async Task<(bool, GetTicketsStageOutput, string)> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue)
         {
             var (singleTickets, parlayTickets) = await requestDetailService.GetTicketsBySiteDbGroupId(siteDbGroupId, queue);

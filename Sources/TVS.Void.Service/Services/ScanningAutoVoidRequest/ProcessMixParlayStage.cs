@@ -10,7 +10,7 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
 {
     public interface ProcessMixParlayStage
     {
-        Task<(bool IsContinueFlow, string LogData)> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue, IEnumerable<RequestDetailModel> mixParlayRequests);
+        Task<(bool IsContinueFlow, string LogData)> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue, IEnumerable<RequestModel> mixParlayRequests);
     }
 
     public class ProcessMixParlayStageImp : ProcessMixParlayStage
@@ -22,7 +22,7 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
             this.autoVoidRequestQueueService = autoVoidRequestQueueService;
         }
 
-        public async Task<(bool IsContinueFlow, string LogData)> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue, IEnumerable<RequestDetailModel> mixParlayRequests)
+        public async Task<(bool IsContinueFlow, string LogData)> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue, IEnumerable<RequestModel> mixParlayRequests)
         {
             if (queue.StatusId == ExecuteStatus.QueueMixParlay && !mixParlayRequests.Any())
             {
@@ -37,7 +37,7 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
             return (true, logData);
         }
 
-        private async Task<string> InsertNewAutoVoidRequestQueueForMixParlaySpecialCase(int queueStatusId, IEnumerable<RequestDetailModel> mixParlayRequests)
+        private async Task<string> InsertNewAutoVoidRequestQueueForMixParlaySpecialCase(int queueStatusId, IEnumerable<RequestModel> mixParlayRequests)
         {
             if (queueStatusId != ExecuteStatus.QueueMixParlay && mixParlayRequests.Any())
             {

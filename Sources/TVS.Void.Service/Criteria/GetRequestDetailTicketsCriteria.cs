@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using Fanex.Data.Repository;
+﻿using Fanex.Data.Repository;
 
 namespace TVS.Void.Service.Criteria
 {

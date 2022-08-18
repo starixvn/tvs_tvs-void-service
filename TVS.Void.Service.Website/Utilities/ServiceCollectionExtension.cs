@@ -108,6 +108,7 @@ namespace TVS.Void.Service.Website.Utilities
             services.AddSingleton<TicketVoidingQueueService, TicketVoidingQueueServiceImp>();
 
             services.AddSingleton<ScanningAutoVoidRequestService, ScanningAutoVoidRequestServiceImp>();
+            services.AddSingleton<CheckRequestQueueValidStage, CheckRequestQueueValidStageImp>();
             services.AddSingleton<GetTicketsStage, GetTicketsStageImp>();
             services.AddSingleton<CheckStatusTicketsStage, CheckStatusTicketsStageImp>();
             services.AddSingleton<ProcessMixParlayStage, ProcessMixParlayStageImp>();

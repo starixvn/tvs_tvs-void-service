@@ -3,9 +3,10 @@ using System.Collections.Generic;
 
 namespace TVS.Void.Service.Models
 {
-    public class RequestDetailModel
+    public class RequestModel
     {
         public int RequestId { get; set; }
+        public string ActionName { get; set; }
     }
 
     public class RequestDetailTicketModel

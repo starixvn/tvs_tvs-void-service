@@ -36,7 +36,7 @@ namespace TVS.Void.Service.Services.CheckingVoidStatus
         public async Task Execute()
         {
             logData = new StringBuilder();
-            timer.Start();
+            timer.Restart();
             var voidServiceList = await requestDetailService.GetVoidServiceDataForCheckStatus();
             if (!voidServiceList.Any())
             {
