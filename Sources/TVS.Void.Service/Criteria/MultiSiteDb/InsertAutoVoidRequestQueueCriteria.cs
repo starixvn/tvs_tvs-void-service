@@ -24,8 +24,8 @@ namespace TVS.Void.Service.Criteria.MultiSiteDb
 
         private static readonly IEnumerable<SiteDbGroupModel> SpList = new List<SiteDbGroupModel>
         {
-            new () {Id = SiteDbGroupConstant.CentralDb, SpName = "CentralDb.TicketVoiding_AutoVoidRequest_Queue_Insert"},
-            new () {Id = SiteDbGroupConstant.SiteDb1, SpName = "SiteDb1.TicketVoiding_AutoVoidRequest_Queue_Insert"}
+            new () {Id = SiteDbGroupConstant.CentralDb, SpName = "DBCTG.TicketVoiding_AutoVoidRequest_Queue_Insert"},
+            new () {Id = SiteDbGroupConstant.SiteDb1, SpName = "DBSIG.TicketVoiding_AutoVoidRequest_Queue_Insert"}
         };
     }
 }

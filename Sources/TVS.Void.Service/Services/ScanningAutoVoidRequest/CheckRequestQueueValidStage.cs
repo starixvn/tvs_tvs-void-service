@@ -26,13 +26,13 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
             var request = await requestDetailService.GetRequestById(queue.RequestId);
             if (request == null)
             {
-                await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, ExecuteStatus.Done, "RequestId invalid.", null);
+                await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, ExecuteStatus.Done, null, "RequestId invalid.");
                 return false;
             }
 
             if (!request.ActionName.Equals(queue.Action, StringComparison.OrdinalIgnoreCase))
             {
-                await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, ExecuteStatus.Done, "Request Action was edited.", null);
+                await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, ExecuteStatus.Done, null, "Request Action was edited.");
                 return false;
             }
 

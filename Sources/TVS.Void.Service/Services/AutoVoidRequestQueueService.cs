@@ -9,7 +9,7 @@ namespace TVS.Void.Service.Services
     {
         Task<AutoVoidRequestQueueModel> GetQueue(int siteDbGroupId, string broadcastSessionId);
 
-        Task UpdateQueue(int siteDbGroupId, int queueId, int? statusId, string message, int? createdDateMinuteOffset);
+        Task UpdateQueue(int siteDbGroupId, int queueId, int? statusId, bool? isUpdateStartTime, string errorMessage);
 
         Task InsertQueue(int siteDbGroupId, string broadcastSessionId, int requestId, int matchId, int statusId, string action);
     }
@@ -41,15 +41,15 @@ namespace TVS.Void.Service.Services
             return result;
         }
 
-        public async Task UpdateQueue(int siteDbGroupId, int queueId, int? statusId, string message, int? createdDateMinuteOffset)
+        public async Task UpdateQueue(int siteDbGroupId, int queueId, int? statusId, bool? isUpdateStartTime, string errorMessage)
         {
             var criteria = new UpdateAutoVoidRequestQueueCriteria
             {
                 SiteDbGroupId = siteDbGroupId,
                 QueueId = queueId,
                 StatusId = statusId,
-                Message = message,
-                CreatedDateMinuteOffset = createdDateMinuteOffset
+                IsUpdateStartTime = isUpdateStartTime,
+                ErrMsg = errorMessage
             };
 
             await repository.ExecuteAsync(criteria);

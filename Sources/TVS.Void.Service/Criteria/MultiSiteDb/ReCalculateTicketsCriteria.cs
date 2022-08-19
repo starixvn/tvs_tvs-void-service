@@ -9,8 +9,10 @@ namespace TVS.Void.Service.Criteria.MultiSiteDb
 {
     public class ReCalculateTicketsCriteria : NonQueryCommand
     {
-        public string SingleTicketsXml { get; set; }
-        public string ParlayTicketsXml { get; set; }
+        public int MatchId { get; set; }
+        public string TransIds { get; set; }
+        public int UserId { get; set; }
+        public string Ip { get; set; }
 
         [SpParam(Ignored = true)]
         public int SiteDbGroupId { get; set; }
@@ -21,8 +23,8 @@ namespace TVS.Void.Service.Criteria.MultiSiteDb
 
         private static readonly IEnumerable<SiteDbGroupModel> SpList = new List<SiteDbGroupModel>
         {
-            new () {Id = SiteDbGroupConstant.CentralDb, SpName = "CentralDb.TicketVoiding_ReCalculate"},
-            new () {Id = SiteDbGroupConstant.SiteDb1, SpName = "SiteDb1.TicketVoiding_ReCalculate"}
+            new () {Id = SiteDbGroupConstant.CentralDb, SpName = "DBCTG.TicketVoiding_ReCalculate_Single_PreUpdate"},
+            new () {Id = SiteDbGroupConstant.SiteDb1, SpName = "DBSIG.TicketVoiding_ReCalculate_Single_PreUpdate"}
         };
     }
 }

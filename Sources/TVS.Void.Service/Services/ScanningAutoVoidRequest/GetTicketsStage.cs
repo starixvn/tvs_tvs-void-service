@@ -29,7 +29,7 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
             var logData = $"{nameof(GetTicketsStage)}: {JsonSerializer.Serialize(new { singleTickets, parlayTickets })}";
             if (!singleTickets.Any() && !parlayTickets.Any())
             {
-                await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, ExecuteStatus.Done, "No ticket found.", null);
+                await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, ExecuteStatus.Done, null, "No ticket found.");
 
                 return (false, null, logData);
             }

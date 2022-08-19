@@ -42,7 +42,7 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
         {
             if (!validVoidSingleTickets.Any() && !validVoidParlayTickets.Any())
             {
-                await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, ExecuteStatus.Done, "No ticket found.", null);
+                await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, ExecuteStatus.Done, null, "No ticket found.");
 
                 return (false, null);
             }
@@ -53,7 +53,7 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
 
             await NotifyRequestRunningToAllUser(validVoidServiceList);
             await InsertTicketVoidingQueue(siteDbGroupId, insertedVoidServiceList, validVoidSingleTickets, validVoidParlayTickets);
-            await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, ExecuteStatus.Done, default, null);
+            await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, ExecuteStatus.Done, null, null);
             return (true, logData);
         }
 

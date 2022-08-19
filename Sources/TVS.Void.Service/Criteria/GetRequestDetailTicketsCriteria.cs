@@ -11,7 +11,7 @@ namespace TVS.Void.Service.Criteria
 
         public string Action { get; set; }
 
-        public override string GetSettingKey() => "TicketVoiding_RequestDetailTickets_Select";
+        public override string GetSettingKey() => "TicketVoiding_AutoVoidRequest_Ticket_Select";
 
         public override bool IsValid() => true;
     }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using TicketVoidingSystem.Constants;
 using TVS.Void.Service.Constants;
@@ -26,8 +27,7 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
         {
             if (queue.StatusId == ExecuteStatus.QueueMixParlay && !mixParlayRequests.Any())
             {
-                const int minuteOffset = 10;
-                await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, null, null, minuteOffset);
+                await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, null, true, null);
 
                 return (false, null);
             }
@@ -41,17 +41,19 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
         {
             if (queueStatusId != ExecuteStatus.QueueMixParlay && mixParlayRequests.Any())
             {
-                var guid = Guid.NewGuid().ToString();
-
-                foreach (var server in SiteDbGroupConstant.ServerList)
+                var logGuid = new StringBuilder();
+                foreach (var request in mixParlayRequests)
                 {
-                    foreach (var request in mixParlayRequests)
+                    var guidInAllServer = Guid.NewGuid().ToString();
+                    foreach (var server in SiteDbGroupConstant.ServerList)
                     {
-                        await autoVoidRequestQueueService.InsertQueue(server.Id, guid, request.RequestId, 0, ExecuteStatus.QueueMixParlay, AutoVoidConstant.QueueActionMixParlay);
+                        await autoVoidRequestQueueService.InsertQueue(server.Id, guidInAllServer, request.RequestId, 0, ExecuteStatus.QueueMixParlay, AutoVoidConstant.QueueActionMixParlay);
                     }
+
+                    logGuid.Append($",{guidInAllServer}");
                 }
 
-                return guid;
+                return logGuid.ToString();
             }
 
             return string.Empty;

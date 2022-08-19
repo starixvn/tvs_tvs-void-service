@@ -11,8 +11,8 @@ namespace TVS.Void.Service.Criteria.MultiSiteDb
     {
         public int QueueId { get; set; }
         public int? StatusId { get; set; }
-        public int? CreatedDateMinuteOffset { get; set; }
-        public string Message { get; set; }
+        public bool? IsUpdateStartTime { get; set; }
+        public string ErrMsg { get; set; }
 
         [SpParam(Ignored = true)]
         public int SiteDbGroupId { get; set; }
@@ -23,8 +23,8 @@ namespace TVS.Void.Service.Criteria.MultiSiteDb
 
         private static readonly IEnumerable<SiteDbGroupModel> SpList = new List<SiteDbGroupModel>
         {
-            new () {Id = SiteDbGroupConstant.CentralDb, SpName = "CentralDb.TicketVoiding_AutoVoidRequest_Queue_Update"},
-            new () {Id = SiteDbGroupConstant.SiteDb1, SpName = "SiteDb1.TicketVoiding_AutoVoidRequest_Queue_Update"}
+            new () {Id = SiteDbGroupConstant.CentralDb, SpName = "DBCTG.TicketVoiding_AutoVoidRequest_Queue_Update"},
+            new () {Id = SiteDbGroupConstant.SiteDb1, SpName = "DBSIG.TicketVoiding_AutoVoidRequest_Queue_Update"}
         };
     }
 }

@@ -121,11 +121,11 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
             }
 
             await reCalculateTicketsStage.Execute(siteDbGroupId,
-                checkStatusTicketsResult.OutputData.SingleTicketsResettle,
+                checkStatusTicketsResult.OutputData.SingleTicketsResettle, // TODO: check column ticket trả về SingleTicketsResettle
                 checkStatusTicketsResult.OutputData.ParlayTicketsResettle);
 
             var insertPreVoidingDataResult = await insertPreVoidingDataStage.Execute(siteDbGroupId, queue,
-                checkStatusTicketsResult.OutputData.ValidVoidSingleTickets,
+                checkStatusTicketsResult.OutputData.ValidVoidSingleTickets, // TODO: check column ticket trả về ValidVoidSingleTickets
                 checkStatusTicketsResult.OutputData.ValidVoidParlayTickets);
             logData.AppendLine(insertPreVoidingDataResult.LogData);
         }
