@@ -34,7 +34,7 @@ namespace TVS.Void.Service.Extensions
             var stringBuilder = new StringBuilder();
             foreach (var model in models)
             {
-                var line = $"<r RequestId='{model.RequestId}' IssueTypeId='{model.IssueTypeId}' MatchId='{model.MatchId}' SiteDbGroupId='{model.SiteDbGroupId}'/>";
+                var line = $"<r RequestId='{model.RequestId}' IssueTypeId='{model.IssueTypeId}' MatchId='{model.MatchId}' SiteDBGroupId='{model.SiteDbGroupId}'/>";
                 stringBuilder.AppendLine(line);
             }
 
