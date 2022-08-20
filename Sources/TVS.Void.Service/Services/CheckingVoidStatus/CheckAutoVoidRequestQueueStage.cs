@@ -33,7 +33,7 @@ namespace TVS.Void.Service.Services.CheckingVoidStatus
                     autoVoidRequestQueues.Add(queue);
                 }
 
-                logData = $"autoVoidRequestQueues: {JsonSerializer.Serialize(autoVoidRequestQueues)}";
+                logData = $"AutoVoidRequestQueues: {JsonSerializer.Serialize(autoVoidRequestQueues)}";
                 if (autoVoidRequestQueues.Any(x => x == null)
                     || autoVoidRequestQueues.Any(x => x.StatusId != ExecuteStatus.Done))
                 {

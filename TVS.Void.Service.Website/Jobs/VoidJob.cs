@@ -35,8 +35,7 @@ namespace TVS.Void.Service.Website.Jobs
 
                     if (!await maintenanceService.IsUnderMaintenanceAsync())
                     {
-                        var tasks = SiteDbGroupConstant.ServerList.Select(x => voidService.Execute(x.Id));
-                        await Task.WhenAll(tasks);
+                        await ExecuteSiteDbSequential();
                     }
 
                     AppConfigService.AppConfig.IsVoidJobExecuting = false;
@@ -46,6 +45,14 @@ namespace TVS.Void.Service.Website.Jobs
             {
                 AppConfigService.AppConfig.IsVoidJobExecuting = false;
                 await loggingService.ErrorAsync("VoidJob execute failed!", ex);
+            }
+        }
+
+        private async Task ExecuteSiteDbSequential()
+        {
+            foreach (var server in SiteDbGroupConstant.ServerList)
+            {
+                await voidService.Execute(server.Id);
             }
         }
     }
