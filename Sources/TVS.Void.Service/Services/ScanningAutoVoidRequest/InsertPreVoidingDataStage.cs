@@ -67,16 +67,16 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
             { RequestId = x.RequestId, IssueTypeId = x.IssueTypeId, SiteDbGroupId = siteDbGroupId }).Distinct(equalityComparer);
             var validVoidServiceList = distinctRequestFirst.Union(distinctRequestSecond, equalityComparer);
 
-            AssignMatchIdForRequests(validVoidServiceList, validVoidSingleTickets, validVoidParlayTickets);
-
-            return validVoidServiceList;
+            var finalVoidServiceList = AssignMatchIdForRequests(validVoidServiceList, validVoidSingleTickets, validVoidParlayTickets);
+            return finalVoidServiceList;
         }
 
-        private static void AssignMatchIdForRequests(IEnumerable<VoidServiceModel> voidServiceModels,
+        private static IEnumerable<VoidServiceModel> AssignMatchIdForRequests(IEnumerable<VoidServiceModel> voidServiceModels,
             IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets)
         {
             const int mixParlayMatch = 29;
-            foreach (var voidService in voidServiceModels)
+            var finalList = voidServiceModels.ToList();
+            finalList.ForEach(voidService =>
             {
                 var ticketsInRequest = singleTickets.Where(x => x.RequestId == voidService.RequestId)
                     .Union(parlayTickets.Where(x => x.RequestId == voidService.RequestId), new RequestDetailTicketModelEqualityComparer());
@@ -84,7 +84,9 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
                 voidService.MatchId = (voidService.IssueTypeId is IssueTypeConstant.AbnormalBet or IssueTypeConstant.AbnormalBetRealMember
                                        && !ticketsInRequest.Any(x => x.RequestId == voidService.RequestId && x.MatchId == mixParlayMatch))
                     ? ticketsInRequest.First().MatchId : 0;
-            }
+            });
+
+            return finalList;
         }
 
         private async Task NotifyRequestRunningToAllUser(IEnumerable<VoidServiceModel> voidServiceModels)
