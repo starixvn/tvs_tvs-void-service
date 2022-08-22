@@ -9,7 +9,8 @@ namespace TVS.Void.Service.Criteria
         public int? RequestId { get; set; }
         public int? VoidingHistoryId { get; set; }
 
-        public int StatusId { get; set; }
+        public int? StatusId { get; set; }
+        public bool? IsUpdateCreatedDate { get; set; }
 
         public override string GetSettingKey() => "TicketVoiding_Void_Service_Update";
 

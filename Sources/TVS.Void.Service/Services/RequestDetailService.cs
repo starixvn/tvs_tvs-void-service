@@ -17,7 +17,7 @@ namespace TVS.Void.Service.Services
 
         Task UpdateVoidService(int siteDbGroupId, int requestId, int voidingHistoryId, int statusId);
 
-        Task UpdateVoidServiceByBroadcastSessionId(string broadcastSessionId, int statusId);
+        Task UpdateVoidServiceByBroadcastSessionId(string broadcastSessionId, int? statusId, bool? isUpdateCreatedDate);
 
         Task<IEnumerable<VoidServiceModel>> GetVoidServiceDataForCheckStatus();
 
@@ -66,7 +66,7 @@ namespace TVS.Void.Service.Services
             return voidServiceData;
         }
 
-        private async Task UpdateVoidService(int? siteDbGroupId, int? requestId, int? voidingHistoryId, int statusId, string broadcastSessionId)
+        private async Task UpdateVoidService(int? siteDbGroupId, int? requestId, int? voidingHistoryId, int? statusId, string broadcastSessionId, bool? isUpdateCreatedDate)
         {
             var criteria = new UpdateVoidServiceCriteria
             {
@@ -74,7 +74,8 @@ namespace TVS.Void.Service.Services
                 RequestId = requestId,
                 VoidingHistoryId = voidingHistoryId,
                 StatusId = statusId,
-                BroadcastSessionId = broadcastSessionId
+                BroadcastSessionId = broadcastSessionId,
+                IsUpdateCreatedDate = isUpdateCreatedDate
             };
 
             await repository.ExecuteAsync(criteria);
@@ -82,12 +83,12 @@ namespace TVS.Void.Service.Services
 
         public async Task UpdateVoidService(int siteDbGroupId, int requestId, int voidingHistoryId, int statusId)
         {
-            await UpdateVoidService(siteDbGroupId, requestId, voidingHistoryId, statusId, null);
+            await UpdateVoidService(siteDbGroupId, requestId, voidingHistoryId, statusId, null, null);
         }
 
-        public async Task UpdateVoidServiceByBroadcastSessionId(string broadcastSessionId, int statusId)
+        public async Task UpdateVoidServiceByBroadcastSessionId(string broadcastSessionId, int? statusId, bool? isUpdateCreatedDate)
         {
-            await UpdateVoidService(null, null, null, statusId, broadcastSessionId);
+            await UpdateVoidService(null, null, null, statusId, broadcastSessionId, isUpdateCreatedDate);
         }
 
         public async Task<IEnumerable<VoidServiceModel>> GetVoidServiceDataForCheckStatus()

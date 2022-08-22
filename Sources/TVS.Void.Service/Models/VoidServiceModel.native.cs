@@ -13,6 +13,7 @@ namespace TVS.Void.Service.Models
         public bool IsAutoVoid { get; set; }
         public int IssueTypeId { get; set; }
         public int MatchId { get; set; }
+        public int CreatedTimeDuration { get; set; }
     }
 
     public class VoidServiceModelEqualityComparer : IEqualityComparer<VoidServiceModel>
