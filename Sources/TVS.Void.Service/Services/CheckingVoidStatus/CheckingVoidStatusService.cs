@@ -53,9 +53,9 @@ namespace TVS.Void.Service.Services.CheckingVoidStatus
                 logData.AppendLine($"CheckingStatus: {JsonSerializer.Serialize(voidServiceList)}");
 
                 var firstVoidService = voidServiceList.First();
-                var checkAutoVoidRequestQueue = await checkAutoVoidRequestQueueStage.Execute(firstVoidService.IsAutoVoid, firstVoidService.BroadcastSessionId, firstVoidService.CreatedTimeDuration);
-                logData.AppendLine(checkAutoVoidRequestQueue.LogData);
-                if (!checkAutoVoidRequestQueue.IsContinueFlow)
+                var checkAutoVoidRequestQueue = await checkAutoVoidRequestQueueStage
+                    .Execute(firstVoidService.IsAutoVoid, firstVoidService.BroadcastSessionId, firstVoidService.CreatedTimeDuration, logData);
+                if (!checkAutoVoidRequestQueue)
                 {
                     await loggingService.InfoAsync(logData.ToString());
                     return;
@@ -63,7 +63,7 @@ namespace TVS.Void.Service.Services.CheckingVoidStatus
 
                 var afterVoidData = await prepareAfterVoidDataStage.Execute(voidServiceList);
                 var insertAfterVoidResult = await requestDetailService.InsertAfterVoidServiceData(firstVoidService.IsAutoVoid, afterVoidData);
-                logData.AppendLine($"insertAfterVoidResult: {JsonSerializer.Serialize(insertAfterVoidResult)}");
+                logData.AppendLine($"InsertAfterVoidResult: {JsonSerializer.Serialize(insertAfterVoidResult)}");
 
                 await requestDetailService.UpdateVoidServiceByBroadcastSessionId(firstVoidService.BroadcastSessionId, ExecuteStatus.Done, null);
 

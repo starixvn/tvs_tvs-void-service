@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
@@ -14,9 +15,9 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
 {
     public interface InsertPreVoidingDataStage
     {
-        Task<(bool IsContinueFlow, string LogData)> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue,
+        Task<bool> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue,
             IEnumerable<RequestDetailTicketModel> validVoidSingleTickets,
-            IEnumerable<RequestDetailTicketModel> validVoidParlayTickets);
+            IEnumerable<RequestDetailTicketModel> validVoidParlayTickets, StringBuilder logData);
     }
 
     public class InsertPreVoidingDataStageImp : InsertPreVoidingDataStage
@@ -37,24 +38,24 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
             this.hubContext = hubContext;
         }
 
-        public async Task<(bool, string)> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue,
-            IEnumerable<RequestDetailTicketModel> validVoidSingleTickets, IEnumerable<RequestDetailTicketModel> validVoidParlayTickets)
+        public async Task<bool> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue,
+            IEnumerable<RequestDetailTicketModel> validVoidSingleTickets, IEnumerable<RequestDetailTicketModel> validVoidParlayTickets, StringBuilder logData)
         {
             if (!validVoidSingleTickets.Any() && !validVoidParlayTickets.Any())
             {
                 await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, ExecuteStatus.Done, null, "No ticket found.");
 
-                return (false, null);
+                return false;
             }
 
             var validVoidServiceList = InitVoidServiceData(siteDbGroupId, validVoidSingleTickets, validVoidParlayTickets);
             var insertedVoidServiceList = await requestDetailService.InsertVoidingHistory(queue.BroadcastSessionId, validVoidServiceList);
-            var logData = $"{nameof(InsertPreVoidingDataStage)}: {JsonSerializer.Serialize(new { validVoidServiceList, insertedVoidServiceList })}";
+            logData.AppendLine($"{nameof(InsertPreVoidingDataStage)}: {JsonSerializer.Serialize(new { validVoidServiceList, insertedVoidServiceList })}");
 
             await NotifyRequestRunningToAllUser(validVoidServiceList);
             await InsertTicketVoidingQueue(siteDbGroupId, insertedVoidServiceList, validVoidSingleTickets, validVoidParlayTickets);
             await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, ExecuteStatus.Done, null, null);
-            return (true, logData);
+            return true;
         }
 
         private static IEnumerable<VoidServiceModel>

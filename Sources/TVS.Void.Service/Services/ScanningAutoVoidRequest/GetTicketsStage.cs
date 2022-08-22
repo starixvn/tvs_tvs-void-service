@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using TicketVoidingSystem.Constants;
@@ -9,7 +10,7 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
 {
     public interface GetTicketsStage
     {
-        Task<(bool IsContinueFlow, GetTicketsStageOutput OutputData, string LogData)> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue);
+        Task<(bool IsContinueFlow, GetTicketsStageOutput OutputData)> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue, StringBuilder logData);
     }
 
     public class GetTicketsStageImp : GetTicketsStage
@@ -23,15 +24,15 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
             this.requestDetailService = requestDetailService;
         }
 
-        public async Task<(bool, GetTicketsStageOutput, string)> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue)
+        public async Task<(bool, GetTicketsStageOutput)> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue, StringBuilder logData)
         {
             var (singleTickets, parlayTickets) = await requestDetailService.GetTicketsBySiteDbGroupId(siteDbGroupId, queue);
-            var logData = $"{nameof(GetTicketsStage)}: {JsonSerializer.Serialize(new { singleTickets, parlayTickets })}";
+            logData?.AppendLine($"{nameof(GetTicketsStage)}: {JsonSerializer.Serialize(new { singleTickets, parlayTickets })}");
             if (!singleTickets.Any() && !parlayTickets.Any())
             {
                 await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, ExecuteStatus.Done, null, "No ticket found.");
 
-                return (false, null, logData);
+                return (false, null);
             }
 
             var outputData = new GetTicketsStageOutput
@@ -39,7 +40,7 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
                 SingleTickets = singleTickets,
                 ParlayTickets = parlayTickets
             };
-            return (true, outputData, logData);
+            return (true, outputData);
         }
     }
 

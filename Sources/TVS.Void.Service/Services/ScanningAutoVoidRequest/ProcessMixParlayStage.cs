@@ -11,7 +11,7 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
 {
     public interface ProcessMixParlayStage
     {
-        Task<(bool IsContinueFlow, string LogData)> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue, IEnumerable<RequestModel> mixParlayRequests);
+        Task<bool> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue, IEnumerable<RequestModel> mixParlayRequests, StringBuilder logData);
     }
 
     public class ProcessMixParlayStageImp : ProcessMixParlayStage
@@ -23,18 +23,18 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
             this.autoVoidRequestQueueService = autoVoidRequestQueueService;
         }
 
-        public async Task<(bool IsContinueFlow, string LogData)> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue, IEnumerable<RequestModel> mixParlayRequests)
+        public async Task<bool> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue, IEnumerable<RequestModel> mixParlayRequests, StringBuilder logData)
         {
             if (queue.StatusId == ExecuteStatus.QueueMixParlay && !mixParlayRequests.Any())
             {
                 await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, null, true, null);
 
-                return (false, null);
+                return false;
             }
 
-            var guid = await InsertNewAutoVoidRequestQueueForMixParlaySpecialCase(queue.StatusId, mixParlayRequests);
-            var logData = $"Guid InsertAutoVoidQueue100: {guid}";
-            return (true, logData);
+            var guidList = await InsertNewAutoVoidRequestQueueForMixParlaySpecialCase(queue.StatusId, mixParlayRequests);
+            logData.AppendLine($"Guid InsertAutoVoidQueue100: {guidList}");
+            return true;
         }
 
         private async Task<string> InsertNewAutoVoidRequestQueueForMixParlaySpecialCase(int queueStatusId, IEnumerable<RequestModel> mixParlayRequests)

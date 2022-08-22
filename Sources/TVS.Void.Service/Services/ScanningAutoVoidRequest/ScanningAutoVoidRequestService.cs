@@ -91,43 +91,39 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
                 return;
             }
 
-            var getTicketsResult = await getTicketsStage.Execute(siteDbGroupId, queue);
+            var getTicketsResult = await getTicketsStage.Execute(siteDbGroupId, queue, logData);
             if (!getTicketsResult.IsContinueFlow)
             {
                 return;
             }
 
-            var insertPreVoidingResult = await insertPreVoidingDataStage.Execute(siteDbGroupId, queue, getTicketsResult.OutputData.SingleTickets, getTicketsResult.OutputData.ParlayTickets);
-            logData.AppendLine(getTicketsResult.LogData);
-            logData.AppendLine(insertPreVoidingResult.LogData);
+            await insertPreVoidingDataStage.Execute(siteDbGroupId, queue,
+                getTicketsResult.OutputData.SingleTickets, getTicketsResult.OutputData.ParlayTickets, logData);
         }
 
         private async Task ExecuteForAutoVoidWinningGroup(int siteDbGroupId, AutoVoidRequestQueueModel queue)
         {
-            var getTicketsResult = await getTicketsStage.Execute(siteDbGroupId, queue);
+            var getTicketsResult = await getTicketsStage.Execute(siteDbGroupId, queue, null);
             if (!getTicketsResult.IsContinueFlow)
             {
                 return;
             }
 
-            var checkStatusTicketsResult = await checkStatusTicketsStage.Execute(siteDbGroupId, getTicketsResult.OutputData.SingleTickets, getTicketsResult.OutputData.ParlayTickets);
-            logData.AppendLine(checkStatusTicketsResult.LogData);
+            var checkStatusTicketsResult = await checkStatusTicketsStage.Execute(siteDbGroupId, getTicketsResult.OutputData.SingleTickets, getTicketsResult.OutputData.ParlayTickets, logData);
 
-            var processMixParlayResult = await processMixParlayStage.Execute(siteDbGroupId, queue, checkStatusTicketsResult.OutputData.MixParlayRequestsNoStatusWinLossButAllChildMatchesCompleted);
-            logData.AppendLine(processMixParlayResult.LogData);
-            if (!processMixParlayResult.IsContinueFlow)
+            var processMixParlayResult = await processMixParlayStage.Execute(siteDbGroupId, queue, checkStatusTicketsResult.MixParlayRequestsNoStatusWinLossButAllChildMatchesCompleted, logData);
+            if (!processMixParlayResult)
             {
                 return;
             }
 
             await reCalculateTicketsStage.Execute(siteDbGroupId,
-                checkStatusTicketsResult.OutputData.SingleTicketsResettle, // TODO: check column ticket trả về SingleTicketsResettle
-                checkStatusTicketsResult.OutputData.ParlayTicketsResettle);
+                checkStatusTicketsResult.SingleTicketsResettle,
+                checkStatusTicketsResult.ParlayTicketsResettle);
 
-            var insertPreVoidingDataResult = await insertPreVoidingDataStage.Execute(siteDbGroupId, queue,
-                checkStatusTicketsResult.OutputData.ValidVoidSingleTickets, // TODO: check column ticket trả về ValidVoidSingleTickets
-                checkStatusTicketsResult.OutputData.ValidVoidParlayTickets);
-            logData.AppendLine(insertPreVoidingDataResult.LogData);
+            await insertPreVoidingDataStage.Execute(siteDbGroupId, queue,
+                 checkStatusTicketsResult.ValidVoidSingleTickets,
+                 checkStatusTicketsResult.ValidVoidParlayTickets, logData);
         }
 
         private static bool IsVoidInstantQueue(string action)

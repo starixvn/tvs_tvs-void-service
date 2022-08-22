@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace TVS.Void.Service.Models
 {
@@ -13,6 +14,8 @@ namespace TVS.Void.Service.Models
         public bool IsAutoVoid { get; set; }
         public int IssueTypeId { get; set; }
         public int MatchId { get; set; }
+
+        [JsonIgnore]
         public int CreatedTimeDuration { get; set; }
     }
 

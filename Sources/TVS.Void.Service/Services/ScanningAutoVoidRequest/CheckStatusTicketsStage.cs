@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Fanex.Data.Repository;
@@ -11,8 +12,8 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
 {
     public interface CheckStatusTicketsStage
     {
-        Task<(CheckStatusTicketOutput OutputData, string LogData)> Execute(int siteDbGroupId,
-            IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets);
+        Task<CheckStatusTicketOutput> Execute(int siteDbGroupId,
+            IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets, StringBuilder logData);
     }
 
     public class CheckStatusTicketsStageImp : CheckStatusTicketsStage
@@ -24,8 +25,8 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
             this.repository = repository;
         }
 
-        public async Task<(CheckStatusTicketOutput OutputData, string LogData)> Execute(int siteDbGroupId,
-            IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets)
+        public async Task<CheckStatusTicketOutput> Execute(int siteDbGroupId,
+            IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets, StringBuilder logData)
         {
             var criteria = new CheckTicketsAllowToVoidCriteria
             {
@@ -54,9 +55,9 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
                 MixParlayRequestsNoStatusWinLossButAllChildMatchesCompleted = objectsArray[4].Cast<RequestModel>()
             };
 
-            var logData = $"{nameof(CheckStatusTicketsStage)}: {JsonSerializer.Serialize(outputData)}";
+            logData.AppendLine($"{nameof(CheckStatusTicketsStage)}: {JsonSerializer.Serialize(outputData)}");
 
-            return (outputData, logData);
+            return outputData;
         }
     }
 }

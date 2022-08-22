@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using TicketVoidingSystem.Constants;
@@ -9,7 +10,7 @@ namespace TVS.Void.Service.Services.CheckingVoidStatus
 {
     public interface CheckAutoVoidRequestQueueStage
     {
-        Task<(bool IsContinueFlow, string LogData)> Execute(bool isAutoVoid, string broadcastSessionId, int createdTimeDuration);
+        Task<bool> Execute(bool isAutoVoid, string broadcastSessionId, int createdTimeDuration, StringBuilder logData);
     }
 
     public class CheckAutoVoidRequestQueueStageImp : CheckAutoVoidRequestQueueStage
@@ -23,33 +24,32 @@ namespace TVS.Void.Service.Services.CheckingVoidStatus
             this.requestDetailService = requestDetailService;
         }
 
-        public async Task<(bool IsContinueFlow, string LogData)> Execute(bool isAutoVoid, string broadcastSessionId, int createdTimeDuration)
+        public async Task<bool> Execute(bool isAutoVoid, string broadcastSessionId, int createdTimeDuration, StringBuilder logData)
         {
-            var logData = string.Empty;
             if (isAutoVoid)
             {
                 var autoVoidRequestQueues = await GetAutoVoidRequestQueueInAllServerDb(broadcastSessionId);
-                logData = $"AutoVoidRequestQueues: {JsonSerializer.Serialize(autoVoidRequestQueues)}";
+                logData.AppendLine($"AutoVoidRequestQueues: {JsonSerializer.Serialize(autoVoidRequestQueues)}");
 
                 if (autoVoidRequestQueues.Any(x => x == null))
 
                 {
-                    return (false, logData);
+                    return false;
                 }
 
                 if (autoVoidRequestQueues.Any(x => x.StatusId == ExecuteStatus.Failed) || createdTimeDuration > 300)
                 {
                     await requestDetailService.UpdateVoidServiceByBroadcastSessionId(broadcastSessionId, null, true);
-                    return (false, logData);
+                    return false;
                 }
 
                 if (autoVoidRequestQueues.Any(x => x.StatusId == ExecuteStatus.New))
                 {
-                    return (false, logData);
+                    return false;
                 }
             }
 
-            return (true, logData);
+            return true;
         }
 
         private async Task<IEnumerable<AutoVoidRequestQueueModel>> GetAutoVoidRequestQueueInAllServerDb(string broadcastSessionId)
