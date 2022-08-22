@@ -119,7 +119,7 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
 
             await reCalculateTicketsStage.Execute(siteDbGroupId,
                 checkStatusTicketsResult.SingleTicketsResettle,
-                checkStatusTicketsResult.ParlayTicketsResettle);
+                checkStatusTicketsResult.ParlayTicketsResettle, logData);
 
             await insertPreVoidingDataStage.Execute(siteDbGroupId, queue,
                  checkStatusTicketsResult.ValidVoidSingleTickets,
