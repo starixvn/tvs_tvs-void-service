@@ -75,19 +75,27 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
         private static IEnumerable<VoidServiceModel> AssignMatchIdForRequests(IEnumerable<VoidServiceModel> voidServiceModels,
             IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets)
         {
-            const int mixParlayMatch = 29;
             var finalList = voidServiceModels.ToList();
             finalList.ForEach(voidService =>
             {
-                var ticketsInRequest = singleTickets.Where(x => x.RequestId == voidService.RequestId)
-                    .Union(parlayTickets.Where(x => x.RequestId == voidService.RequestId), new RequestDetailTicketModelEqualityComparer());
-
-                voidService.MatchId = (voidService.IssueTypeId is IssueTypeConstant.AbnormalBet or IssueTypeConstant.AbnormalBetRealMember
-                                       && !ticketsInRequest.Any(x => x.RequestId == voidService.RequestId && x.MatchId == mixParlayMatch))
-                    ? ticketsInRequest.First().MatchId : 0;
+                var distinctMatchIdFromSingleTicketsInRequest = singleTickets.Where(x => x.RequestId == voidService.RequestId).Select(x => x.MatchId).Distinct();
+                var distinctMatchIdFromParlayTicketsInRequest = parlayTickets.Where(x => x.RequestId == voidService.RequestId).Select(x => x.MatchId).Distinct();
+                var distinctMatchIdInRequest = distinctMatchIdFromSingleTicketsInRequest.Union(distinctMatchIdFromParlayTicketsInRequest);
+                voidService.MatchId = GetMatchIdFromVoidTickets(voidService.IssueTypeId, distinctMatchIdInRequest);
             });
 
             return finalList;
+        }
+
+        private static int GetMatchIdFromVoidTickets(int issueTypeId, IEnumerable<int> distinctMatchIdInRequest)
+        {
+            const int parlayMatchId = 29;
+            if (issueTypeId == IssueTypeConstant.AbnormalAccount || distinctMatchIdInRequest.Count() > 1 || distinctMatchIdInRequest.Any(x => x == parlayMatchId))
+            {
+                return 0;
+            }
+
+            return distinctMatchIdInRequest.First();
         }
 
         private async Task NotifyRequestRunningToAllUser(IEnumerable<VoidServiceModel> voidServiceModels)

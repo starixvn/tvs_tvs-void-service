@@ -63,7 +63,7 @@ namespace TVS.Void.Service.Services.Void
                 logData.AppendLine($"{nameof(ProcessVoidQueueResult)}: {JsonSerializer.Serialize(processVoidQueuesResult)}");
 
                 var firstVoidingQueue = voidingQueues.First();
-                if (processVoidQueuesResult.Any(x => x.StatusId == ExecuteStatus.Failed))
+                if (processVoidQueuesResult.Any(x => x.StatusId is ExecuteStatus.Failed or ExecuteStatus.New))
                 {
                     await requestDetailService.UpdateVoidService(siteDbGroupId, firstVoidingQueue.RequestId, firstVoidingQueue.VoidingHistoryId, ExecuteStatus.Failed);
                     await requestDetailService.UpdateTicketVoidingHistory(firstVoidingQueue.VoidingHistoryId, ExecuteStatus.Failed);
