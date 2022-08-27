@@ -61,10 +61,7 @@ namespace TVS.Void.Service.Services.CheckingVoidStatus
                     return;
                 }
 
-                var afterVoidData = await prepareAfterVoidDataStage.Execute(voidServiceList);
-                var insertAfterVoidResult = await requestDetailService.InsertAfterVoidServiceData(firstVoidService.IsAutoVoid, afterVoidData);
-                logData.AppendLine($"InsertAfterVoidResult: {JsonSerializer.Serialize(insertAfterVoidResult)}");
-
+                await InsertAfterVoidData(firstVoidService.IsAutoVoid, voidServiceList);
                 await requestDetailService.UpdateVoidServiceByBroadcastSessionId(firstVoidService.BroadcastSessionId, ExecuteStatus.Done, null);
 
                 logData.AppendLine($"Server Time: {DateTime.Now:MM/dd/yyyy HH:mm:ss.fff}");
@@ -76,6 +73,23 @@ namespace TVS.Void.Service.Services.CheckingVoidStatus
             {
                 await loggingService.InfoAsync(logData.ToString());
                 await loggingService.ErrorAsync($"{nameof(CheckingVoidStatusService)} Error", e);
+            }
+        }
+
+        private async Task InsertAfterVoidData(bool isAutoVoid, IEnumerable<VoidServiceModel> voidServiceList)
+        {
+            var (groupHaveMatchId, groupNoMatchId) = await prepareAfterVoidDataStage.Execute(voidServiceList);
+            logData.AppendLine($"PrepareDataCount GroupHaveMatchId: {groupHaveMatchId.Count()} - GroupNoMatchId: {groupNoMatchId.Count()}");
+            if (groupHaveMatchId.Any())
+            {
+                var insertAfterVoidResult = await requestDetailService.InsertAfterVoidServiceData(isAutoVoid, groupHaveMatchId);
+                logData.AppendLine($"InsertAfterVoidResult-GroupHaveMatchId: {JsonSerializer.Serialize(insertAfterVoidResult)}");
+            }
+
+            if (groupNoMatchId.Any())
+            {
+                var insertAfterVoidResult = await requestDetailService.InsertAfterVoidServiceData(isAutoVoid, groupNoMatchId);
+                logData.AppendLine($"InsertAfterVoidResult-GroupNoMatchId: {JsonSerializer.Serialize(insertAfterVoidResult)}");
             }
         }
     }
