@@ -109,10 +109,11 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
                 return;
             }
 
-            var checkStatusTicketsResult = await checkStatusTicketsStage.Execute(siteDbGroupId, getTicketsResult.OutputData.SingleTickets, getTicketsResult.OutputData.ParlayTickets, logData);
+            var checkStatusTicketsResult = await checkStatusTicketsStage.Execute(siteDbGroupId, queue.Action,
+                getTicketsResult.OutputData.SingleTickets, getTicketsResult.OutputData.ParlayTickets, logData);
 
-            var processMixParlayResult = await processMixParlayStage.Execute(siteDbGroupId, queue, checkStatusTicketsResult.MixParlayRequestsNoStatusWinLossButAllChildMatchesCompleted, logData);
-            if (!processMixParlayResult)
+            var isContinueFlow = await processMixParlayStage.Execute(siteDbGroupId, queue, checkStatusTicketsResult.MixParlayRequestsNoStatusWinLossButAllChildMatchesCompleted, logData);
+            if (!isContinueFlow)
             {
                 return;
             }

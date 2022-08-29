@@ -25,38 +25,61 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
 
         public async Task<bool> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue, IEnumerable<RequestModel> mixParlayRequests, StringBuilder logData)
         {
-            if (queue.StatusId == ExecuteStatus.QueueMixParlay && !mixParlayRequests.Any())
+            var isMixParlayQueue = queue.Action.Equals(AutoVoidConstant.QueueActionMixParlay, StringComparison.OrdinalIgnoreCase);
+            if (isMixParlayQueue)
             {
-                await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, null, true, null);
-
-                return false;
+                return await ExecuteForMixParlayQueueOnly(siteDbGroupId, queue, mixParlayRequests, logData);
             }
 
-            var guidList = await InsertNewAutoVoidRequestQueueForMixParlaySpecialCase(queue.StatusId, mixParlayRequests);
-            logData.AppendLine($"Guid InsertAutoVoidQueue100: {guidList}");
+            return await ExecuteForOthersCalcQueue(mixParlayRequests, logData);
+        }
+
+        private async Task<bool> ExecuteForMixParlayQueueOnly(int siteDbGroupId, AutoVoidRequestQueueModel queue, IEnumerable<RequestModel> mixParlayRequests, StringBuilder logData)
+        {
+            var currentRequest = mixParlayRequests.First(x => x.RequestId == queue.RequestId);
+            switch (currentRequest.ProcessMixParlayStatus)
+            {
+                case ProcessMixParlayStatusConstant.InsertNewMixParlayQueue:
+                    await InsertNewAutoVoidRequestQueueForMixParlaySpecialCase(mixParlayRequests, logData);
+                    return true;
+
+                case ProcessMixParlayStatusConstant.DoneQueueWithNoTicketFound:
+                    return true;
+
+                case ProcessMixParlayStatusConstant.WaitingForNextRunning:
+                    await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, null, true, null);
+                    return false;
+
+                default:
+                    return false;
+            }
+        }
+
+        private async Task<bool> ExecuteForOthersCalcQueue(IEnumerable<RequestModel> mixParlayRequests, StringBuilder logData)
+        {
+            if (mixParlayRequests.Any())
+            {
+                await InsertNewAutoVoidRequestQueueForMixParlaySpecialCase(mixParlayRequests, logData);
+            }
+
             return true;
         }
 
-        private async Task<string> InsertNewAutoVoidRequestQueueForMixParlaySpecialCase(int queueStatusId, IEnumerable<RequestModel> mixParlayRequests)
+        private async Task InsertNewAutoVoidRequestQueueForMixParlaySpecialCase(IEnumerable<RequestModel> mixParlayRequests, StringBuilder logData)
         {
-            if (queueStatusId != ExecuteStatus.QueueMixParlay && mixParlayRequests.Any())
+            var guidList = new StringBuilder();
+            foreach (var request in mixParlayRequests)
             {
-                var logGuid = new StringBuilder();
-                foreach (var request in mixParlayRequests)
+                var guidInAllServer = Guid.NewGuid().ToString();
+                foreach (var server in SiteDbGroupConstant.ServerList)
                 {
-                    var guidInAllServer = Guid.NewGuid().ToString();
-                    foreach (var server in SiteDbGroupConstant.ServerList)
-                    {
-                        await autoVoidRequestQueueService.InsertQueue(server.Id, guidInAllServer, request.RequestId, 0, ExecuteStatus.QueueMixParlay, AutoVoidConstant.QueueActionMixParlay);
-                    }
-
-                    logGuid.Append($",{guidInAllServer}");
+                    await autoVoidRequestQueueService.InsertQueue(server.Id, guidInAllServer, request.RequestId, 0, ExecuteStatus.QueueMixParlay, AutoVoidConstant.QueueActionMixParlay);
                 }
 
-                return logGuid.ToString();
+                guidList.Append($",{guidInAllServer}");
             }
 
-            return string.Empty;
+            logData.AppendLine($"Guid InsertAutoVoidQueue100: {guidList}");
         }
     }
 }

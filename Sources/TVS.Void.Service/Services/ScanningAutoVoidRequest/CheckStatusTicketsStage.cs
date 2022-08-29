@@ -12,7 +12,7 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
 {
     public interface CheckStatusTicketsStage
     {
-        Task<CheckStatusTicketOutput> Execute(int siteDbGroupId,
+        Task<CheckStatusTicketOutput> Execute(int siteDbGroupId, string queueAction,
             IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets, StringBuilder logData);
     }
 
@@ -25,12 +25,13 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
             this.repository = repository;
         }
 
-        public async Task<CheckStatusTicketOutput> Execute(int siteDbGroupId,
+        public async Task<CheckStatusTicketOutput> Execute(int siteDbGroupId, string queueAction,
             IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets, StringBuilder logData)
         {
             var criteria = new CheckTicketsAllowToVoidCriteria
             {
                 SiteDbGroupId = siteDbGroupId,
+                Action = queueAction,
                 SingleTicketsXml = singleTickets.ToTicketsXml(),
                 ParlayTicketsXml = parlayTickets.ToTicketsXml()
             };

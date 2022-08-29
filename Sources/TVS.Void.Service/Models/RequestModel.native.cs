@@ -7,6 +7,8 @@ namespace TVS.Void.Service.Models
     {
         public int RequestId { get; set; }
         public string ActionName { get; set; }
+
+        public int ProcessMixParlayStatus { get; set; }
     }
 
     public class RequestDetailTicketModel
