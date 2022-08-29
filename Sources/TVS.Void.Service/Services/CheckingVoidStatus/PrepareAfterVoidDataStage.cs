@@ -7,7 +7,8 @@ namespace TVS.Void.Service.Services.CheckingVoidStatus
 {
     public interface PrepareAfterVoidDataStage
     {
-        Task<(IEnumerable<AfterVoidServiceModel> GroupHaveMatchId, IEnumerable<AfterVoidServiceModel> GroupNoMatchId)> Execute(IEnumerable<VoidServiceModel> voidServiceList);
+        Task<(IEnumerable<AfterVoidServiceModel> GroupHaveMatchId, IEnumerable<AfterVoidServiceModel> GroupNoMatchId)>
+            Execute(IEnumerable<VoidServiceModel> voidServiceList);
     }
 
     public class PrepareAfterVoidDataStageImp : PrepareAfterVoidDataStage
@@ -19,27 +20,31 @@ namespace TVS.Void.Service.Services.CheckingVoidStatus
             this.ticketVoidingQueueService = ticketVoidingQueueService;
         }
 
-        public async Task<(IEnumerable<AfterVoidServiceModel> GroupHaveMatchId, IEnumerable<AfterVoidServiceModel> GroupNoMatchId)> Execute(IEnumerable<VoidServiceModel> voidServiceList)
+        public async Task<(IEnumerable<AfterVoidServiceModel> GroupHaveMatchId, IEnumerable<AfterVoidServiceModel> GroupNoMatchId)>
+            Execute(IEnumerable<VoidServiceModel> voidServiceList)
         {
             var afterVoidData = voidServiceList.Select(x => new AfterVoidServiceModel
             { RequestId = x.RequestId, VoidingHistoryId = x.VoidingHistoryId, MatchId = x.MatchId }).Distinct(new AfterVoidServiceModelEqualComparer());
 
-            await AssignNegativeBalanceUsers(afterVoidData, voidServiceList);
+            var finalAfterVoidData = await AssignNegativeBalanceUsers(afterVoidData, voidServiceList);
             // TODO: in future if new issueType has Action Auto Void Winning, can't group by MatchId, must include condition IssueType
-            var groupHaveMatchId = afterVoidData.Where(x => x.MatchId > 0);
-            var groupNoMatchId = afterVoidData.Where(x => x.MatchId == 0);
+            var groupHaveMatchId = finalAfterVoidData.Where(x => x.MatchId > 0);
+            var groupNoMatchId = finalAfterVoidData.Where(x => x.MatchId == 0);
             return (groupHaveMatchId, groupNoMatchId);
         }
 
-        private async Task AssignNegativeBalanceUsers(IEnumerable<AfterVoidServiceModel> afterVoidData, IEnumerable<VoidServiceModel> voidServiceList)
+        private async Task<IEnumerable<AfterVoidServiceModel>> AssignNegativeBalanceUsers(IEnumerable<AfterVoidServiceModel> afterVoidData, IEnumerable<VoidServiceModel> voidServiceList)
         {
-            foreach (var item in afterVoidData)
+            var finalData = afterVoidData.ToList();
+            foreach (var item in finalData)
             {
-                var affectedSiteDbList = voidServiceList.Where(x => x.RequestId == item.RequestId && x.VoidingHistoryId == item.VoidingHistoryId)
-                    .Select(x => x.SiteDbGroupId).Distinct();
+                var affectedSiteDbList = voidServiceList.Where(x =>
+                    x.RequestId == item.RequestId && x.VoidingHistoryId == item.VoidingHistoryId).Select(x => x.SiteDbGroupId).Distinct();
 
                 item.NegativeBalanceUsers = await GetNegativeBalanceUsersInAllVoidingQueues(item.VoidingHistoryId, affectedSiteDbList);
             }
+
+            return finalData;
         }
 
         private async Task<string> GetNegativeBalanceUsersInAllVoidingQueues(int voidingHistoryId, IEnumerable<int> affectedSiteDbList)
