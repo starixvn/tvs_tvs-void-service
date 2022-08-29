@@ -7,7 +7,7 @@ using TicketVoidingSystem.Models;
 
 namespace TVS.Void.Service.Criteria.MultiSiteDb
 {
-    public class UnMarkTicketsCriteria : NonQueryCommand
+    public class UnMarkTicketsCriteria : CriteriaBase
     {
         public string TransIds { get; set; }
         public int UserId { get; set; }

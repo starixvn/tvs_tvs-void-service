@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Fanex.Data.Repository;
+using TicketVoidingSystem.Models;
 using TVS.Void.Service.Constants;
 using TVS.Void.Service.Criteria.MultiSiteDb;
 using TVS.Void.Service.Models;
@@ -48,7 +49,7 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
             };
 
             // TODO: Handle when error
-            await repository.ExecuteAsync(criteria);
+            await repository.FetchAsync<Result>(criteria);
         }
 
         private async Task ReCalculateTickets(int siteDbGroupId, IEnumerable<RequestDetailTicketModel> singleTicketsResettle,
