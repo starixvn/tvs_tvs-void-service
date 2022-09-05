@@ -2,8 +2,8 @@
 {
     public static class ProcessMixParlayStatusConstant
     {
-        public const int InsertNewMixParlayQueue = 0;
-        public const int WaitingForNextRunning = 1;
-        public const int DoneQueueWithNoTicketFound = 2;
+        public const int PartialProcessTickets_WaitingForNextRunning = 0;
+        public const int NoTickets_WaitingForNextRunning = 1;
+        public const int DoneQueue = 2;
     }
 }

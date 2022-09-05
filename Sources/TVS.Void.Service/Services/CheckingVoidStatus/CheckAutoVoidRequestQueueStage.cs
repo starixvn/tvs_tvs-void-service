@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
@@ -17,6 +18,7 @@ namespace TVS.Void.Service.Services.CheckingVoidStatus
     {
         private readonly AutoVoidRequestQueueService autoVoidRequestQueueService;
         private readonly RequestDetailService requestDetailService;
+        private const int FiveMinutesInSecond = 300;
 
         public CheckAutoVoidRequestQueueStageImp(AutoVoidRequestQueueService autoVoidRequestQueueService, RequestDetailService requestDetailService)
         {
@@ -28,28 +30,81 @@ namespace TVS.Void.Service.Services.CheckingVoidStatus
         {
             if (isAutoVoid)
             {
-                var autoVoidRequestQueues = await GetAutoVoidRequestQueueInAllServerDb(broadcastSessionId);
-                logData.AppendLine($"AutoVoidRequestQueues: {JsonSerializer.Serialize(autoVoidRequestQueues)}");
+                var queuesInAllServer = await GetAutoVoidRequestQueueInAllServerDb(broadcastSessionId);
+                logData.AppendLine($"AutoVoidRequestQueues: {JsonSerializer.Serialize(queuesInAllServer)}");
 
-                if (autoVoidRequestQueues.Any(x => x == null))
-
+                var isMixParlayQueue = broadcastSessionId.Contains("_mp");
+                if (!isMixParlayQueue)
                 {
-                    return false;
+                    return await ExecuteForOthersCalcQueue(broadcastSessionId, createdTimeDuration, queuesInAllServer, logData);
                 }
 
-                if (autoVoidRequestQueues.Any(x => x.StatusId == ExecuteStatus.Failed) || createdTimeDuration > 300)
-                {
-                    await requestDetailService.UpdateVoidServiceByBroadcastSessionId(broadcastSessionId, null, true);
-                    return false;
-                }
-
-                if (autoVoidRequestQueues.Any(x => x.StatusId == ExecuteStatus.New))
-                {
-                    return false;
-                }
+                return await ExecuteForMixParlayQueueOnly(broadcastSessionId, createdTimeDuration, queuesInAllServer, logData);
             }
 
             return true;
+        }
+
+        public async Task<bool> ExecuteForOthersCalcQueue(string broadcastSessionId, int createdTimeDuration, IEnumerable<AutoVoidRequestQueueModel> queuesInAllServer, StringBuilder logData)
+        {
+            if (queuesInAllServer.Any(x => x == null))
+            {
+                return false;
+            }
+
+            if (queuesInAllServer.Any(x => x.StatusId == ExecuteStatus.Failed) || createdTimeDuration > FiveMinutesInSecond)
+            {
+                await requestDetailService.UpdateVoidServiceByBroadcastSessionId(broadcastSessionId, null, true);
+                logData.AppendLine("UpdatedCreatedDateVoidServiceByBroadcastSessionId");
+                return false;
+            }
+
+            if (queuesInAllServer.Any(x => x.StatusId != ExecuteStatus.Done))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        public async Task<bool> ExecuteForMixParlayQueueOnly(string broadcastSessionId, int createdTimeDuration, IEnumerable<AutoVoidRequestQueueModel> queuesInAllServer, StringBuilder logData)
+        {
+            //// case re-run check service but current session has been changed => auto pass
+            if (queuesInAllServer.All(x => x == null))
+            {
+                return true;
+            }
+
+            if (queuesInAllServer.Any(x => x.StatusId == ExecuteStatus.Failed) || createdTimeDuration > FiveMinutesInSecond)
+            {
+                await requestDetailService.UpdateVoidServiceByBroadcastSessionId(broadcastSessionId, null, true);
+                logData.AppendLine("UpdatedCreatedDateVoidServiceByBroadcastSessionId");
+                return false;
+            }
+
+            if (queuesInAllServer.Any(x => x.StatusId == ExecuteStatus.New))
+            {
+                var newBroadcastSessionId = GetNextExecutionMixParlayBroadcastSessionId(broadcastSessionId);
+                foreach (var queue in queuesInAllServer)
+                {
+                    await autoVoidRequestQueueService.UpdateQueue(queue.SiteDbGroupId, queue.QueueId, newBroadcastSessionId, null, null, null);
+                }
+
+                logData.AppendLine($"UpdatedAutoVoidRequestQueue-NewBroadcastSessionId: {newBroadcastSessionId}");
+                return true;
+            }
+
+            return true;
+        }
+
+        private static string GetNextExecutionMixParlayBroadcastSessionId(string broadcastSessionId)
+        {
+            var indexOfMixParlay = broadcastSessionId.IndexOf("_mp", StringComparison.OrdinalIgnoreCase);
+            var currentGuid = broadcastSessionId[..indexOfMixParlay];
+            var numberAfterMpText = broadcastSessionId[(indexOfMixParlay + 3)..];
+            int.TryParse(numberAfterMpText, out var currentExecutionTimes);
+
+            return $"{currentGuid}_mp{currentExecutionTimes + 1}";
         }
 
         private async Task<IEnumerable<AutoVoidRequestQueueModel>> GetAutoVoidRequestQueueInAllServerDb(string broadcastSessionId)

@@ -10,6 +10,7 @@ namespace TVS.Void.Service.Criteria.MultiSiteDb
     public class UpdateAutoVoidRequestQueueCriteria : NonQueryCommand
     {
         public int QueueId { get; set; }
+        public string BroadcastSessionId { get; set; }
         public int? StatusId { get; set; }
         public bool? IsUpdateStartTime { get; set; }
         public string ErrMsg { get; set; }

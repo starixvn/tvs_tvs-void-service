@@ -11,7 +11,7 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
 {
     public interface ProcessMixParlayStage
     {
-        Task<bool> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue, IEnumerable<RequestModel> mixParlayRequests, StringBuilder logData);
+        Task Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue, IEnumerable<RequestModel> mixParlayRequests, string queueErrorMessage, StringBuilder logData);
     }
 
     public class ProcessMixParlayStageImp : ProcessMixParlayStage
@@ -23,46 +23,27 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
             this.autoVoidRequestQueueService = autoVoidRequestQueueService;
         }
 
-        public async Task<bool> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue, IEnumerable<RequestModel> mixParlayRequests, StringBuilder logData)
+        public async Task Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue, IEnumerable<RequestModel> mixParlayRequests, string queueErrorMessage, StringBuilder logData)
         {
             var isMixParlayQueue = queue.Action.Equals(AutoVoidConstant.QueueActionMixParlay, StringComparison.OrdinalIgnoreCase);
-            if (isMixParlayQueue)
+            if (!isMixParlayQueue)
             {
-                return await ExecuteForMixParlayQueueOnly(siteDbGroupId, queue, mixParlayRequests, logData);
+                await ExecuteForOthersCalcQueue(siteDbGroupId, queue, mixParlayRequests, queueErrorMessage, logData);
+                return;
             }
 
-            return await ExecuteForOthersCalcQueue(mixParlayRequests, logData);
+            await ExecuteForMixParlayQueueOnly(siteDbGroupId, queue, mixParlayRequests, queueErrorMessage);
         }
 
-        private async Task<bool> ExecuteForMixParlayQueueOnly(int siteDbGroupId, AutoVoidRequestQueueModel queue, IEnumerable<RequestModel> mixParlayRequests, StringBuilder logData)
+        private async Task ExecuteForOthersCalcQueue(int siteDbGroupId, AutoVoidRequestQueueModel queue,
+            IEnumerable<RequestModel> mixParlayRequests, string queueErrorMessage, StringBuilder logData)
         {
-            var currentRequest = mixParlayRequests.First(x => x.RequestId == queue.RequestId);
-            switch (currentRequest.ProcessMixParlayStatus)
-            {
-                case ProcessMixParlayStatusConstant.InsertNewMixParlayQueue:
-                    await InsertNewAutoVoidRequestQueueForMixParlaySpecialCase(mixParlayRequests, logData);
-                    return true;
+            await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, null, ExecuteStatus.Done, null, queueErrorMessage);
 
-                case ProcessMixParlayStatusConstant.DoneQueueWithNoTicketFound:
-                    return true;
-
-                case ProcessMixParlayStatusConstant.WaitingForNextRunning:
-                    await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, null, true, null);
-                    return false;
-
-                default:
-                    return false;
-            }
-        }
-
-        private async Task<bool> ExecuteForOthersCalcQueue(IEnumerable<RequestModel> mixParlayRequests, StringBuilder logData)
-        {
             if (mixParlayRequests.Any())
             {
                 await InsertNewAutoVoidRequestQueueForMixParlaySpecialCase(mixParlayRequests, logData);
             }
-
-            return true;
         }
 
         private async Task InsertNewAutoVoidRequestQueueForMixParlaySpecialCase(IEnumerable<RequestModel> mixParlayRequests, StringBuilder logData)
@@ -70,16 +51,36 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
             var guidList = new StringBuilder();
             foreach (var request in mixParlayRequests)
             {
-                var guidInAllServer = Guid.NewGuid().ToString();
+                var guidInAllServer = $"{Guid.NewGuid()}_mp";
                 foreach (var server in SiteDbGroupConstant.ServerList)
                 {
-                    await autoVoidRequestQueueService.InsertQueue(server.Id, guidInAllServer, request.RequestId, 0, ExecuteStatus.QueueMixParlay, AutoVoidConstant.QueueActionMixParlay);
+                    await autoVoidRequestQueueService.InsertQueue(server.Id, guidInAllServer, request.RequestId, 0, ExecuteStatus.New, AutoVoidConstant.QueueActionMixParlay);
                 }
 
                 guidList.Append($",{guidInAllServer}");
             }
 
-            logData.AppendLine($"Guid InsertAutoVoidQueue100: {guidList}");
+            logData.AppendLine($"Guid InsertMixParlayQueue: {guidList}");
+        }
+
+        private async Task ExecuteForMixParlayQueueOnly(int siteDbGroupId, AutoVoidRequestQueueModel queue,
+            IEnumerable<RequestModel> mixParlayRequests, string queueErrorMessage)
+        {
+            var currentRequest = mixParlayRequests.First(x => x.RequestId == queue.RequestId);
+            switch (currentRequest.ProcessMixParlayStatus)
+            {
+                case ProcessMixParlayStatusConstant.PartialProcessTickets_WaitingForNextRunning:
+                case ProcessMixParlayStatusConstant.NoTickets_WaitingForNextRunning:
+                    await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, null, ExecuteStatus.New, true, null);
+                    return;
+
+                case ProcessMixParlayStatusConstant.DoneQueue:
+                    await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, null, ExecuteStatus.Done, null, queueErrorMessage);
+                    return;
+
+                default:
+                    return;
+            }
         }
     }
 }

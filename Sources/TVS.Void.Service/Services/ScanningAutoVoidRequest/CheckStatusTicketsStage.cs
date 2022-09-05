@@ -53,7 +53,7 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
                 ValidVoidParlayTickets = objectsArray[1].Cast<RequestDetailTicketModel>(),
                 SingleTicketsResettle = objectsArray[2].Cast<RequestDetailTicketModel>(),
                 ParlayTicketsResettle = objectsArray[3].Cast<RequestDetailTicketModel>(),
-                MixParlayRequestsNoStatusWinLossButAllChildMatchesCompleted = objectsArray[4].Cast<RequestModel>()
+                MixParlayRequestsNoStatusWLButAllChildMatchesCompleted = objectsArray[4].Cast<RequestModel>()
             };
 
             logData.AppendLine($"{nameof(CheckStatusTicketsStage)}: {JsonSerializer.Serialize(outputData)}");

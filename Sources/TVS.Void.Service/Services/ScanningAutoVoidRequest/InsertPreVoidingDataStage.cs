@@ -15,7 +15,7 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
 {
     public interface InsertPreVoidingDataStage
     {
-        Task<bool> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue,
+        Task<string> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue,
             IEnumerable<RequestDetailTicketModel> validVoidSingleTickets,
             IEnumerable<RequestDetailTicketModel> validVoidParlayTickets, StringBuilder logData);
     }
@@ -38,14 +38,12 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
             this.hubContext = hubContext;
         }
 
-        public async Task<bool> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue,
+        public async Task<string> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue,
             IEnumerable<RequestDetailTicketModel> validVoidSingleTickets, IEnumerable<RequestDetailTicketModel> validVoidParlayTickets, StringBuilder logData)
         {
             if (!validVoidSingleTickets.Any() && !validVoidParlayTickets.Any())
             {
-                await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, ExecuteStatus.Done, null, "No ticket found.");
-
-                return false;
+                return "No ticket found.";
             }
 
             var validVoidServiceList = InitVoidServiceData(siteDbGroupId, validVoidSingleTickets, validVoidParlayTickets);
@@ -54,8 +52,8 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
 
             await NotifyRequestRunningToAllUser(validVoidServiceList);
             await InsertTicketVoidingQueue(siteDbGroupId, insertedVoidServiceList, validVoidSingleTickets, validVoidParlayTickets);
-            await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, ExecuteStatus.Done, null, null);
-            return true;
+
+            return string.Empty;
         }
 
         private static IEnumerable<VoidServiceModel>

@@ -8,6 +8,6 @@ namespace TVS.Void.Service.Models
         public IEnumerable<RequestDetailTicketModel> ValidVoidParlayTickets { get; set; }
         public IEnumerable<RequestDetailTicketModel> SingleTicketsResettle { get; set; }
         public IEnumerable<RequestDetailTicketModel> ParlayTicketsResettle { get; set; }
-        public IEnumerable<RequestModel> MixParlayRequestsNoStatusWinLossButAllChildMatchesCompleted { get; set; }
+        public IEnumerable<RequestModel> MixParlayRequestsNoStatusWLButAllChildMatchesCompleted { get; set; }
     }
 }

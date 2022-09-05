@@ -79,7 +79,7 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
             {
                 await loggingService.InfoAsync(logData.ToString());
                 await loggingService.ErrorAsync($"{nameof(ScanningAutoVoidRequestService)} Error", e);
-                await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, ExecuteStatus.Failed, null, null);
+                await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, null, ExecuteStatus.Failed, null, null);
             }
         }
 
@@ -97,8 +97,9 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
                 return;
             }
 
-            await insertPreVoidingDataStage.Execute(siteDbGroupId, queue,
+            var queueErrorMessage = await insertPreVoidingDataStage.Execute(siteDbGroupId, queue,
                 getTicketsResult.OutputData.SingleTickets, getTicketsResult.OutputData.ParlayTickets, logData);
+            await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, null, ExecuteStatus.Done, null, queueErrorMessage);
         }
 
         private async Task ExecuteForAutoVoidWinningGroup(int siteDbGroupId, AutoVoidRequestQueueModel queue)
@@ -112,19 +113,16 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
             var checkStatusTicketsResult = await checkStatusTicketsStage.Execute(siteDbGroupId, queue.Action,
                 getTicketsResult.OutputData.SingleTickets, getTicketsResult.OutputData.ParlayTickets, logData);
 
-            var isContinueFlow = await processMixParlayStage.Execute(siteDbGroupId, queue, checkStatusTicketsResult.MixParlayRequestsNoStatusWinLossButAllChildMatchesCompleted, logData);
-            if (!isContinueFlow)
-            {
-                return;
-            }
-
             await reCalculateTicketsStage.Execute(siteDbGroupId,
                 checkStatusTicketsResult.SingleTicketsResettle,
                 checkStatusTicketsResult.ParlayTicketsResettle, logData);
 
-            await insertPreVoidingDataStage.Execute(siteDbGroupId, queue,
-                 checkStatusTicketsResult.ValidVoidSingleTickets,
-                 checkStatusTicketsResult.ValidVoidParlayTickets, logData);
+            var queueErrorMessage = await insertPreVoidingDataStage.Execute(siteDbGroupId, queue,
+                  checkStatusTicketsResult.ValidVoidSingleTickets,
+                  checkStatusTicketsResult.ValidVoidParlayTickets, logData);
+
+            await processMixParlayStage.Execute(siteDbGroupId, queue,
+                checkStatusTicketsResult.MixParlayRequestsNoStatusWLButAllChildMatchesCompleted, queueErrorMessage, logData);
         }
 
         private static bool IsVoidInstantQueue(string action)

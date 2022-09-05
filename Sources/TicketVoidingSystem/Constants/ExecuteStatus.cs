@@ -7,7 +7,6 @@
         public const byte Done = 2;
         public const byte Failed = 3;
 
-        public const byte QueueMixParlay = 100;
         public const byte VoidServiceExecuteVoidDone = 12;
     }
 }
