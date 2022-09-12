@@ -27,7 +27,7 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
         public async Task<(bool, GetTicketsStageOutput)> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue, StringBuilder logData)
         {
             var (singleTickets, parlayTickets) = await requestDetailService.GetTicketsBySiteDbGroupId(siteDbGroupId, queue);
-            logData?.AppendLine($"{nameof(GetTicketsStage)}: {JsonSerializer.Serialize(new { singleTickets, parlayTickets })}");
+            logData?.AppendLine($"{nameof(GetTicketsStage)} - SingleCount: {singleTickets.Count()} - ParlayCount: {parlayTickets.Count()}");
             if (!singleTickets.Any() && !parlayTickets.Any())
             {
                 await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, null, ExecuteStatus.Done, null, "No ticket found.");

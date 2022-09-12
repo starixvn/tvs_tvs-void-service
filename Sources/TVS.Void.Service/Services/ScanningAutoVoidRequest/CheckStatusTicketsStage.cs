@@ -56,7 +56,9 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
                 MixParlayRequestsNoStatusWLButAllChildMatchesCompleted = objectsArray[4].Cast<RequestModel>()
             };
 
-            logData.AppendLine($"{nameof(CheckStatusTicketsStage)}: {JsonSerializer.Serialize(outputData)}");
+            logData.AppendLine($"{nameof(CheckStatusTicketsStage)} - VVSingle: {outputData.ValidVoidSingleTickets.Count()} - VVParlay: {outputData.ValidVoidParlayTickets.Count()} " +
+                               $"- SingleResettle: {outputData.SingleTicketsResettle.Count()} - ParlayResettle: {outputData.ParlayTicketsResettle.Count()} " +
+                               $"- MixParlayRequestsNoStatusWLButAllChildMatchesCompleted: {JsonSerializer.Serialize(outputData.MixParlayRequestsNoStatusWLButAllChildMatchesCompleted)}");
 
             return outputData;
         }
