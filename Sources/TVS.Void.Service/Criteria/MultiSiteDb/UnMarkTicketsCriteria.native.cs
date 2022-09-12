@@ -13,6 +13,8 @@ namespace TVS.Void.Service.Criteria.MultiSiteDb
         public int UserId { get; set; }
         public string Ip { get; set; }
 
+        public int LogActionId { get; set; }
+
         [SpParam(Ignored = true)]
         public int SiteDbGroupId { get; set; }
 

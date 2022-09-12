@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Fanex.Data.Repository;
 using TicketVoidingSystem.Models;
@@ -42,6 +43,7 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
             logData.AppendLine($"UnMarkTickets: {transIdText}");
             var criteria = new UnMarkTicketsCriteria
             {
+                LogActionId = 90510,
                 SiteDbGroupId = siteDbGroupId,
                 TransIds = transIdText,
                 UserId = AutoVoidConstant.ActorId,
@@ -49,7 +51,8 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
             };
 
             // TODO: Handle when error
-            await repository.FetchAsync<Result>(criteria);
+            var result = await repository.FetchAsync<Result>(criteria);
+            logData.AppendLine($"UnMarkTickets-Result: {JsonSerializer.Serialize(result)}");
         }
 
         private async Task ReCalculateTickets(int siteDbGroupId, IEnumerable<RequestDetailTicketModel> singleTicketsResettle,

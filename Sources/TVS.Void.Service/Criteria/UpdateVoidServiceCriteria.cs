@@ -8,7 +8,6 @@ namespace TVS.Void.Service.Criteria
         public int? SiteDbGroupId { get; set; }
         public int? RequestId { get; set; }
         public int? VoidingHistoryId { get; set; }
-
         public int? StatusId { get; set; }
         public bool? IsUpdateCreatedDate { get; set; }
 
