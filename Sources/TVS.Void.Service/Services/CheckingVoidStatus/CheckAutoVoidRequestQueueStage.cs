@@ -47,19 +47,15 @@ namespace TVS.Void.Service.Services.CheckingVoidStatus
 
         public async Task<bool> ExecuteForOthersCalcQueue(string broadcastSessionId, int createdTimeDuration, IEnumerable<AutoVoidRequestQueueModel> queuesInAllServer, StringBuilder logData)
         {
-            if (queuesInAllServer.Any(x => x == null))
-            {
-                return false;
-            }
-
-            if (queuesInAllServer.Any(x => x.StatusId == ExecuteStatus.Failed) || createdTimeDuration > FiveMinutesInSecond)
+            if (createdTimeDuration > FiveMinutesInSecond)
             {
                 await requestDetailService.UpdateVoidServiceByBroadcastSessionId(broadcastSessionId, null, true);
                 logData.AppendLine("UpdatedCreatedDateVoidServiceByBroadcastSessionId");
-                return false;
             }
 
-            if (queuesInAllServer.Any(x => x.StatusId != ExecuteStatus.Done))
+            if (queuesInAllServer.Any(x => x == null)
+            || queuesInAllServer.Any(x => x.StatusId == ExecuteStatus.Failed)
+            || queuesInAllServer.Any(x => x.StatusId != ExecuteStatus.Done))
             {
                 return false;
             }
