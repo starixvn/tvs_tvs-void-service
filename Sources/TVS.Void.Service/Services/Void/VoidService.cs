@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Fanex.Logging;
 using Microsoft.AspNetCore.SignalR;
 using TicketVoidingSystem.Constants;
 using TicketVoidingSystem.Models;
@@ -94,18 +95,32 @@ namespace TVS.Void.Service.Services.Void
 
         private async Task NotifyVoidFailedToUser(int requestId, IEnumerable<ProcessVoidQueueResult> voidQueueResults)
         {
-            var voidResultHasUserInfo = voidQueueResults.First(x => x.UserId > 0);
-            var errorMessage = $"Failed to void Request ID: {requestId}, please contact IT for support. (Error: VOID_SERVICE)";
-            await ticketVoidingSystemHttpClientService.SignalRNotifyErrorMessageToUser(voidResultHasUserInfo.UserName, errorMessage);
-            await hubContext.Clients.User(voidResultHasUserInfo.UserName).showErrorMessage(errorMessage);
+            try
+            {
+                var voidResultHasUserInfo = voidQueueResults.First(x => x.UserId > 0);
+                var errorMessage = $"Failed to void Request ID: {requestId}, please contact IT for support. (Error: VOID_SERVICE)";
+                await ticketVoidingSystemHttpClientService.SignalRNotifyErrorMessageToUser(voidResultHasUserInfo.UserName, errorMessage);
+                await hubContext.Clients.User(voidResultHasUserInfo.UserName).showErrorMessage(errorMessage);
+            }
+            catch (Exception e)
+            {
+                await loggingService.ErrorAsync(e.Message);
+            }
         }
 
         private async Task NotifyRequestFailedToAllUser(int requestId)
         {
-            var failedRequests = new List<RequestStatus>
-                {new () {RequestId = requestId, Status = RequestStatusConstant.Failed}};
-            await ticketVoidingSystemHttpClientService.SignalRUpdateRequestStatusToAllUsers(failedRequests);
-            await hubContext.Clients.All.updateRequestStatus(failedRequests);
+            try
+            {
+                var failedRequests = new List<RequestStatus>
+                    { new() { RequestId = requestId, Status = RequestStatusConstant.Failed } };
+                await ticketVoidingSystemHttpClientService.SignalRUpdateRequestStatusToAllUsers(failedRequests);
+                await hubContext.Clients.All.updateRequestStatus(failedRequests);
+            }
+            catch (Exception e)
+            {
+                await loggingService.ErrorAsync(e.Message);
+            }
         }
     }
 }

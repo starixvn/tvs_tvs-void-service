@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Fanex.Logging;
 using Microsoft.AspNetCore.SignalR;
 using TicketVoidingSystem.Constants;
 using TicketVoidingSystem.Models;
@@ -27,15 +29,18 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
         private readonly TicketVoidingQueueService ticketVoidingQueueService;
         private readonly TicketVoidingSystemHttpClientService ticketVoidingSystemHttpClientService;
         private readonly IHubContext<NotificationHub, ClientEvent> hubContext;
+        private readonly LoggingService loggingService;
 
         public InsertPreVoidingDataStageImp(AutoVoidRequestQueueService autoVoidRequestQueueService, RequestDetailService requestDetailService,
-            TicketVoidingQueueService ticketVoidingQueueService, TicketVoidingSystemHttpClientService ticketVoidingSystemHttpClientService, IHubContext<NotificationHub, ClientEvent> hubContext)
+            TicketVoidingQueueService ticketVoidingQueueService, TicketVoidingSystemHttpClientService ticketVoidingSystemHttpClientService, IHubContext<NotificationHub,
+                ClientEvent> hubContext, LoggingService loggingService)
         {
             this.autoVoidRequestQueueService = autoVoidRequestQueueService;
             this.requestDetailService = requestDetailService;
             this.ticketVoidingQueueService = ticketVoidingQueueService;
             this.ticketVoidingSystemHttpClientService = ticketVoidingSystemHttpClientService;
             this.hubContext = hubContext;
+            this.loggingService = loggingService;
         }
 
         public async Task<string> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue,
@@ -98,10 +103,17 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
 
         private async Task NotifyRequestRunningToAllUser(IEnumerable<VoidServiceModel> voidServiceModels)
         {
-            var runningRequests = voidServiceModels.Select(x => new RequestStatus
-            { RequestId = x.RequestId, Status = RequestStatusConstant.Running });
-            await ticketVoidingSystemHttpClientService.SignalRUpdateRequestStatusToAllUsers(runningRequests);
-            await hubContext.Clients.All.updateRequestStatus(runningRequests);
+            try
+            {
+                var runningRequests = voidServiceModels.Select(x => new RequestStatus
+                { RequestId = x.RequestId, Status = RequestStatusConstant.Running });
+                await ticketVoidingSystemHttpClientService.SignalRUpdateRequestStatusToAllUsers(runningRequests);
+                await hubContext.Clients.All.updateRequestStatus(runningRequests);
+            }
+            catch (Exception e)
+            {
+                await loggingService.ErrorAsync(e.Message);
+            }
         }
 
         private async Task InsertTicketVoidingQueue(int siteDbGroupId, IEnumerable<VoidServiceModel> voidServiceList,
