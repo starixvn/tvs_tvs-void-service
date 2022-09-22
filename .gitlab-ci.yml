@@ -1,0 +1,4 @@
+include:
+  - project: "ci/repos-ci/olympus_nap_tvs_void_service"
+    ref: master
+    file: "gitlab-ci.yml"

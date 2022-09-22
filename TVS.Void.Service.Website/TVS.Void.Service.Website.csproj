@@ -2,6 +2,55 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
+    <CodeAnalysisRuleSet>..\.sonarlint\tvs-void-servicecsharp.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="App_Data\Fanex.Data\TVSVoidServiceSpNames.AWS.xml" />
+    <None Remove="App_Data\Fanex.Data\TVSVoidServiceSpNames.LOCAL.xml" />
+    <None Remove="App_Data\Fanex.Data\TVSVoidServiceSpNames.PROD.xml" />
+    <None Remove="App_Data\Fanex.Data\TVSVoidServiceSpNames.SIT.xml" />
+    <None Remove="App_Data\Fanex.Data\TVSVoidServiceSpNames.xml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AdditionalFiles Include="..\.sonarlint\tvs-void-service\CSharp\SonarLint.xml" Link="SonarLint.xml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="App_Data\Fanex.Data\TVSVoidServiceSpNames.AWS.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="App_Data\Fanex.Data\TVSVoidServiceSpNames.LOCAL.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="App_Data\Fanex.Data\TVSVoidServiceSpNames.PROD.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="App_Data\Fanex.Data\TVSVoidServiceSpNames.SIT.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="App_Data\Fanex.Data\TVSVoidServiceSpNames.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Fanex.Data.Repository" Version="4.2.2" />
+    <PackageReference Include="Fanex.Data.SqlServer" Version="4.2.2" />
+    <PackageReference Include="Fanex.Logging.Extensions.AspNetCore" Version="1.0.1-beta1" />
+    <PackageReference Include="Fanex.Logging.Extensions.Database" Version="1.0.8" />
+    <PackageReference Include="Fanex.Logging.Sentry" Version="1.0.6" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.StackExchangeRedis" Version="5.0.17" />
+    <PackageReference Include="ONEbook.UM.AspNetCore" Version="3.1.0" />
+    <PackageReference Include="ONEbook.UM.Transport" Version="3.1.1" />
+    <PackageReference Include="Quartz" Version="3.4.0" />
+    <PackageReference Include="Quartz.Extensions.Hosting" Version="3.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Sources\TicketVoidingSystem\TicketVoidingSystem.csproj" />
+    <ProjectReference Include="..\Sources\TVS.Void.Service\TVS.Void.Service.csproj" />
+  </ItemGroup>
 
 </Project>

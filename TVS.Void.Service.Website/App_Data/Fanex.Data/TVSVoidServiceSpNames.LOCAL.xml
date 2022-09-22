@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Functions>
+    <Function Name="Scanning Auto Void Request Service">
+        <Setting Key="DBCTG.TicketVoiding_AutoVoidRequest_Queue_Select" SpName="TicketVoiding_AutoVoidRequest_Queue_Select" DbName="DBCTG.bodb02.bodbAdminNet" TimeOut="600" />
+        <Setting Key="DBSIG.TicketVoiding_AutoVoidRequest_Queue_Select" SpName="TicketVoiding_AutoVoidRequest_Queue_Select" DbName="DBSIG.bodb02.bodbAdminNet" TimeOut="600" />
+        <Setting Key="DBCTG.TicketVoiding_AutoVoidRequest_Validation" SpName="TicketVoiding_AutoVoidRequest_Validation" DbName="DBCTG.bodb02.bodbAdminNet" TimeOut="600" />
+        <Setting Key="DBSIG.TicketVoiding_AutoVoidRequest_Validation" SpName="TicketVoiding_AutoVoidRequest_Validation" DbName="DBSIG.bodb02.bodbAdminNet" TimeOut="600" />
+        <Setting Key="DBCTG.TicketVoiding_AutoVoidRequest_Queue_Update" SpName="TicketVoiding_AutoVoidRequest_Queue_Update" DbName="DBCTG.bodb02.bodbAdminNet" TimeOut="600" />
+        <Setting Key="DBSIG.TicketVoiding_AutoVoidRequest_Queue_Update" SpName="TicketVoiding_AutoVoidRequest_Queue_Update" DbName="DBSIG.bodb02.bodbAdminNet" TimeOut="600" />
+        <Setting Key="DBCTG.TicketVoiding_AutoVoidRequest_Queue_Insert" SpName="TicketVoiding_AutoVoidRequest_Queue_Insert" DbName="DBCTG.bodb02.bodbAdminNet" TimeOut="600" />
+        <Setting Key="DBSIG.TicketVoiding_AutoVoidRequest_Queue_Insert" SpName="TicketVoiding_AutoVoidRequest_Queue_Insert" DbName="DBSIG.bodb02.bodbAdminNet" TimeOut="600" />
+        <Setting Key="DBCTG.Nap_SpecialDelete_MarkedTickets_Update" SpName="Nap_SpecialDelete_MarkedTickets_Update" DbName="DBCTG.bodb02.bodbAdminNet" TimeOut="600" />
+        <Setting Key="DBSIG.Nap_SpecialDelete_MarkedTickets_Update" SpName="Nap_SpecialDelete_MarkedTickets_Update" DbName="DBSIG.bodb02.bodbAdminNet" TimeOut="600" />
+        <Setting Key="DBCTG.TicketVoiding_ReCalculate_Single_PreUpdate" SpName="TicketVoiding_ReCalculate_Single_PreUpdate" DbName="DBCTG.bodb02.bodbAdminNet" TimeOut="600" />
+        <Setting Key="DBSIG.TicketVoiding_ReCalculate_Single_PreUpdate" SpName="TicketVoiding_ReCalculate_Single_PreUpdate" DbName="DBSIG.bodb02.bodbAdminNet" TimeOut="600" />
+        <Setting Key="DBCTG.TicketVoiding_Queue_Select" SpName="TicketVoiding_Queue_Select" DbName="DBCTG.bodb02.bodbAdminNet" TimeOut="600" />
+        <Setting Key="DBSIG.TicketVoiding_Queue_Select" SpName="TicketVoiding_Queue_Select" DbName="DBSIG.bodb02.bodbAdminNet" TimeOut="600" />
+        <Setting Key="DBCTG.TicketVoiding_Queue_Insert" SpName="TicketVoiding_Queue_Insert" DbName="DBCTG.bodb02.bodbAdminNet" TimeOut="600" />
+        <Setting Key="DBSIG.TicketVoiding_Queue_Insert" SpName="TicketVoiding_Queue_Insert" DbName="DBSIG.bodb02.bodbAdminNet" TimeOut="600" />
+        <Setting Key="DBCTG.TicketVoiding_Queue_Job" SpName="TicketVoiding_Queue_Job" DbName="DBCTG.bodb02.bodbAdminNet" TimeOut="600" />
+        <Setting Key="DBSIG.TicketVoiding_Queue_Job" SpName="TicketVoiding_Queue_Job" DbName="DBSIG.bodb02.bodbAdminNet" TimeOut="600" />
+
+        <Setting Key="TicketVoiding_AutoVoidRequest_Ticket_Select" SpName="TicketVoiding_AutoVoidRequest_Ticket_Select" DbName="DBCTG.bodb02.bodbAdminNet" TimeOut="600" />
+        <Setting Key="TicketVoiding_VoidingHistory_Insert" SpName="TicketVoiding_VoidingHistory_Insert" DbName="DBCTG.bodb02.bodbAdminNet" TimeOut="600" />
+        <Setting Key="TicketVoiding_VoidingHistory_Update" SpName="TicketVoiding_VoidingHistory_Update" DbName="DBCTG.bodb02.bodbAdminNet" TimeOut="600" />
+        <Setting Key="TicketVoiding_Void_Service_Select" SpName="TicketVoiding_Void_Service_Select" DbName="DBCTG.bodb02.bodbAdminNet" TimeOut="600" />
+        <Setting Key="TicketVoiding_Void_Service_Update" SpName="TicketVoiding_Void_Service_Update" DbName="DBCTG.bodb02.bodbAdminNet" TimeOut="600" />
+        <Setting Key="TicketVoiding_VoidBetAutomation_Service_Insert" SpName="TicketVoiding_VoidBetAutomation_Service_Insert" DbName="DBCTG.bodb02.bodbAdminNet" TimeOut="600" />
+        <Setting Key="TicketVoiding_Request_Select" SpName="TicketVoiding_Request_Select" DbName="DBCTG.bodb02.bodbAdminNet" TimeOut="600" />
+    </Function>
+</Functions>
