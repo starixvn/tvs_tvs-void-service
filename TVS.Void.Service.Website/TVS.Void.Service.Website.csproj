@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
@@ -46,11 +46,28 @@
     <PackageReference Include="ONEbook.UM.Transport" Version="3.1.1" />
     <PackageReference Include="Quartz" Version="3.4.0" />
     <PackageReference Include="Quartz.Extensions.Hosting" Version="3.4.0" />
+    <PackageReference Include="T4.FileManager.VisualStudio" Version="3.1.2" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Sources\TicketVoidingSystem\TicketVoidingSystem.csproj" />
     <ProjectReference Include="..\Sources\TVS.Void.Service\TVS.Void.Service.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="App_Data\Fanex.Data\TVSVoidServiceSpNames.config.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>TVSVoidServiceSpNames.config.txt</LastGenOutput>
+    </None>
+    <None Update="App_Data\Fanex.Data\TVSVoidServiceSpNames.config.txt">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>TVSVoidServiceSpNames.config.tt</DependentUpon>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
   </ItemGroup>
 
 </Project>

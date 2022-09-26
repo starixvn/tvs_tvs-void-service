@@ -1,0 +1,20 @@
+﻿<#@ template debug="true" hostspecific="true" language="C#" #>
+<#@ output extension=".txt" #>
+<#@ import namespace="System.IO" #>
+<#@ include file="$(TargetDir)\T4.FileManager.VisualStudio19.ttinclude" #>
+<# string fileContent = File.ReadAllText(this.Host.ResolvePath("TVSVoidServiceSpNames.xml")); #>
+<#
+    var manager = T4FileManager.Create(this);
+#>
+<#
+    var siteEnvironments = new string[] { "LOCAL", "SIT", "PROD", "AWS" };
+    foreach(var site in siteEnvironments)
+    {
+        var fileName = string.Format("TVSVoidServiceSpNames.{0}.xml", site);
+        manager.StartNewFile(fileName, null, "App_Data/Fanex.Data", null);
+#>
+<#= fileContent #>
+<#
+    }
+    manager.Process();
+#>
