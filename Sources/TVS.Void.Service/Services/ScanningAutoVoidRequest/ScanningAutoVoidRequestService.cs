@@ -69,11 +69,6 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
                 {
                     await ExecuteForAutoVoidWinningGroup(siteDbGroupId, queue);
                 }
-
-                timer.Stop();
-                logData.AppendLine($"Server Time: {DateTime.Now:MM/dd/yyyy HH:mm:ss.fff}");
-                logData.AppendLine($"Elapsed Time: {timer.ElapsedMilliseconds} ms");
-                await loggingService.InfoAsync(logData.ToString());
             }
             catch (Exception e)
             {
@@ -100,6 +95,8 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
             var queueErrorMessage = await insertPreVoidingDataStage.Execute(siteDbGroupId, queue,
                 getTicketsResult.OutputData.SingleTickets, getTicketsResult.OutputData.ParlayTickets, logData);
             await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, null, ExecuteStatus.Done, null, queueErrorMessage);
+
+            await WriteLog();
         }
 
         private async Task ExecuteForAutoVoidWinningGroup(int siteDbGroupId, AutoVoidRequestQueueModel queue)
@@ -123,6 +120,7 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
 
             await processMixParlayStage.Execute(siteDbGroupId, queue,
                 checkStatusTicketsResult.MixParlayRequestsNoStatusWLButAllChildMatchesCompleted, queueErrorMessage, logData);
+            await WriteLog();
         }
 
         private static bool IsVoidInstantQueue(string action)
@@ -131,6 +129,14 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
                    || action.Equals(AutoVoidConstant.QueueActionVoidInstant5m, StringComparison.OrdinalIgnoreCase)
                    || action.Equals(AutoVoidConstant.QueueActionVoidInstant10m, StringComparison.OrdinalIgnoreCase)
                    || action.Equals(AutoVoidConstant.QueueActionVoidInstantNoPolicy, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private async Task WriteLog()
+        {
+            timer.Stop();
+            logData.AppendLine($"Server Time: {DateTime.Now:MM/dd/yyyy HH:mm:ss.fff}");
+            logData.AppendLine($"Elapsed Time: {timer.ElapsedMilliseconds} ms");
+            await loggingService.InfoAsync(logData.ToString());
         }
     }
 }

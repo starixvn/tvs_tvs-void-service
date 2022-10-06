@@ -18,7 +18,7 @@ namespace TVS.Void.Service.Services.CheckingVoidStatus
     {
         private readonly AutoVoidRequestQueueService autoVoidRequestQueueService;
         private readonly RequestDetailService requestDetailService;
-        private const int FiveMinutesInSecond = 300;
+        private const int WaitingTimeInSecond = 120;
 
         public CheckAutoVoidRequestQueueStageImp(AutoVoidRequestQueueService autoVoidRequestQueueService, RequestDetailService requestDetailService)
         {
@@ -47,7 +47,7 @@ namespace TVS.Void.Service.Services.CheckingVoidStatus
 
         public async Task<bool> ExecuteForOthersCalcQueue(string broadcastSessionId, int createdTimeDuration, IEnumerable<AutoVoidRequestQueueModel> queuesInAllServer, StringBuilder logData)
         {
-            if (createdTimeDuration > FiveMinutesInSecond)
+            if (createdTimeDuration > WaitingTimeInSecond)
             {
                 await requestDetailService.UpdateVoidServiceByBroadcastSessionId(broadcastSessionId, null, true);
                 logData.AppendLine("UpdatedCreatedDateVoidServiceByBroadcastSessionId");
@@ -65,13 +65,13 @@ namespace TVS.Void.Service.Services.CheckingVoidStatus
 
         public async Task<bool> ExecuteForMixParlayQueueOnly(string broadcastSessionId, int createdTimeDuration, IEnumerable<AutoVoidRequestQueueModel> queuesInAllServer, StringBuilder logData)
         {
-            //// case re-run check service but current session has been changed => auto pass
+            //// case re-run service but current session has been changed => auto pass
             if (queuesInAllServer.All(x => x == null))
             {
                 return true;
             }
 
-            if (queuesInAllServer.Any(x => x.StatusId == ExecuteStatus.Failed) || createdTimeDuration > FiveMinutesInSecond)
+            if (queuesInAllServer.Any(x => x.StatusId == ExecuteStatus.Failed) || createdTimeDuration > WaitingTimeInSecond)
             {
                 await requestDetailService.UpdateVoidServiceByBroadcastSessionId(broadcastSessionId, null, true);
                 logData.AppendLine("UpdatedCreatedDateVoidServiceByBroadcastSessionId");
