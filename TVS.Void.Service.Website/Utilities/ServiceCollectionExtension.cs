@@ -18,7 +18,6 @@ using ONEbook.UM.Services;
 using ONEbook.UM.Transport;
 using Quartz;
 using Sentry;
-using TicketVoidingSystem.Services;
 using TVS.Void.Service.Models;
 using TVS.Void.Service.Services;
 using TVS.Void.Service.Services.CheckingVoidStatus;
@@ -126,6 +125,7 @@ namespace TVS.Void.Service.Website.Utilities
         public static void RegisterQuartzScheduler(this IServiceCollection services)
         {
             const int maxConcurrencyThread = 10;
+            services.AddTransient<CheckTicketStatusJob>();
             services.AddTransient<ScanningAutoVoidRequestJob>();
             services.AddTransient<VoidJob>();
             services.AddTransient<CheckingVoidStatusJob>();
@@ -143,11 +143,17 @@ namespace TVS.Void.Service.Website.Utilities
                     tp.MaxConcurrency = maxConcurrencyThread;
                 });
 
+                q.ScheduleJob<CheckTicketStatusJob>(trigger => trigger
+                    .WithIdentity("CheckTicketStatusJob Trigger")
+                    .StartNow()
+                    .WithSimpleSchedule(x => x.WithIntervalInSeconds(1).RepeatForever())
+                );
+
                 q.ScheduleJob<ScanningAutoVoidRequestJob>(trigger => trigger
                     .WithIdentity("ScanningAutoVoidRequestJob Trigger")
                     .StartNow()
                     .WithSimpleSchedule(x => x.WithIntervalInSeconds(1).RepeatForever())
-               );
+                );
 
                 q.ScheduleJob<VoidJob>(trigger => trigger
                     .WithIdentity("VoidJob Trigger")

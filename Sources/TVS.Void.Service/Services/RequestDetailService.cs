@@ -10,9 +10,6 @@ namespace TVS.Void.Service.Services
 {
     public interface RequestDetailService
     {
-        Task<(IEnumerable<RequestDetailTicketModel>, IEnumerable<RequestDetailTicketModel>)> GetTicketsBySiteDbGroupId(
-            int siteDbGroupId, AutoVoidRequestQueueModel autoVoidRequestQueue);
-
         Task<IEnumerable<VoidServiceModel>> InsertVoidingHistory(string broadcastSessionId, IEnumerable<VoidServiceModel> voidServiceModels);
 
         Task UpdateVoidService(int siteDbGroupId, int requestId, int voidingHistoryId, int statusId);
@@ -35,21 +32,6 @@ namespace TVS.Void.Service.Services
         public RequestDetailServiceImp(IDynamicRepository repository)
         {
             this.repository = repository;
-        }
-
-        public async Task<(IEnumerable<RequestDetailTicketModel>, IEnumerable<RequestDetailTicketModel>)> GetTicketsBySiteDbGroupId(int siteDbGroupId, AutoVoidRequestQueueModel autoVoidRequestQueue)
-        {
-            var criteria = new GetRequestDetailTicketsCriteria
-            {
-                SiteDbGroupId = siteDbGroupId,
-                RequestId = autoVoidRequestQueue.RequestId,
-                MatchId = autoVoidRequestQueue.MatchId,
-                Action = autoVoidRequestQueue.Action
-            };
-
-            var (singleTickets, parlayTickets) =
-                await repository.FetchMultipleAsync<RequestDetailTicketModel, RequestDetailTicketModel>(criteria);
-            return (singleTickets, parlayTickets);
         }
 
         public async Task<IEnumerable<VoidServiceModel>> InsertVoidingHistory(string broadcastSessionId, IEnumerable<VoidServiceModel> voidServiceModels)
