@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Fanex.Logging;
 using Fanex.Logging.Extensions;
@@ -16,6 +18,8 @@ namespace TVS.Void.Service.Services
         Task ErrorAsync(string message);
 
         Task InfoAsync(string message);
+
+        Task InfoJsonAsync(IList<string> logData);
     }
 
     [ExcludeFromCodeCoverage]
@@ -40,6 +44,11 @@ namespace TVS.Void.Service.Services
         public async Task InfoAsync(string message)
         {
             await LogService.InfoAsync(message);
+        }
+
+        public async Task InfoJsonAsync(IList<string> logData)
+        {
+            await InfoAsync(JsonSerializer.Serialize(logData));
         }
 
         private static async Task HandleException(Exception exception)

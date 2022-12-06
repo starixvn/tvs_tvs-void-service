@@ -19,7 +19,7 @@ namespace TVS.Void.Service.Website.Controllers
         public IActionResult Index()
         {
             var jobStatus =
-                $"{{{nameof(ConfigSettingModel.IsScanningAutoVoidRequestJobExecuting)}: {AppConfigService.AppConfig.IsScanningAutoVoidRequestJobExecuting}," +
+                $"{{{nameof(ConfigSettingModel.IsScanAutoVoidRequestJobExecuting)}: {AppConfigService.AppConfig.IsScanAutoVoidRequestJobExecuting}," +
                 $" {nameof(ConfigSettingModel.IsVoidJobExecuting)}: {AppConfigService.AppConfig.IsVoidJobExecuting}," +
                 $" {nameof(ConfigSettingModel.IsCheckingVoidStatusJobExecuting)}: {AppConfigService.AppConfig.IsCheckingVoidStatusJobExecuting}}} - {DateTime.Now}";
             logger.LogInformation(jobStatus);

@@ -10,13 +10,11 @@ namespace TVS.Void.Service.Services
 {
     public interface RequestDetailService
     {
-        Task<IEnumerable<VoidServiceModel>> InsertVoidingHistory(string broadcastSessionId, IEnumerable<VoidServiceModel> voidServiceModels);
+        Task<VoidingHistoryModel> InsertVoidingHistory(int requestId);
 
         Task UpdateVoidService(int siteDbGroupId, int requestId, int voidingHistoryId, int statusId);
 
         Task UpdateVoidServiceByBroadcastSessionId(string broadcastSessionId, int? statusId, bool? isUpdateCreatedDate);
-
-        Task<IEnumerable<VoidServiceModel>> GetVoidServiceDataForCheckStatus();
 
         Task<IEnumerable<AfterVoidServiceModel>> InsertAfterVoidServiceData(bool isAutoVoid, IEnumerable<AfterVoidServiceModel> afterVoidData);
 
@@ -34,18 +32,16 @@ namespace TVS.Void.Service.Services
             this.repository = repository;
         }
 
-        public async Task<IEnumerable<VoidServiceModel>> InsertVoidingHistory(string broadcastSessionId, IEnumerable<VoidServiceModel> voidServiceModels)
+        public async Task<VoidingHistoryModel> InsertVoidingHistory(int requestId)
         {
             var criteria = new InsertVoidingHistoryCriteria
             {
-                BroadcastSessionId = broadcastSessionId,
+                RequestId = requestId,
                 IsAutoVoid = true,
                 UserId = AutoVoidConstant.ActorId,
-                VoidServiceXml = voidServiceModels.ToVoidServiceXml()
             };
 
-            var voidServiceData = await repository.FetchAsync<VoidServiceModel>(criteria);
-            return voidServiceData;
+            return await repository.GetAsync<VoidingHistoryModel>(criteria);
         }
 
         private async Task UpdateVoidService(int? siteDbGroupId, int? requestId, int? voidingHistoryId, int? statusId, string broadcastSessionId, bool? isUpdateCreatedDate)
@@ -73,19 +69,12 @@ namespace TVS.Void.Service.Services
             await UpdateVoidService(null, null, null, statusId, broadcastSessionId, isUpdateCreatedDate);
         }
 
-        public async Task<IEnumerable<VoidServiceModel>> GetVoidServiceDataForCheckStatus()
-        {
-            var criteria = new GetVoidServiceDataForCheckStatusCriteria();
-            var voidServiceData = await repository.FetchAsync<VoidServiceModel>(criteria);
-            return voidServiceData;
-        }
-
         public async Task<IEnumerable<AfterVoidServiceModel>> InsertAfterVoidServiceData(bool isAutoVoid, IEnumerable<AfterVoidServiceModel> afterVoidData)
         {
             var criteria = new InsertAfterVoidServiceDataCriteria
             {
                 IsAutoVoid = isAutoVoid,
-                AfterVoidDataXml = afterVoidData.ToAfterVoidDataXml()
+                AfterVoidDataXml = afterVoidData.ToAfterVoidDataXml(),
             };
 
             var result = await repository.FetchAsync<AfterVoidServiceModel>(criteria);

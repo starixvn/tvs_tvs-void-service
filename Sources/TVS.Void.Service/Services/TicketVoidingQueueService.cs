@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Fanex.Data.Repository;
 using TVS.Void.Service.Constants;
 using TVS.Void.Service.Criteria.MultiSiteDb;
-using TVS.Void.Service.Extensions;
 using TVS.Void.Service.Models;
 
 namespace TVS.Void.Service.Services
@@ -12,7 +12,7 @@ namespace TVS.Void.Service.Services
     {
         Task<IEnumerable<TicketVoidingQueueModel>> GetQueues(int siteDbGroupId, int? voidingHistoryId);
 
-        Task InsertQueue(int siteDbGroupId, int voidingHistoryId, int requestId, int issueTypeId,
+        Task InsertQueue(int siteDbGroupId, int requestId, int voidingHistoryId,
             IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets);
 
         Task<ProcessVoidQueueResult> ProcessVoidQueue(int siteDbGroupId, int queueId);
@@ -39,7 +39,7 @@ namespace TVS.Void.Service.Services
             return result;
         }
 
-        public async Task InsertQueue(int siteDbGroupId, int voidingHistoryId, int requestId, int issueTypeId,
+        public async Task InsertQueue(int siteDbGroupId, int requestId, int voidingHistoryId,
             IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets)
         {
             var criteria = new InsertTicketVoidingQueueCriteria
@@ -47,9 +47,8 @@ namespace TVS.Void.Service.Services
                 SiteDbGroupId = siteDbGroupId,
                 RequestId = requestId,
                 VoidingHistoryId = voidingHistoryId,
-                IssueTypeId = issueTypeId,
-                SingleTicketsXml = singleTickets.ToTicketsXml(),
-                ParlayTicketsXml = parlayTickets.ToTicketsXml(),
+                SingleTicketsJson = JsonSerializer.Serialize(singleTickets),
+                ParlayTicketsJson = JsonSerializer.Serialize(parlayTickets),
                 UserId = AutoVoidConstant.ActorId,
                 IP = AutoVoidConstant.IPAddress,
             };

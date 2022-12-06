@@ -8,9 +8,8 @@ namespace TVS.Void.Service.Criteria.MultiSiteDb
     {
         public int RequestId { get; set; }
         public int VoidingHistoryId { get; set; }
-        public int IssueTypeId { get; set; }
-        public string SingleTicketsXml { get; set; }
-        public string ParlayTicketsXml { get; set; }
+        public string SingleTicketsJson { get; set; }
+        public string ParlayTicketsJson { get; set; }
         public int UserId { get; set; }
         public string IP { get; set; }
 

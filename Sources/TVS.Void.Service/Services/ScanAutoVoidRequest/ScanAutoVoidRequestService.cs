@@ -1,41 +1,36 @@
 ﻿using System;
-using System.Diagnostics;
-using System.Text;
+using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
 using TicketVoidingSystem.Constants;
 using TVS.Void.Service.Constants;
 using TVS.Void.Service.Models;
 
-namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
+namespace TVS.Void.Service.Services.ScanAutoVoidRequest
 {
-    public interface ScanningAutoVoidRequestService
+    public interface ScanAutoVoidRequestService
     {
         Task Execute(int siteDbGroupId);
     }
 
-    public class ScanningAutoVoidRequestServiceImp : ScanningAutoVoidRequestService
+    public class ScanAutoVoidRequestServiceImp : ScanAutoVoidRequestService
     {
-        private StringBuilder logData;
-        private readonly Stopwatch timer = new();
         private readonly CheckRequestQueueValidStage checkRequestQueueValidStage;
         private readonly GetTicketsStage getTicketsStage;
-        private readonly CheckStatusTicketsStage checkStatusTicketsStage;
-        private readonly ProcessMixParlayStage processMixParlayStage;
+        private readonly CheckTicketAllowToVoidStage checkTicketAllowToVoidStage;
         private readonly ReCalculateTicketsStage reCalculateTicketsStage;
         private readonly InsertPreVoidingDataStage insertPreVoidingDataStage;
 
         private readonly AutoVoidRequestQueueService autoVoidRequestQueueService;
         private readonly LoggingService loggingService;
 
-        public ScanningAutoVoidRequestServiceImp(CheckRequestQueueValidStage checkRequestQueueValidStage, GetTicketsStage getTicketsStage, CheckStatusTicketsStage checkStatusTicketsStage,
-            ProcessMixParlayStage processMixParlayStage, ReCalculateTicketsStage reCalculateTicketsStage, InsertPreVoidingDataStage insertPreVoidingDataStage,
-            AutoVoidRequestQueueService autoVoidRequestQueueService, LoggingService loggingService)
+        public ScanAutoVoidRequestServiceImp(CheckRequestQueueValidStage checkRequestQueueValidStage, GetTicketsStage getTicketsStage,
+            CheckTicketAllowToVoidStage checkTicketAllowToVoidStage, ReCalculateTicketsStage reCalculateTicketsStage,
+            InsertPreVoidingDataStage insertPreVoidingDataStage, AutoVoidRequestQueueService autoVoidRequestQueueService, LoggingService loggingService)
         {
             this.checkRequestQueueValidStage = checkRequestQueueValidStage;
             this.getTicketsStage = getTicketsStage;
-            this.checkStatusTicketsStage = checkStatusTicketsStage;
-            this.processMixParlayStage = processMixParlayStage;
+            this.checkTicketAllowToVoidStage = checkTicketAllowToVoidStage;
             this.reCalculateTicketsStage = reCalculateTicketsStage;
             this.insertPreVoidingDataStage = insertPreVoidingDataStage;
 
@@ -45,9 +40,7 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
 
         public async Task Execute(int siteDbGroupId)
         {
-            logData = new StringBuilder();
-            timer.Restart();
-            var queue = await autoVoidRequestQueueService.GetQueue(siteDbGroupId, null);
+            var queue = await autoVoidRequestQueueService.GetQueue(siteDbGroupId);
             if (queue == null)
             {
                 return;
@@ -58,27 +51,28 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
 
         private async Task ExecuteWhenHaveData(int siteDbGroupId, AutoVoidRequestQueueModel queue)
         {
+            var logData = new List<string>();
             try
             {
-                logData.AppendLine($"Scanning[{siteDbGroupId}]: {JsonSerializer.Serialize(queue)}");
+                logData.Add($"Scan[{siteDbGroupId}]: {JsonSerializer.Serialize(queue)}");
                 if (IsVoidInstantQueue(queue.Action))
                 {
-                    await ExecuteForVoidInstantGroup(siteDbGroupId, queue);
+                    await ExecuteForVoidInstantGroup(siteDbGroupId, queue, logData);
                 }
                 else
                 {
-                    await ExecuteForAutoVoidWinningGroup(siteDbGroupId, queue);
+                    await ExecuteForAutoVoidWinningGroup(siteDbGroupId, queue, logData);
                 }
             }
             catch (Exception e)
             {
-                await loggingService.InfoAsync(logData.ToString());
-                await loggingService.ErrorAsync($"{nameof(ScanningAutoVoidRequestService)} Error", e);
-                await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, null, ExecuteStatus.Failed, null, null);
+                await loggingService.InfoJsonAsync(logData);
+                await loggingService.ErrorAsync($"{nameof(ScanAutoVoidRequestService)} Error", e);
+                await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, ExecuteStatus.Failed, null);
             }
         }
 
-        private async Task ExecuteForVoidInstantGroup(int siteDbGroupId, AutoVoidRequestQueueModel queue)
+        private async Task ExecuteForVoidInstantGroup(int siteDbGroupId, AutoVoidRequestQueueModel queue, IList<string> logData)
         {
             var isRequestQueueValid = await checkRequestQueueValidStage.Execute(siteDbGroupId, queue);
             if (!isRequestQueueValid)
@@ -94,12 +88,11 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
 
             var queueErrorMessage = await insertPreVoidingDataStage.Execute(siteDbGroupId, queue,
                 getTicketsResult.OutputData.SingleTickets, getTicketsResult.OutputData.ParlayTickets, logData);
-            await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, null, ExecuteStatus.Done, null, queueErrorMessage);
-
-            await WriteLog();
+            await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, ExecuteStatus.Done, queueErrorMessage);
+            await WriteLog(logData);
         }
 
-        private async Task ExecuteForAutoVoidWinningGroup(int siteDbGroupId, AutoVoidRequestQueueModel queue)
+        private async Task ExecuteForAutoVoidWinningGroup(int siteDbGroupId, AutoVoidRequestQueueModel queue, IList<string> logData)
         {
             var getTicketsResult = await getTicketsStage.Execute(siteDbGroupId, queue, null);
             if (!getTicketsResult.IsContinueFlow)
@@ -107,20 +100,19 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
                 return;
             }
 
-            var checkStatusTicketsResult = await checkStatusTicketsStage.Execute(siteDbGroupId, queue.Action,
+            var checkTicketResult = await checkTicketAllowToVoidStage.Execute(siteDbGroupId, queue.Action,
                 getTicketsResult.OutputData.SingleTickets, getTicketsResult.OutputData.ParlayTickets, logData);
 
             await reCalculateTicketsStage.Execute(siteDbGroupId,
-                checkStatusTicketsResult.SingleTicketsResettle,
-                checkStatusTicketsResult.ParlayTicketsResettle, logData);
+                checkTicketResult.SingleTicketsResettle,
+                checkTicketResult.ParlayTicketsResettle, logData);
 
             var queueErrorMessage = await insertPreVoidingDataStage.Execute(siteDbGroupId, queue,
-                  checkStatusTicketsResult.ValidVoidSingleTickets,
-                  checkStatusTicketsResult.ValidVoidParlayTickets, logData);
+                checkTicketResult.ValidVoidSingleTickets,
+                checkTicketResult.ValidVoidParlayTickets, logData);
 
-            await processMixParlayStage.Execute(siteDbGroupId, queue,
-                checkStatusTicketsResult.MixParlayRequestsNoStatusWLButAllChildMatchesCompleted, queueErrorMessage, logData);
-            await WriteLog();
+            await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, ExecuteStatus.Done, queueErrorMessage);
+            await WriteLog(logData);
         }
 
         private static bool IsVoidInstantQueue(string action)
@@ -131,12 +123,10 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
                    || action.Equals(AutoVoidConstant.QueueActionVoidInstantNoPolicy, StringComparison.OrdinalIgnoreCase);
         }
 
-        private async Task WriteLog()
+        private async Task WriteLog(IList<string> logData)
         {
-            timer.Stop();
-            logData.AppendLine($"Server Time: {DateTime.Now:MM/dd/yyyy HH:mm:ss.fff}");
-            logData.AppendLine($"Elapsed Time: {timer.ElapsedMilliseconds} ms");
-            await loggingService.InfoAsync(logData.ToString());
+            logData.Add($"ServerTime: {DateTime.Now:MM/dd/yyyy HH:mm:ss.fff}");
+            await loggingService.InfoJsonAsync(logData);
         }
     }
 }

@@ -1,32 +1,30 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
 using Fanex.Data.Repository;
 using TVS.Void.Service.Criteria.MultiSiteDb;
 using TVS.Void.Service.Extensions;
 using TVS.Void.Service.Models;
 
-namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
+namespace TVS.Void.Service.Services.ScanAutoVoidRequest
 {
-    public interface CheckStatusTicketsStage
+    public interface CheckTicketAllowToVoidStage
     {
         Task<CheckStatusTicketOutput> Execute(int siteDbGroupId, string queueAction,
-            IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets, StringBuilder logData);
+            IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets, IList<string> logData);
     }
 
-    public class CheckStatusTicketsStageImp : CheckStatusTicketsStage
+    public class CheckTicketAllowToVoidStageImp : CheckTicketAllowToVoidStage
     {
         private readonly IDynamicRepository repository;
 
-        public CheckStatusTicketsStageImp(IDynamicRepository repository)
+        public CheckTicketAllowToVoidStageImp(IDynamicRepository repository)
         {
             this.repository = repository;
         }
 
         public async Task<CheckStatusTicketOutput> Execute(int siteDbGroupId, string queueAction,
-            IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets, StringBuilder logData)
+            IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets, IList<string> logData)
         {
             var criteria = new CheckTicketsAllowToVoidCriteria
             {
@@ -42,7 +40,6 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
                 typeof (RequestDetailTicketModel),
                 typeof(RequestDetailTicketModel),
                 typeof(RequestDetailTicketModel),
-                typeof(RequestModel)
             };
 
             var objectsArray = await repository.FetchMultipleAsync(criteria, mappingTypes);
@@ -53,12 +50,10 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
                 ValidVoidParlayTickets = objectsArray[1].Cast<RequestDetailTicketModel>(),
                 SingleTicketsResettle = objectsArray[2].Cast<RequestDetailTicketModel>(),
                 ParlayTicketsResettle = objectsArray[3].Cast<RequestDetailTicketModel>(),
-                MixParlayRequestsNoStatusWLButAllChildMatchesCompleted = objectsArray[4].Cast<RequestModel>()
             };
 
-            logData.AppendLine($"{nameof(CheckStatusTicketsStage)} - VVSingle: {outputData.ValidVoidSingleTickets.Count()} - VVParlay: {outputData.ValidVoidParlayTickets.Count()} " +
-                               $"- SingleResettle: {outputData.SingleTicketsResettle.Count()} - ParlayResettle: {outputData.ParlayTicketsResettle.Count()} " +
-                               $"- MixParlayRequestsNoStatusWLButAllChildMatchesCompleted: {JsonSerializer.Serialize(outputData.MixParlayRequestsNoStatusWLButAllChildMatchesCompleted)}");
+            logData.Add($"{nameof(CheckTicketAllowToVoidStage)} - VVSingle: {outputData.ValidVoidSingleTickets.Count()} - VVParlay: {outputData.ValidVoidParlayTickets.Count()} " +
+                               $"- SingleResettle: {outputData.SingleTicketsResettle.Count()} - ParlayResettle: {outputData.ParlayTicketsResettle.Count()}");
 
             return outputData;
         }

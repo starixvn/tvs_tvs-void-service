@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
 using System.Threading.Tasks;
 using TicketVoidingSystem.Constants;
 
@@ -53,12 +52,12 @@ namespace TVS.Void.Service.Services.CheckTicketStatus
             }
 
             logData.Add($"ServerTime: {DateTime.Now:MM/dd/yyyy HH:mm:ss.fff}");
-            await loggingService.InfoAsync(JsonSerializer.Serialize(logData));
+            await loggingService.InfoJsonAsync(logData);
         }
 
-        private async Task HandleException(IEnumerable<string> logData, Exception exception)
+        private async Task HandleException(IList<string> logData, Exception exception)
         {
-            await loggingService.InfoAsync(logData.ToString());
+            await loggingService.InfoJsonAsync(logData);
             await loggingService.ErrorAsync($"{nameof(CheckTicketStatusService)} Error", exception);
         }
     }

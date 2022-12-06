@@ -21,7 +21,7 @@ using Sentry;
 using TVS.Void.Service.Models;
 using TVS.Void.Service.Services;
 using TVS.Void.Service.Services.CheckingVoidStatus;
-using TVS.Void.Service.Services.ScanningAutoVoidRequest;
+using TVS.Void.Service.Services.ScanAutoVoidRequest;
 using TVS.Void.Service.Services.Void;
 using TVS.Void.Service.Website.Jobs;
 using TVS.Void.Service.Website.Jobs.Listener;
@@ -106,11 +106,10 @@ namespace TVS.Void.Service.Website.Utilities
             services.AddSingleton<RequestDetailService, RequestDetailServiceImp>();
             services.AddSingleton<TicketVoidingQueueService, TicketVoidingQueueServiceImp>();
 
-            services.AddSingleton<ScanningAutoVoidRequestService, ScanningAutoVoidRequestServiceImp>();
+            services.AddSingleton<ScanAutoVoidRequestService, ScanAutoVoidRequestServiceImp>();
             services.AddSingleton<CheckRequestQueueValidStage, CheckRequestQueueValidStageImp>();
             services.AddSingleton<GetTicketsStage, GetTicketsStageImp>();
-            services.AddSingleton<CheckStatusTicketsStage, CheckStatusTicketsStageImp>();
-            services.AddSingleton<ProcessMixParlayStage, ProcessMixParlayStageImp>();
+            services.AddSingleton<CheckTicketAllowToVoidStage, CheckTicketAllowToVoidStageImp>();
             services.AddSingleton<ReCalculateTicketsStage, ReCalculateTicketsStageImp>();
             services.AddSingleton<InsertPreVoidingDataStage, InsertPreVoidingDataStageImp>();
 
@@ -126,7 +125,7 @@ namespace TVS.Void.Service.Website.Utilities
         {
             const int maxConcurrencyThread = 10;
             services.AddTransient<CheckTicketStatusJob>();
-            services.AddTransient<ScanningAutoVoidRequestJob>();
+            services.AddTransient<ScanAutoVoidRequestJob>();
             services.AddTransient<VoidJob>();
             services.AddTransient<CheckingVoidStatusJob>();
             services.AddQuartz(q =>
@@ -144,25 +143,25 @@ namespace TVS.Void.Service.Website.Utilities
                 });
 
                 q.ScheduleJob<CheckTicketStatusJob>(trigger => trigger
-                    .WithIdentity("CheckTicketStatusJob Trigger")
+                    .WithIdentity($"{nameof(CheckTicketStatusJob)} Trigger")
                     .StartNow()
                     .WithSimpleSchedule(x => x.WithIntervalInSeconds(1).RepeatForever())
                 );
 
-                q.ScheduleJob<ScanningAutoVoidRequestJob>(trigger => trigger
-                    .WithIdentity("ScanningAutoVoidRequestJob Trigger")
+                q.ScheduleJob<ScanAutoVoidRequestJob>(trigger => trigger
+                    .WithIdentity($"{nameof(ScanAutoVoidRequestJob)} Trigger")
                     .StartNow()
                     .WithSimpleSchedule(x => x.WithIntervalInSeconds(1).RepeatForever())
                 );
 
                 q.ScheduleJob<VoidJob>(trigger => trigger
-                    .WithIdentity("VoidJob Trigger")
+                    .WithIdentity($"{nameof(VoidJob)}Trigger")
                     .StartNow()
                     .WithSimpleSchedule(x => x.WithIntervalInSeconds(1).RepeatForever())
                 );
 
                 q.ScheduleJob<CheckingVoidStatusJob>(trigger => trigger
-                    .WithIdentity("CheckingVoidStatusJob Trigger")
+                    .WithIdentity($"{nameof(CheckingVoidStatusJob)} Trigger")
                     .StartNow()
                     .WithSimpleSchedule(x => x.WithIntervalInSeconds(1).RepeatForever())
                 );

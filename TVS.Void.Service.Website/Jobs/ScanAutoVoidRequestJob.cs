@@ -1,51 +1,46 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using ONEbook.UM.Services;
 using Quartz;
 using TicketVoidingSystem.Constants;
 using TVS.Void.Service.Services;
-using TVS.Void.Service.Services.ScanningAutoVoidRequest;
+using TVS.Void.Service.Services.ScanAutoVoidRequest;
 
 namespace TVS.Void.Service.Website.Jobs
 {
-    public class ScanningAutoVoidRequestJob : IJob
+    public class ScanAutoVoidRequestJob : IJob
     {
         private readonly LoggingService loggingService;
         private readonly IMaintenanceService maintenanceService;
-        private readonly ScanningAutoVoidRequestService scanningService;
-        private readonly ILogger<ScanningAutoVoidRequestJob> logger;
+        private readonly ScanAutoVoidRequestService scanningService;
 
-        public ScanningAutoVoidRequestJob(IMaintenanceService maintenanceService, LoggingService loggingService, ScanningAutoVoidRequestService scanningService,
-            ILogger<ScanningAutoVoidRequestJob> logger
-)
+        public ScanAutoVoidRequestJob(IMaintenanceService maintenanceService, LoggingService loggingService, ScanAutoVoidRequestService scanningService)
         {
             this.maintenanceService = maintenanceService;
             this.loggingService = loggingService;
             this.scanningService = scanningService;
-            this.logger = logger;
         }
 
         public async Task Execute(IJobExecutionContext context)
         {
             try
             {
-                if (!AppConfigService.AppConfig.IsScanningAutoVoidRequestJobExecuting)
+                if (!AppConfigService.AppConfig.IsScanAutoVoidRequestJobExecuting)
                 {
-                    AppConfigService.AppConfig.IsScanningAutoVoidRequestJobExecuting = true;
+                    AppConfigService.AppConfig.IsScanAutoVoidRequestJobExecuting = true;
 
                     if (!await maintenanceService.IsUnderMaintenanceAsync())
                     {
                         await ExecuteSiteDbSequential();
                     }
 
-                    AppConfigService.AppConfig.IsScanningAutoVoidRequestJobExecuting = false;
+                    AppConfigService.AppConfig.IsScanAutoVoidRequestJobExecuting = false;
                 }
             }
             catch (Exception ex)
             {
-                AppConfigService.AppConfig.IsScanningAutoVoidRequestJobExecuting = false;
-                await loggingService.ErrorAsync("ScanningAutoVoidRequestJob execute failed!", ex);
+                AppConfigService.AppConfig.IsScanAutoVoidRequestJobExecuting = false;
+                await loggingService.ErrorAsync($"{nameof(ScanAutoVoidRequestJob)} execute failed!", ex);
             }
         }
 

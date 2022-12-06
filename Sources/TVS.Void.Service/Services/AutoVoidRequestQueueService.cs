@@ -7,9 +7,9 @@ namespace TVS.Void.Service.Services
 {
     public interface AutoVoidRequestQueueService
     {
-        Task<AutoVoidRequestQueueModel> GetQueue(int siteDbGroupId, string broadcastSessionId);
+        Task<AutoVoidRequestQueueModel> GetQueue(int siteDbGroupId);
 
-        Task UpdateQueue(int siteDbGroupId, int queueId, string broadcastSessionId, int? statusId, bool? isUpdateStartTime, string errorMessage);
+        Task UpdateQueue(int siteDbGroupId, int queueId, int? statusId, string errorMessage);
 
         Task InsertQueue(int siteDbGroupId, int requestId, int statusId, string action);
     }
@@ -23,18 +23,11 @@ namespace TVS.Void.Service.Services
             this.repository = repository;
         }
 
-        /// <summary>
-        /// If broadcastSessionId == null, only get valid queue
-        /// </summary>
-        /// <param name="siteDbGroupId"></param>
-        /// <param name="broadcastSessionId"></param>
-        /// <returns></returns>
-        public async Task<AutoVoidRequestQueueModel> GetQueue(int siteDbGroupId, string broadcastSessionId)
+        public async Task<AutoVoidRequestQueueModel> GetQueue(int siteDbGroupId)
         {
             var criteria = new GetAutoVoidRequestQueueCriteria
             {
                 SiteDbGroupId = siteDbGroupId,
-                BroadcastSessionId = broadcastSessionId
             };
 
             var result = await repository.GetAsync<AutoVoidRequestQueueModel>(criteria);
@@ -46,15 +39,13 @@ namespace TVS.Void.Service.Services
             return result;
         }
 
-        public async Task UpdateQueue(int siteDbGroupId, int queueId, string broadcastSessionId, int? statusId, bool? isUpdateStartTime, string errorMessage)
+        public async Task UpdateQueue(int siteDbGroupId, int queueId, int? statusId, string errorMessage)
         {
             var criteria = new UpdateAutoVoidRequestQueueCriteria
             {
                 SiteDbGroupId = siteDbGroupId,
                 QueueId = queueId,
-                BroadcastSessionId = broadcastSessionId,
                 StatusId = statusId,
-                IsUpdateStartTime = isUpdateStartTime,
                 ErrMsg = errorMessage
             };
 

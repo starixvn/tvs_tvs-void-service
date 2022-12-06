@@ -24,23 +24,6 @@ namespace TVS.Void.Service.Extensions
             return $"<root>{stringBuilder.ToString().Trim()}</root>";
         }
 
-        public static string ToVoidServiceXml(this IEnumerable<VoidServiceModel> models)
-        {
-            if (models == null || !models.Any())
-            {
-                return string.Empty;
-            }
-
-            var stringBuilder = new StringBuilder();
-            foreach (var model in models)
-            {
-                var line = $"<r RequestId='{model.RequestId}' IssueTypeId='{model.IssueTypeId}' MatchId='{model.MatchId}' SiteDBGroupId='{model.SiteDbGroupId}'/>";
-                stringBuilder.AppendLine(line);
-            }
-
-            return $"<root>{stringBuilder.ToString().Trim()}</root>";
-        }
-
         public static string ToAfterVoidDataXml(this IEnumerable<AfterVoidServiceModel> afterVoidData)
         {
             if (afterVoidData == null || !afterVoidData.Any())

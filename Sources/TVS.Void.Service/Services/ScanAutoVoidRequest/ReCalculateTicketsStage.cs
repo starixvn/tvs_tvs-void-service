@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Fanex.Data.Repository;
@@ -9,11 +8,11 @@ using TVS.Void.Service.Constants;
 using TVS.Void.Service.Criteria.MultiSiteDb;
 using TVS.Void.Service.Models;
 
-namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
+namespace TVS.Void.Service.Services.ScanAutoVoidRequest
 {
     public interface ReCalculateTicketsStage
     {
-        Task Execute(int siteDbGroupId, IEnumerable<RequestDetailTicketModel> singleTicketsResettle, IEnumerable<RequestDetailTicketModel> parlayTicketsResettle, StringBuilder logData);
+        Task Execute(int siteDbGroupId, IEnumerable<RequestDetailTicketModel> singleTicketsResettle, IEnumerable<RequestDetailTicketModel> parlayTicketsResettle, IList<string> logData);
     }
 
     public class ReCalculateTicketsStageImp : ReCalculateTicketsStage
@@ -25,7 +24,7 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
             this.repository = repository;
         }
 
-        public async Task Execute(int siteDbGroupId, IEnumerable<RequestDetailTicketModel> singleTicketsResettle, IEnumerable<RequestDetailTicketModel> parlayTicketsResettle, StringBuilder logData)
+        public async Task Execute(int siteDbGroupId, IEnumerable<RequestDetailTicketModel> singleTicketsResettle, IEnumerable<RequestDetailTicketModel> parlayTicketsResettle, IList<string> logData)
         {
             // TODO: Check if this step fail -> re execute, write log
             if (singleTicketsResettle.Any() || parlayTicketsResettle.Any())
@@ -36,11 +35,11 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
         }
 
         private async Task UnMarkTickets(int siteDbGroupId, IEnumerable<RequestDetailTicketModel> singleTicketsResettle,
-            IEnumerable<RequestDetailTicketModel> parlayTicketsResettle, StringBuilder logData)
+            IEnumerable<RequestDetailTicketModel> parlayTicketsResettle, IList<string> logData)
         {
             var ticketList = singleTicketsResettle.Select(x => x.TransId).Union(parlayTicketsResettle.Select(x => x.TransId));
             var transIdText = string.Join(",", ticketList);
-            logData.AppendLine($"UnMarkTickets: {transIdText}");
+            logData.Add($"UnMarkTickets: {transIdText}");
             var criteria = new UnMarkTicketsCriteria
             {
                 LogActionId = 90510,
@@ -52,11 +51,11 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
 
             // TODO: Handle when error
             var result = await repository.FetchAsync<Result>(criteria);
-            logData.AppendLine($"UnMarkTickets-Result: {JsonSerializer.Serialize(result)}");
+            logData.Add($"UnMarkTickets-Result: {JsonSerializer.Serialize(result)}");
         }
 
         private async Task ReCalculateTickets(int siteDbGroupId, IEnumerable<RequestDetailTicketModel> singleTicketsResettle,
-            IEnumerable<RequestDetailTicketModel> parlayTicketsResettle, StringBuilder logData)
+            IEnumerable<RequestDetailTicketModel> parlayTicketsResettle, IList<string> logData)
         {
             if (singleTicketsResettle.Any())
             {
@@ -64,7 +63,7 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
                 var singleTransIdList = singleTicketsResettle.Where(x => x.MatchId == firstSingleTicket.MatchId)
                     .Select(x => x.TransId);
                 var singleTransIdText = string.Join(",", singleTransIdList);
-                logData.AppendLine($"ReCalcSingle - MatchId:{firstSingleTicket.MatchId} - SingleTransId:{singleTransIdText}");
+                logData.Add($"ReCalcSingle - MatchId:{firstSingleTicket.MatchId} - SingleTransId:{singleTransIdText}");
                 await ExecuteReCalculateTickets(siteDbGroupId, firstSingleTicket.MatchId, singleTransIdText);
             }
 
@@ -73,7 +72,7 @@ namespace TVS.Void.Service.Services.ScanningAutoVoidRequest
                 const int parlayMatchId = 29;
                 var parlayTransIdList = parlayTicketsResettle.Where(x => x.MatchId == parlayMatchId).Select(x => x.TransId);
                 var parlayTransIdText = string.Join(",", parlayTransIdList);
-                logData.AppendLine($"ReCalcParlay - MatchId:{parlayMatchId} - ParlayTransId:{parlayTransIdText}");
+                logData.Add($"ReCalcParlay - MatchId:{parlayMatchId} - ParlayTransId:{parlayTransIdText}");
                 await ExecuteReCalculateTickets(siteDbGroupId, parlayMatchId, parlayTransIdText);
             }
         }
