@@ -6,7 +6,5 @@
         public const byte Running = 1;
         public const byte Done = 2;
         public const byte Failed = 3;
-
-        public const byte VoidServiceExecuteVoidDone = 12;
     }
 }

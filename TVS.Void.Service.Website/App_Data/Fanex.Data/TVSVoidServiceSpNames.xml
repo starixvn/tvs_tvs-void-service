@@ -40,8 +40,6 @@
         <Setting Key="TicketVoiding_AutoVoidRequest_Ticket_Select" SpName="TicketVoiding_AutoVoidRequest_Ticket_Select" DbName="DBCTG.bodb02.bodbAdminNet" TimeOut="600" />
         <Setting Key="TicketVoiding_VoidingHistory_Insert" SpName="TicketVoiding_VoidingHistory_Insert" DbName="DBCTG.bodb02.bodbAdminNet" TimeOut="600" />
         <Setting Key="TicketVoiding_VoidingHistory_Update" SpName="TicketVoiding_VoidingHistory_Update" DbName="DBCTG.bodb02.bodbAdminNet" TimeOut="600" />
-        <Setting Key="TicketVoiding_Void_Service_Select" SpName="TicketVoiding_Void_Service_Select" DbName="DBCTG.bodb02.bodbAdminNet" TimeOut="600" />
-        <Setting Key="TicketVoiding_Void_Service_Update" SpName="TicketVoiding_Void_Service_Update" DbName="DBCTG.bodb02.bodbAdminNet" TimeOut="600" />
         <Setting Key="TicketVoiding_VoidBetAutomation_Service_Insert" SpName="TicketVoiding_VoidBetAutomation_Service_Insert" DbName="DBCTG.bodb02.bodbAdminNet" TimeOut="600" />
         <Setting Key="TicketVoiding_Request_Select" SpName="TicketVoiding_Request_Select" DbName="DBCTG.bodb02.bodbAdminNet" TimeOut="600" />
     </Function>

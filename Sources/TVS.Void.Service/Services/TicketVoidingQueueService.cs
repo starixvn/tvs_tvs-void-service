@@ -15,7 +15,7 @@ namespace TVS.Void.Service.Services
         Task InsertQueue(int siteDbGroupId, int requestId, int voidingHistoryId,
             IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets);
 
-        Task<ProcessVoidQueueResult> ProcessVoidQueue(int siteDbGroupId, int queueId);
+        Task<TicketVoidingQueueModel> ProcessVoidQueue(int siteDbGroupId, int queueId);
     }
 
     public class TicketVoidingQueueServiceImp : TicketVoidingQueueService
@@ -55,7 +55,7 @@ namespace TVS.Void.Service.Services
             await repository.ExecuteAsync(criteria);
         }
 
-        public async Task<ProcessVoidQueueResult> ProcessVoidQueue(int siteDbGroupId, int queueId)
+        public async Task<TicketVoidingQueueModel> ProcessVoidQueue(int siteDbGroupId, int queueId)
         {
             var criteria = new ProcessVoidQueueCriteria
             {
@@ -63,7 +63,7 @@ namespace TVS.Void.Service.Services
                 QueueId = queueId
             };
 
-            var result = await repository.GetAsync<ProcessVoidQueueResult>(criteria);
+            var result = await repository.GetAsync<TicketVoidingQueueModel>(criteria);
             return result;
         }
     }

@@ -127,7 +127,6 @@ namespace TVS.Void.Service.Website.Utilities
             services.AddTransient<CheckTicketStatusJob>();
             services.AddTransient<ScanAutoVoidRequestJob>();
             services.AddTransient<VoidJob>();
-            services.AddTransient<CheckingVoidStatusJob>();
             services.AddQuartz(q =>
             {
                 // handy when part of cluster or you want to otherwise identify multiple schedulers
@@ -156,12 +155,6 @@ namespace TVS.Void.Service.Website.Utilities
 
                 q.ScheduleJob<VoidJob>(trigger => trigger
                     .WithIdentity($"{nameof(VoidJob)}Trigger")
-                    .StartNow()
-                    .WithSimpleSchedule(x => x.WithIntervalInSeconds(1).RepeatForever())
-                );
-
-                q.ScheduleJob<CheckingVoidStatusJob>(trigger => trigger
-                    .WithIdentity($"{nameof(CheckingVoidStatusJob)} Trigger")
                     .StartNow()
                     .WithSimpleSchedule(x => x.WithIntervalInSeconds(1).RepeatForever())
                 );

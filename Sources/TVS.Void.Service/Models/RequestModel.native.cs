@@ -7,6 +7,13 @@ namespace TVS.Void.Service.Models
     {
         public int RequestId { get; set; }
         public string ActionName { get; set; }
+        public int IssueTypeId { get; set; }
+    }
+
+    public class RequestDetail
+    {
+        public int RequestId { get; set; }
+        public int MatchId { get; set; }
     }
 
     public class RequestDetailTicketModel

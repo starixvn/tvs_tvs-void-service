@@ -7,7 +7,7 @@ namespace TVS.Void.Service.Services.Void
 {
     public interface ProcessVoidQueuesStage
     {
-        Task<IEnumerable<ProcessVoidQueueResult>> Execute(int siteDbGroupId, IEnumerable<TicketVoidingQueueModel> voidingQueues);
+        Task<IEnumerable<TicketVoidingQueueModel>> Execute(int siteDbGroupId, IEnumerable<TicketVoidingQueueModel> voidingQueues);
     }
 
     public class ProcessVoidQueuesStageImp : ProcessVoidQueuesStage
@@ -19,14 +19,14 @@ namespace TVS.Void.Service.Services.Void
             this.ticketVoidingQueueService = ticketVoidingQueueService;
         }
 
-        public async Task<IEnumerable<ProcessVoidQueueResult>> Execute(int siteDbGroupId, IEnumerable<TicketVoidingQueueModel> voidingQueues)
+        public async Task<IEnumerable<TicketVoidingQueueModel>> Execute(int siteDbGroupId, IEnumerable<TicketVoidingQueueModel> voidingQueues)
         {
-            var processResult = new List<ProcessVoidQueueResult>();
+            var processResult = new List<TicketVoidingQueueModel>();
             foreach (var queue in voidingQueues)
             {
                 if (queue.StatusId is ExecuteStatus.Done or ExecuteStatus.Failed)
                 {
-                    processResult.Add(new ProcessVoidQueueResult { QueueId = queue.QueueId, StatusId = queue.StatusId });
+                    processResult.Add(new TicketVoidingQueueModel { QueueId = queue.QueueId, StatusId = queue.StatusId, NegativeBalanceUsers = queue.NegativeBalanceUsers });
                     continue;
                 }
 
