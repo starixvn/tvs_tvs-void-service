@@ -17,6 +17,8 @@ namespace TVS.Void.Service.Services
 
         Task<IEnumerable<RequestModel>> CheckStatusTicketForInsertAutoVoid(int siteDbGroupId,
                     IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets);
+
+        Task UpdateIsProcessed(IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets);
     }
 
     public class RequestTicketServiceImp : RequestTicketService
@@ -62,6 +64,17 @@ namespace TVS.Void.Service.Services
             };
 
             return await repository.FetchAsync<RequestModel>(criteria);
+        }
+
+        public async Task UpdateIsProcessed(IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets)
+        {
+            var criteria = new UpdateIsProcessedForRequestTicketsCriteria
+            {
+                SingleTicketsJson = JsonSerializer.Serialize(singleTickets),
+                ParlayTicketsJson = JsonSerializer.Serialize(parlayTickets)
+            };
+
+            await repository.ExecuteAsync(criteria);
         }
     }
 }

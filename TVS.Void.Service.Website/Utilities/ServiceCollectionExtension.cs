@@ -20,7 +20,7 @@ using Quartz;
 using Sentry;
 using TVS.Void.Service.Models;
 using TVS.Void.Service.Services;
-using TVS.Void.Service.Services.CheckingVoidStatus;
+using TVS.Void.Service.Services.CheckTicketStatus;
 using TVS.Void.Service.Services.ScanAutoVoidRequest;
 using TVS.Void.Service.Services.Void;
 using TVS.Void.Service.Website.Jobs;
@@ -105,6 +105,11 @@ namespace TVS.Void.Service.Website.Utilities
             services.AddSingleton<AutoVoidRequestQueueService, AutoVoidRequestQueueServiceImp>();
             services.AddSingleton<RequestDetailService, RequestDetailServiceImp>();
             services.AddSingleton<TicketVoidingQueueService, TicketVoidingQueueServiceImp>();
+            services.AddSingleton<RequestTicketService, RequestTicketServiceImp>();
+            services.AddSingleton<NotificationService, NotificationServiceImp>();
+
+            services.AddSingleton<CheckTicketStatusService, CheckTicketStatusServiceImp>();
+            services.AddSingleton<InsertAutoVoidQueueStage, InsertAutoVoidQueueStageImp>();
 
             services.AddSingleton<ScanAutoVoidRequestService, ScanAutoVoidRequestServiceImp>();
             services.AddSingleton<CheckRequestQueueValidStage, CheckRequestQueueValidStageImp>();
@@ -115,10 +120,7 @@ namespace TVS.Void.Service.Website.Utilities
 
             services.AddSingleton<VoidService, VoidServiceImp>();
             services.AddSingleton<ProcessVoidQueuesStage, ProcessVoidQueuesStageImp>();
-
-            services.AddSingleton<CheckingVoidStatusService, CheckingVoidStatusServiceImp>();
-            services.AddSingleton<CheckAutoVoidRequestQueueStage, CheckAutoVoidRequestQueueStageImp>();
-            services.AddSingleton<PrepareAfterVoidDataStage, PrepareAfterVoidDataStageImp>();
+            services.AddSingleton<InsertAfterVoidDataStage, InsertAfterVoidDataStageImp>();
         }
 
         public static void RegisterQuartzScheduler(this IServiceCollection services)
@@ -141,10 +143,11 @@ namespace TVS.Void.Service.Website.Utilities
                     tp.MaxConcurrency = maxConcurrencyThread;
                 });
 
+                const int schedulerInterval = 5;
                 q.ScheduleJob<CheckTicketStatusJob>(trigger => trigger
                     .WithIdentity($"{nameof(CheckTicketStatusJob)} Trigger")
                     .StartNow()
-                    .WithSimpleSchedule(x => x.WithIntervalInSeconds(1).RepeatForever())
+                    .WithSimpleSchedule(x => x.WithIntervalInMinutes(schedulerInterval).RepeatForever())
                 );
 
                 q.ScheduleJob<ScanAutoVoidRequestJob>(trigger => trigger

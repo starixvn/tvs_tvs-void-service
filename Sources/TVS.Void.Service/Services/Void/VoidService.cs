@@ -18,15 +18,17 @@ namespace TVS.Void.Service.Services.Void
         private readonly TicketVoidingQueueService ticketVoidingQueueService;
         private readonly RequestDetailService requestDetailService;
         private readonly ProcessVoidQueuesStage processVoidQueuesStage;
+        private readonly InsertAfterVoidDataStage insertAfterVoidDataStage;
         private readonly NotificationService notificationService;
         private readonly LoggingService loggingService;
 
         public VoidServiceImp(TicketVoidingQueueService ticketVoidingQueueService, RequestDetailService requestDetailService, ProcessVoidQueuesStage processVoidQueuesStage,
-            NotificationService notificationService, LoggingService loggingService)
+            InsertAfterVoidDataStage insertAfterVoidDataStage, NotificationService notificationService, LoggingService loggingService)
         {
             this.ticketVoidingQueueService = ticketVoidingQueueService;
             this.requestDetailService = requestDetailService;
             this.processVoidQueuesStage = processVoidQueuesStage;
+            this.insertAfterVoidDataStage = insertAfterVoidDataStage;
             this.notificationService = notificationService;
             this.loggingService = loggingService;
         }
@@ -77,6 +79,8 @@ namespace TVS.Void.Service.Services.Void
                 await loggingService.InfoJsonAsync(logData);
                 return;
             }
+
+            await insertAfterVoidDataStage.Execute(processVoidQueuesResult, logData);
 
             logData.Add($"ServerTime: {DateTime.Now:MM/dd/yyyy HH:mm:ss.fff}");
             await loggingService.InfoJsonAsync(logData);

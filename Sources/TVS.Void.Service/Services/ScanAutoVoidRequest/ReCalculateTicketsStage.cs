@@ -17,11 +17,13 @@ namespace TVS.Void.Service.Services.ScanAutoVoidRequest
 
     public class ReCalculateTicketsStageImp : ReCalculateTicketsStage
     {
+        private readonly RequestTicketService requestTicketService;
         private readonly IDynamicRepository repository;
 
-        public ReCalculateTicketsStageImp(IDynamicRepository repository)
+        public ReCalculateTicketsStageImp(IDynamicRepository repository, RequestTicketService requestTicketService)
         {
             this.repository = repository;
+            this.requestTicketService = requestTicketService;
         }
 
         public async Task Execute(int siteDbGroupId, IEnumerable<RequestDetailTicketModel> singleTicketsResettle, IEnumerable<RequestDetailTicketModel> parlayTicketsResettle, IList<string> logData)
@@ -31,6 +33,7 @@ namespace TVS.Void.Service.Services.ScanAutoVoidRequest
             {
                 await UnMarkTickets(siteDbGroupId, singleTicketsResettle, parlayTicketsResettle, logData);
                 await ReCalculateTickets(siteDbGroupId, singleTicketsResettle, parlayTicketsResettle, logData);
+                await UpdateIsProcessed(singleTicketsResettle, parlayTicketsResettle, logData);
             }
         }
 
@@ -90,6 +93,12 @@ namespace TVS.Void.Service.Services.ScanAutoVoidRequest
 
             // TODO: Handle when error
             await repository.ExecuteAsync(criteria);
+        }
+
+        private async Task UpdateIsProcessed(IEnumerable<RequestDetailTicketModel> singleTicketsResettle, IEnumerable<RequestDetailTicketModel> parlayTicketsResettle, IList<string> logData)
+        {
+            await requestTicketService.UpdateIsProcessed(singleTicketsResettle, parlayTicketsResettle);
+            logData.Add($"{nameof(RequestTicketService.UpdateIsProcessed)}-AfterReCalc-OK");
         }
     }
 }

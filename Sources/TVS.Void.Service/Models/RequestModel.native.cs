@@ -7,6 +7,7 @@ namespace TVS.Void.Service.Models
     {
         public int RequestId { get; set; }
         public string ActionName { get; set; }
+        public int ActionId { get; set; }
         public int IssueTypeId { get; set; }
     }
 

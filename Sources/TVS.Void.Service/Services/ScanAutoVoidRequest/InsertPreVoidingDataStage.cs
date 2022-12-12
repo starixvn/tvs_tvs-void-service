@@ -16,13 +16,15 @@ namespace TVS.Void.Service.Services.ScanAutoVoidRequest
     {
         private readonly RequestDetailService requestDetailService;
         private readonly TicketVoidingQueueService ticketVoidingQueueService;
+        private readonly RequestTicketService requestTicketService;
         private readonly NotificationService notificationService;
 
         public InsertPreVoidingDataStageImp(RequestDetailService requestDetailService,
-            TicketVoidingQueueService ticketVoidingQueueService, NotificationService notificationService)
+            TicketVoidingQueueService ticketVoidingQueueService, RequestTicketService requestTicketService, NotificationService notificationService)
         {
             this.requestDetailService = requestDetailService;
             this.ticketVoidingQueueService = ticketVoidingQueueService;
+            this.requestTicketService = requestTicketService;
             this.notificationService = notificationService;
         }
 
@@ -41,6 +43,9 @@ namespace TVS.Void.Service.Services.ScanAutoVoidRequest
             await ticketVoidingQueueService.InsertQueue(siteDbGroupId, queue.RequestId, voidingHistory.VoidingHistoryId,
                 validVoidSingleTickets, validVoidParlayTickets);
             logData.Add("InsertQueue-OK");
+
+            await requestTicketService.UpdateIsProcessed(validVoidSingleTickets, validVoidParlayTickets);
+            logData.Add($"{nameof(RequestTicketService.UpdateIsProcessed)}-AfterInsertVoidQueue-OK");
 
             return string.Empty;
         }

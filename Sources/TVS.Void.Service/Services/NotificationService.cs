@@ -51,7 +51,7 @@ namespace TVS.Void.Service.Services
         {
             try
             {
-                var voidResultHasUserInfo = voidQueueResults.First(x => x.UserId > 0);
+                var voidResultHasUserInfo = voidQueueResults.First(x => !string.IsNullOrWhiteSpace(x.UserName));
                 var errorMessage = $"Failed to void Request ID: {requestId}, please contact IT for support. (Error: VOID_SERVICE)";
                 await ticketVoidingSystemHttpClientService.SignalRNotifyErrorMessageToUser(voidResultHasUserInfo.UserName, errorMessage);
                 await hubContext.Clients.User(voidResultHasUserInfo.UserName).showErrorMessage(errorMessage);

@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Fanex.Data.Repository;
 using TVS.Void.Service.Constants;
 using TVS.Void.Service.Criteria;
-using TVS.Void.Service.Extensions;
 using TVS.Void.Service.Models;
 
 namespace TVS.Void.Service.Services
@@ -12,7 +11,7 @@ namespace TVS.Void.Service.Services
     {
         Task<VoidingHistoryModel> InsertVoidingHistory(int requestId);
 
-        Task<IEnumerable<AfterVoidServiceModel>> InsertAfterVoidServiceData(bool isAutoVoid, IEnumerable<AfterVoidServiceModel> afterVoidData);
+        Task<AfterVoidServiceModel> InsertAfterVoidServiceData(bool isAutoVoid, AfterVoidServiceModel afterVoidData);
 
         Task UpdateTicketVoidingHistory(int voidingHistoryId, int statusId);
 
@@ -40,15 +39,18 @@ namespace TVS.Void.Service.Services
             return await repository.GetAsync<VoidingHistoryModel>(criteria);
         }
 
-        public async Task<IEnumerable<AfterVoidServiceModel>> InsertAfterVoidServiceData(bool isAutoVoid, IEnumerable<AfterVoidServiceModel> afterVoidData)
+        public async Task<AfterVoidServiceModel> InsertAfterVoidServiceData(bool isAutoVoid, AfterVoidServiceModel afterVoidData)
         {
             var criteria = new InsertAfterVoidServiceDataCriteria
             {
                 IsAutoVoid = isAutoVoid,
-                AfterVoidDataXml = afterVoidData.ToAfterVoidDataXml(),
+                RequestId = afterVoidData.RequestId,
+                VoidingHistoryId = afterVoidData.VoidingHistoryId,
+                MatchId = afterVoidData.MatchId,
+                NegativeBalanceUsers = afterVoidData.NegativeBalanceUsers
             };
 
-            var result = await repository.FetchAsync<AfterVoidServiceModel>(criteria);
+            var result = await repository.GetAsync<AfterVoidServiceModel>(criteria);
             return result;
         }
 

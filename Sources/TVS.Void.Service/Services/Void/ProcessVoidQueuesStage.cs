@@ -26,7 +26,7 @@ namespace TVS.Void.Service.Services.Void
             {
                 if (queue.StatusId is ExecuteStatus.Done or ExecuteStatus.Failed)
                 {
-                    processResult.Add(new TicketVoidingQueueModel { QueueId = queue.QueueId, StatusId = queue.StatusId, NegativeBalanceUsers = queue.NegativeBalanceUsers });
+                    processResult.Add(queue);
                     continue;
                 }
 
