@@ -1,16 +1,16 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Fanex.Data.Repository;
 using TVS.Void.Service.Criteria.MultiSiteDb;
-using TVS.Void.Service.Extensions;
 using TVS.Void.Service.Models;
 
 namespace TVS.Void.Service.Services.ScanAutoVoidRequest
 {
     public interface CheckTicketAllowToVoidStage
     {
-        Task<CheckStatusTicketOutput> Execute(int siteDbGroupId, string queueAction,
+        Task<CheckStatusTicketOutput> Execute(int siteDbGroupId,
             IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets, IList<string> logData);
     }
 
@@ -23,15 +23,14 @@ namespace TVS.Void.Service.Services.ScanAutoVoidRequest
             this.repository = repository;
         }
 
-        public async Task<CheckStatusTicketOutput> Execute(int siteDbGroupId, string queueAction,
+        public async Task<CheckStatusTicketOutput> Execute(int siteDbGroupId,
             IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets, IList<string> logData)
         {
             var criteria = new CheckTicketsAllowToVoidCriteria
             {
                 SiteDbGroupId = siteDbGroupId,
-                Action = queueAction,
-                SingleTicketsXml = singleTickets.ToTicketsXml(),
-                ParlayTicketsXml = parlayTickets.ToTicketsXml()
+                SingleTicketsJson = JsonSerializer.Serialize(singleTickets),
+                ParlayTicketsJson = JsonSerializer.Serialize(parlayTickets)
             };
 
             var mappingTypes = new[]

@@ -15,7 +15,7 @@ namespace TVS.Void.Service.Services
 
         Task<(IEnumerable<RequestDetailTicketModel>, IEnumerable<RequestDetailTicketModel>)> GetTicketInAllRequests();
 
-        Task<IEnumerable<RequestModel>> CheckStatusTicketForInsertAutoVoid(int siteDbGroupId,
+        Task<IEnumerable<RequestModel>> CheckStatusTicketForInsertAutoVoidQueue(int siteDbGroupId,
                     IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets);
 
         Task UpdateIsProcessed(IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets);
@@ -53,7 +53,7 @@ namespace TVS.Void.Service.Services
             return (singleTickets, parlayTickets);
         }
 
-        public async Task<IEnumerable<RequestModel>> CheckStatusTicketForInsertAutoVoid(int siteDbGroupId,
+        public async Task<IEnumerable<RequestModel>> CheckStatusTicketForInsertAutoVoidQueue(int siteDbGroupId,
             IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets)
         {
             var criteria = new CheckStatusTicketCriteria

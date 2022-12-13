@@ -100,7 +100,7 @@ namespace TVS.Void.Service.Services.ScanAutoVoidRequest
                 return;
             }
 
-            var checkTicketResult = await checkTicketAllowToVoidStage.Execute(siteDbGroupId, queue.Action,
+            var checkTicketResult = await checkTicketAllowToVoidStage.Execute(siteDbGroupId,
                 getTicketsResult.OutputData.SingleTickets, getTicketsResult.OutputData.ParlayTickets, logData);
 
             await reCalculateTicketsStage.Execute(siteDbGroupId,

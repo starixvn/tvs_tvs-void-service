@@ -6,9 +6,8 @@ namespace TVS.Void.Service.Criteria.MultiSiteDb
 {
     public class CheckTicketsAllowToVoidCriteria : CriteriaBase
     {
-        public string Action { get; set; }
-        public string SingleTicketsXml { get; set; }
-        public string ParlayTicketsXml { get; set; }
+        public string SingleTicketsJson { get; set; }
+        public string ParlayTicketsJson { get; set; }
 
         [SpParam(Ignored = true)]
         public int SiteDbGroupId { get; set; }

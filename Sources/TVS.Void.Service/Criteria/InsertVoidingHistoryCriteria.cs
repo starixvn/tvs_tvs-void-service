@@ -5,7 +5,6 @@ namespace TVS.Void.Service.Criteria
     public class InsertVoidingHistoryCriteria : CriteriaBase
     {
         public int RequestId { get; set; }
-        public bool IsAutoVoid { get; set; }
 
         public int UserId { get; set; }
 

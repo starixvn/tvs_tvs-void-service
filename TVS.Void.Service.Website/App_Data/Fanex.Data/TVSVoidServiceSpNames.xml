@@ -37,10 +37,15 @@
         <Setting Key="DBSIG.TicketVoiding_Queue_Job" SpName="TicketVoiding_Queue_Job" DbName="DBSIG.bodb02.bodbAdminNet" TimeOut="600" />
         <Setting Key="DBSIG2.TicketVoiding_Queue_Job" SpName="TicketVoiding_Queue_Job" DbName="DBSIG2.bodb02.bodbAdminNet" TimeOut="600" />
 
+        <Setting Key="DBCTG.TicketVoiding_AutoVoidRequest_CheckQueue" SpName="TicketVoiding_AutoVoidRequest_CheckQueue" DbName="DBCTG.bodb02.bodbAdminNet" TimeOut="600" />
+        <Setting Key="DBSIG.TicketVoiding_AutoVoidRequest_CheckQueue" SpName="TicketVoiding_AutoVoidRequest_CheckQueue" DbName="DBSIG.bodb02.bodbAdminNet" TimeOut="600" />
+        <Setting Key="DBSIG2.TicketVoiding_AutoVoidRequest_CheckQueue" SpName="TicketVoiding_AutoVoidRequest_CheckQueue" DbName="DBSIG2.bodb02.bodbAdminNet" TimeOut="600" />
+
         <Setting Key="TicketVoiding_AutoVoidRequest_Ticket_Select" SpName="TicketVoiding_AutoVoidRequest_Ticket_Select" DbName="DBCTG.bodb02.bodbAdminNet" TimeOut="600" />
         <Setting Key="TicketVoiding_VoidingHistory_Insert" SpName="TicketVoiding_VoidingHistory_Insert" DbName="DBCTG.bodb02.bodbAdminNet" TimeOut="600" />
         <Setting Key="TicketVoiding_VoidingHistory_Update" SpName="TicketVoiding_VoidingHistory_Update" DbName="DBCTG.bodb02.bodbAdminNet" TimeOut="600" />
         <Setting Key="TicketVoiding_VoidBetAutomation_Service_Insert" SpName="TicketVoiding_VoidBetAutomation_Service_Insert" DbName="DBCTG.bodb02.bodbAdminNet" TimeOut="600" />
         <Setting Key="TicketVoiding_Request_Select" SpName="TicketVoiding_Request_Select" DbName="DBCTG.bodb02.bodbAdminNet" TimeOut="600" />
+        <Setting Key="TicketVoiding_TicketProcess_Update" SpName="TicketVoiding_TicketProcess_Update" DbName="DBCTG.bodb02.bodbAdminNet" TimeOut="600" />
     </Function>
 </Functions>

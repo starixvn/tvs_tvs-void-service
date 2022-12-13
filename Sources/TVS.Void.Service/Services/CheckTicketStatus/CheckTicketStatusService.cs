@@ -47,7 +47,7 @@ namespace TVS.Void.Service.Services.CheckTicketStatus
                 var singleTicketsInServer = singleTickets.Where(x => x.SiteDbGroupId == server.Id);
                 var parlayTicketsInServer = parlayTickets.Where(x => x.SiteDbGroupId == server.Id);
 
-                var requestsList = await requestTicketService.CheckStatusTicketForInsertAutoVoid(server.Id, singleTicketsInServer, parlayTicketsInServer);
+                var requestsList = await requestTicketService.CheckStatusTicketForInsertAutoVoidQueue(server.Id, singleTicketsInServer, parlayTicketsInServer);
                 await insertAutoVoidQueueStage.Execute(server.Id, requestsList, logData);
             }
 

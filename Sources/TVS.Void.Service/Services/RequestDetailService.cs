@@ -32,7 +32,6 @@ namespace TVS.Void.Service.Services
             var criteria = new InsertVoidingHistoryCriteria
             {
                 RequestId = requestId,
-                IsAutoVoid = true,
                 UserId = AutoVoidConstant.ActorId,
             };
 
