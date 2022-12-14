@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Fanex.Logging;
@@ -48,7 +49,11 @@ namespace TVS.Void.Service.Services
 
         public async Task InfoJsonAsync(IList<string> logData)
         {
-            await InfoAsync(JsonSerializer.Serialize(logData));
+            var serializeOptions = new JsonSerializerOptions
+            {
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+            };
+            await InfoAsync(JsonSerializer.Serialize(logData, serializeOptions));
         }
 
         private static async Task HandleException(Exception exception)

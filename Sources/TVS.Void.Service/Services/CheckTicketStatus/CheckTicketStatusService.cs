@@ -51,8 +51,11 @@ namespace TVS.Void.Service.Services.CheckTicketStatus
                 await insertAutoVoidQueueStage.Execute(server.Id, requestsList, logData);
             }
 
-            logData.Add($"ServerTime: {DateTime.Now:MM/dd/yyyy HH:mm:ss.fff}");
-            await loggingService.InfoJsonAsync(logData);
+            if (singleTickets.Any() || parlayTickets.Any())
+            {
+                logData.Add($"ServerTime: {DateTime.Now:MM/dd/yyyy HH:mm:ss.fff}");
+                await loggingService.InfoJsonAsync(logData);
+            }
         }
 
         private async Task HandleException(IList<string> logData, Exception exception)

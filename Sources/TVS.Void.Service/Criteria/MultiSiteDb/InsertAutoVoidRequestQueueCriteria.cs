@@ -9,6 +9,7 @@ namespace TVS.Void.Service.Criteria.MultiSiteDb
         public int RequestId { get; set; }
         public int StatusId { get; set; }
         public string Action { get; set; }
+        public int? MatchId { get; set; }
 
         [SpParam(Ignored = true)]
         public int SiteDbGroupId { get; set; }

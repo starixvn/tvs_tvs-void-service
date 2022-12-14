@@ -31,7 +31,7 @@ namespace TVS.Void.Service.Services.CheckTicketStatus
                 foreach (var request in requests)
                 {
                     // DB must check exist queue Status = New => not insert
-                    await autoVoidRequestQueueService.InsertQueue(siteDbGroupId, request.RequestId, ExecuteStatus.New, AutoVoidConstant.QueueActionCal);
+                    await autoVoidRequestQueueService.InsertQueue(siteDbGroupId, request.RequestId, ExecuteStatus.New, AutoVoidConstant.QueueActionCal, null);
                 }
             }
         }

@@ -94,7 +94,7 @@ namespace TVS.Void.Service.Services.ScanAutoVoidRequest
 
         private async Task ExecuteForAutoVoidWinningGroup(int siteDbGroupId, AutoVoidRequestQueueModel queue, IList<string> logData)
         {
-            var getTicketsResult = await getTicketsStage.Execute(siteDbGroupId, queue, null);
+            var getTicketsResult = await getTicketsStage.Execute(siteDbGroupId, queue, logData);
             if (!getTicketsResult.IsContinueFlow)
             {
                 return;
