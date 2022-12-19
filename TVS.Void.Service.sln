@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.32602.291
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33122.133
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TVS.Void.Service.Website", "TVS.Void.Service.Website\TVS.Void.Service.Website.csproj", "{1763DA1B-A442-46FD-81BE-0B448A6FCC80}"
 EndProject
@@ -9,7 +9,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sources", "Sources", "{1235
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TVS.Void.Service", "Sources\TVS.Void.Service\TVS.Void.Service.csproj", "{0AD92ED4-EC51-4B49-9873-D7AAD54B9C56}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicketVoidingSystem", "Sources\TicketVoidingSystem\TicketVoidingSystem.csproj", "{AD684343-1989-46F4-8751-010841D6D35E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TicketVoidingSystem", "Sources\TicketVoidingSystem\TicketVoidingSystem.csproj", "{AD684343-1989-46F4-8751-010841D6D35E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{1264FC95-2CFA-47F7-8F1C-90ED4263B3C7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TVS.Void.Service.Tests", "Tests\TVS.Void.Service.Tests\TVS.Void.Service.Tests.csproj", "{BF94E0F2-F760-4572-B1AC-0E05E5C82214}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,6 +33,10 @@ Global
 		{AD684343-1989-46F4-8751-010841D6D35E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AD684343-1989-46F4-8751-010841D6D35E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AD684343-1989-46F4-8751-010841D6D35E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF94E0F2-F760-4572-B1AC-0E05E5C82214}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF94E0F2-F760-4572-B1AC-0E05E5C82214}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF94E0F2-F760-4572-B1AC-0E05E5C82214}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF94E0F2-F760-4572-B1AC-0E05E5C82214}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -36,6 +44,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{0AD92ED4-EC51-4B49-9873-D7AAD54B9C56} = {123503A4-A16B-41D5-BF7E-A2A6C8657463}
 		{AD684343-1989-46F4-8751-010841D6D35E} = {123503A4-A16B-41D5-BF7E-A2A6C8657463}
+		{BF94E0F2-F760-4572-B1AC-0E05E5C82214} = {1264FC95-2CFA-47F7-8F1C-90ED4263B3C7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {80486A11-A220-41E5-9F1D-E2F6BC0BAB02}
