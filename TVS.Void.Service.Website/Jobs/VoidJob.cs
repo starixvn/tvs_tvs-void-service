@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using ONEbook.UM.Services;
 using Quartz;
 using TicketVoidingSystem.Constants;
@@ -15,14 +13,12 @@ namespace TVS.Void.Service.Website.Jobs
         private readonly LoggingService loggingService;
         private readonly IMaintenanceService maintenanceService;
         private readonly VoidService voidService;
-        private readonly ILogger<VoidJob> logger;
 
-        public VoidJob(IMaintenanceService maintenanceService, LoggingService loggingService, VoidService voidService, ILogger<VoidJob> logger)
+        public VoidJob(IMaintenanceService maintenanceService, LoggingService loggingService, VoidService voidService)
         {
             this.maintenanceService = maintenanceService;
             this.loggingService = loggingService;
             this.voidService = voidService;
-            this.logger = logger;
         }
 
         public async Task Execute(IJobExecutionContext context)

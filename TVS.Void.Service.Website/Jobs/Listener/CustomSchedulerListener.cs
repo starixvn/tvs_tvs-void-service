@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 using Fanex.Logging;
@@ -7,6 +8,7 @@ using Quartz;
 
 namespace TVS.Void.Service.Website.Jobs.Listener
 {
+    [ExcludeFromCodeCoverage]
     public class CustomSchedulerListener : ISchedulerListener
     {
         private readonly ILogger<CustomSchedulerListener> logger;

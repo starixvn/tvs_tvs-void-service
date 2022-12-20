@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using TVS.Void.Service.Models;
@@ -6,6 +7,7 @@ using TVS.Void.Service.Services;
 
 namespace TVS.Void.Service.Website.Controllers
 {
+    [ExcludeFromCodeCoverage]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> logger;

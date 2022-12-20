@@ -1,7 +1,9 @@
-﻿using ONEbook.UM.Helpers;
+﻿using System.Diagnostics.CodeAnalysis;
+using ONEbook.UM.Helpers;
 
 namespace TVS.Void.Service.Website.Utilities
 {
+    [ExcludeFromCodeCoverage]
     public class CustomHttpContextHelper : IHttpContextHelper
     {
         public string GetSession(string key)
