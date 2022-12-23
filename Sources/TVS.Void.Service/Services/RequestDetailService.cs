@@ -9,7 +9,7 @@ namespace TVS.Void.Service.Services
 {
     public interface RequestDetailService
     {
-        Task<VoidingHistoryModel> InsertVoidingHistory(int requestId);
+        Task<VoidingHistoryModel> InsertVoidingHistory(int requestId, int siteDbGroupId, string broadcastSessionId);
 
         Task<AfterVoidServiceModel> InsertAfterVoidServiceData(bool isAutoVoid, AfterVoidServiceModel afterVoidData);
 
@@ -27,12 +27,14 @@ namespace TVS.Void.Service.Services
             this.repository = repository;
         }
 
-        public async Task<VoidingHistoryModel> InsertVoidingHistory(int requestId)
+        public async Task<VoidingHistoryModel> InsertVoidingHistory(int requestId, int siteDbGroupId, string broadcastSessionId)
         {
             var criteria = new InsertVoidingHistoryCriteria
             {
                 RequestId = requestId,
                 UserId = AutoVoidConstant.ActorId,
+                SiteDbGroupId = siteDbGroupId,
+                BroadcastSessionId = broadcastSessionId
             };
 
             return await repository.GetAsync<VoidingHistoryModel>(criteria);

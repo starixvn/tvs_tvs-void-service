@@ -41,18 +41,18 @@ namespace TVS.Void.Service.Services.CheckTicketStatus
         {
             logData.Add(nameof(CheckTicketStatusService));
             var (singleTickets, parlayTickets) = await requestTicketService.GetTicketInAllRequests();
-
-            foreach (var server in SiteDbGroupConstant.ServerList)
-            {
-                var singleTicketsInServer = singleTickets.Where(x => x.SiteDbGroupId == server.Id);
-                var parlayTicketsInServer = parlayTickets.Where(x => x.SiteDbGroupId == server.Id);
-
-                var requestsList = await requestTicketService.CheckStatusTicketForInsertAutoVoidQueue(server.Id, singleTicketsInServer, parlayTicketsInServer);
-                await insertAutoVoidQueueStage.Execute(server.Id, requestsList, logData);
-            }
-
             if (singleTickets.Any() || parlayTickets.Any())
             {
+                var broadcastSessionId = Guid.NewGuid().ToString();
+                foreach (var server in SiteDbGroupConstant.ServerList)
+                {
+                    var singleTicketsInServer = singleTickets.Where(x => x.SiteDbGroupId == server.Id);
+                    var parlayTicketsInServer = parlayTickets.Where(x => x.SiteDbGroupId == server.Id);
+
+                    var requestsList = await requestTicketService.CheckStatusTicketForInsertAutoVoidQueue(server.Id, singleTicketsInServer, parlayTicketsInServer);
+                    await insertAutoVoidQueueStage.Execute(server.Id, requestsList, broadcastSessionId, logData);
+                }
+
                 logData.Add($"ServerTime: {DateTime.Now:MM/dd/yyyy HH:mm:ss.fff}");
                 await loggingService.InfoJsonAsync(logData);
             }

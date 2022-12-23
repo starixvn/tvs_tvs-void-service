@@ -7,5 +7,6 @@
         public int StatusId { get; set; }
         public int QueueId { get; set; }
         public int SiteDbGroupId { get; set; }
+        public string BroadcastSessionId { get; set; }
     }
 }

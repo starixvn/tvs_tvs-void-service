@@ -8,6 +8,10 @@ namespace TVS.Void.Service.Criteria
 
         public int UserId { get; set; }
 
+        public int SiteDbGroupId { get; set; }
+
+        public string BroadcastSessionId { get; set; }
+
         public override string GetSettingKey() => "TicketVoiding_VoidingHistory_Insert";
 
         public override bool IsValid() => true;

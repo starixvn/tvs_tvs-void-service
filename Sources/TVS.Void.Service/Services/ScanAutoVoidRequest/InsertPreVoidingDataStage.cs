@@ -36,8 +36,8 @@ namespace TVS.Void.Service.Services.ScanAutoVoidRequest
                 return "No ticket found.";
             }
 
-            var voidingHistory = await requestDetailService.InsertVoidingHistory(queue.RequestId);
-            logData.Add($"{nameof(voidingHistory)}: {voidingHistory.VoidingHistoryId}");
+            var voidingHistory = await requestDetailService.InsertVoidingHistory(queue.RequestId, siteDbGroupId, queue.BroadcastSessionId);
+            logData.Add($"{nameof(voidingHistory.VoidingHistoryId)}: {voidingHistory.VoidingHistoryId}");
 
             await notificationService.NotifyRequestRunningToAllUser(queue.RequestId);
             await ticketVoidingQueueService.InsertQueue(siteDbGroupId, queue.RequestId, voidingHistory.VoidingHistoryId,

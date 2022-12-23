@@ -6,6 +6,7 @@ namespace TVS.Void.Service.Criteria.MultiSiteDb
 {
     public class InsertAutoVoidRequestQueueCriteria : NonQueryCommand
     {
+        public string BroadcastSessionId { get; set; }
         public int RequestId { get; set; }
         public int StatusId { get; set; }
         public string Action { get; set; }

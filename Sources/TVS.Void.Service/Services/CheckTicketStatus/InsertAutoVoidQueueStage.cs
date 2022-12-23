@@ -10,7 +10,7 @@ namespace TVS.Void.Service.Services.CheckTicketStatus
 {
     public interface InsertAutoVoidQueueStage
     {
-        Task Execute(int siteDbGroupId, IEnumerable<RequestModel> requests, IList<string> logData);
+        Task Execute(int siteDbGroupId, IEnumerable<RequestModel> requests, string broadcastSessionId, IList<string> logData);
     }
 
     public class InsertAutoVoidQueueStageImp : InsertAutoVoidQueueStage
@@ -22,7 +22,7 @@ namespace TVS.Void.Service.Services.CheckTicketStatus
             this.autoVoidRequestQueueService = autoVoidRequestQueueService;
         }
 
-        public async Task Execute(int siteDbGroupId, IEnumerable<RequestModel> requests, IList<string> logData)
+        public async Task Execute(int siteDbGroupId, IEnumerable<RequestModel> requests, string broadcastSessionId, IList<string> logData)
         {
             if (requests.Any())
             {
@@ -31,7 +31,7 @@ namespace TVS.Void.Service.Services.CheckTicketStatus
                 foreach (var request in requests)
                 {
                     // DB must check exist queue Status = New => not insert
-                    await autoVoidRequestQueueService.InsertQueue(siteDbGroupId, request.RequestId, ExecuteStatus.New, AutoVoidConstant.QueueActionCal, null);
+                    await autoVoidRequestQueueService.InsertQueue(siteDbGroupId, broadcastSessionId, request.RequestId, ExecuteStatus.New, AutoVoidConstant.QueueActionCal, null);
                 }
             }
         }
