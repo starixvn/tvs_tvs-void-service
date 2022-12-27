@@ -15,11 +15,11 @@ namespace TVS.Void.Service.Tests.Services.CheckTicketStatus
             var stage = new InsertAutoVoidQueueStageImp(autoVoidRequestQueueService);
 
             // Act
-            await stage.Execute(0, new List<RequestModel>(), default);
+            await stage.Execute(0, new List<RequestModel>(), default, default);
 
             // Assert
             await autoVoidRequestQueueService.DidNotReceiveWithAnyArgs()
-                .InsertQueue(default, default, default, default, default);
+                .InsertQueue(default, default, default, default, default, default);
         }
 
         [Fact]
@@ -30,7 +30,7 @@ namespace TVS.Void.Service.Tests.Services.CheckTicketStatus
             var stage = new InsertAutoVoidQueueStageImp(autoVoidRequestQueueService);
 
             // Act & Assert
-            await Assert.ThrowsAsync<ArgumentNullException>(() => stage.Execute(0, null, default));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => stage.Execute(0, null, default, default));
         }
 
         [Fact]
@@ -38,16 +38,17 @@ namespace TVS.Void.Service.Tests.Services.CheckTicketStatus
         {
             // Arrange
             const int fakeSiteDbGroupId = 1;
+            const string fakeBroadcastSessionId = "123asdad";
             var fakeRequests = new List<RequestModel> { new() { RequestId = 113 }, new() { RequestId = 224 } };
             var autoVoidRequestQueueService = Substitute.For<AutoVoidRequestQueueService>();
             var stage = new InsertAutoVoidQueueStageImp(autoVoidRequestQueueService);
 
             // Act
-            await stage.Execute(fakeSiteDbGroupId, fakeRequests, new List<string>());
+            await stage.Execute(fakeSiteDbGroupId, fakeRequests, fakeBroadcastSessionId, new List<string>());
 
             // Assert
             await autoVoidRequestQueueService.Received(fakeRequests.Count)
-                .InsertQueue(Arg.Is<int>(x => x == fakeSiteDbGroupId), Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string>(), Arg.Is<int?>(x => x == null));
+                .InsertQueue(Arg.Is<int>(x => x == fakeSiteDbGroupId), Arg.Is<string>(x => x == fakeBroadcastSessionId), Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string>(), Arg.Is<int?>(x => x == null));
         }
     }
 }

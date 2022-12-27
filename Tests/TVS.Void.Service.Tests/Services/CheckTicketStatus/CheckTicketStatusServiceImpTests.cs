@@ -12,7 +12,6 @@ namespace TVS.Void.Service.Tests.Services.CheckTicketStatus
         public async Task Execute_WhenTicketsEmpty_ShouldNotWriteLog()
         {
             // Arrange
-            var totalSiteDbCount = SiteDbGroupConstant.ServerList.Count;
             var fakeRequestsList = new List<RequestModel> { new() { RequestId = 112 } };
             var requestTicketService = Substitute.For<RequestTicketService>();
             var insertAutoVoidQueueStage = Substitute.For<InsertAutoVoidQueueStage>();
@@ -26,10 +25,10 @@ namespace TVS.Void.Service.Tests.Services.CheckTicketStatus
 
             // Assert
             await requestTicketService.Received(1).GetTicketInAllRequests();
-            await requestTicketService.Received(totalSiteDbCount).CheckStatusTicketForInsertAutoVoidQueue(Arg.Any<int>(), Arg.Any<IEnumerable<RequestDetailTicketModel>>(), Arg.Any<IEnumerable<RequestDetailTicketModel>>());
-            await insertAutoVoidQueueStage.Received(totalSiteDbCount)
-                .Execute(Arg.Any<int>(), Arg.Is<IEnumerable<RequestModel>>(x => x == fakeRequestsList),
-                    Arg.Any<List<string>>());
+            await requestTicketService.DidNotReceiveWithAnyArgs().CheckStatusTicketForInsertAutoVoidQueue(Arg.Any<int>(), Arg.Any<IEnumerable<RequestDetailTicketModel>>(), Arg.Any<IEnumerable<RequestDetailTicketModel>>());
+            await insertAutoVoidQueueStage.DidNotReceiveWithAnyArgs()
+                .Execute(Arg.Any<int>(), Arg.Any<IEnumerable<RequestModel>>(),
+                     Arg.Any<string>(), Arg.Any<List<string>>());
             await loggingService.DidNotReceiveWithAnyArgs().InfoJsonAsync(default);
         }
 
@@ -55,7 +54,7 @@ namespace TVS.Void.Service.Tests.Services.CheckTicketStatus
             await requestTicketService.Received(totalSiteDbCount).CheckStatusTicketForInsertAutoVoidQueue(Arg.Any<int>(), Arg.Any<IEnumerable<RequestDetailTicketModel>>(), Arg.Any<IEnumerable<RequestDetailTicketModel>>());
             await insertAutoVoidQueueStage.Received(totalSiteDbCount)
                 .Execute(Arg.Any<int>(), Arg.Is<IEnumerable<RequestModel>>(x => x == fakeRequestsList),
-                    Arg.Any<List<string>>());
+                    Arg.Any<string>(), Arg.Any<List<string>>());
             await loggingService.ReceivedWithAnyArgs(1).InfoJsonAsync(default);
         }
 
@@ -75,7 +74,7 @@ namespace TVS.Void.Service.Tests.Services.CheckTicketStatus
 
             // Assert
             await requestTicketService.Received(1).GetTicketInAllRequests();
-            await insertAutoVoidQueueStage.DidNotReceiveWithAnyArgs().Execute(default, default, default);
+            await insertAutoVoidQueueStage.DidNotReceiveWithAnyArgs().Execute(default, default, default, default);
             await loggingService.ReceivedWithAnyArgs(1).InfoJsonAsync(default);
             await loggingService.ReceivedWithAnyArgs(1).ErrorAsync(default, default);
         }

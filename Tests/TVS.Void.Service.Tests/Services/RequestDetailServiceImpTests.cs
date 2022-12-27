@@ -9,9 +9,9 @@ namespace TVS.Void.Service.Tests.Services
     public class RequestDetailServiceImpTests
     {
         [Theory]
-        [InlineData(1)]
-        [InlineData(0)]
-        public async Task InsertVoidingHistory_ShouldReturnExpectedData(int requestId)
+        [InlineData(1, 1, "123xyz")]
+        [InlineData(0, 0, "")]
+        public async Task InsertVoidingHistory_ShouldReturnExpectedData(int requestId, int siteDbGroupId, string broadcastSessionId)
         {
             // Arrange
             var fakeVoidingHistory = new VoidingHistoryModel { VoidingHistoryId = 112 };
@@ -20,7 +20,7 @@ namespace TVS.Void.Service.Tests.Services
             var service = new RequestDetailServiceImp(repository);
 
             // Act
-            var actual = await service.InsertVoidingHistory(requestId);
+            var actual = await service.InsertVoidingHistory(requestId, siteDbGroupId, broadcastSessionId);
 
             // Assert
             await repository.Received(1).GetAsync<VoidingHistoryModel>

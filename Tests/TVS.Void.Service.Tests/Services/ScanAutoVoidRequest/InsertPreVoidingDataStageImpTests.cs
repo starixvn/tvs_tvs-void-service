@@ -12,23 +12,20 @@ namespace TVS.Void.Service.Tests.Services.ScanAutoVoidRequest
         {
             var expected = string.Empty;
             const int siteDbGroupId = 0;
-            var singleTickets = new List<RequestDetailTicketModel>
-            {
-                new()
-            };
+            var singleTickets = new List<RequestDetailTicketModel> { new() };
             var parlayTickets = new List<RequestDetailTicketModel>();
             var queue = new AutoVoidRequestQueueModel();
             var requestDetailService = Substitute.For<RequestDetailService>();
             var ticketVoidingQueueService = Substitute.For<TicketVoidingQueueService>();
             var requestTicketService = Substitute.For<RequestTicketService>();
             var notificationService = Substitute.For<NotificationService>();
-            requestDetailService.InsertVoidingHistory(default).ReturnsForAnyArgs(new VoidingHistoryModel());
+            requestDetailService.InsertVoidingHistory(default, default, default).ReturnsForAnyArgs(new VoidingHistoryModel());
 
             var service = new InsertPreVoidingDataStageImp(requestDetailService, ticketVoidingQueueService, requestTicketService, notificationService);
 
             var actual = await service.Execute(siteDbGroupId, queue, singleTickets, parlayTickets, new List<string>());
 
-            await requestDetailService.Received(1).InsertVoidingHistory(Arg.Any<int>());
+            await requestDetailService.Received(1).InsertVoidingHistory(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string>());
             Assert.Equal(expected, actual);
         }
 

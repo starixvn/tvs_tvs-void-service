@@ -65,16 +65,16 @@ namespace TVS.Void.Service.Tests.Services
         }
 
         [Theory]
-        [InlineData(1, 2, 3, "abc", 5)]
-        [InlineData(0, 0, 0, "", null)]
-        public async Task InsertQueue_ShouldExecuteRepositorySuccessful(int siteDbGroupId, int requestId, int statusId, string action, int? matchId)
+        [InlineData(1, "xyz", 2, 3, "abc", 5)]
+        [InlineData(0, "", 0, 0, "", null)]
+        public async Task InsertQueue_ShouldExecuteRepositorySuccessful(int siteDbGroupId, string broadcastSessionId, int requestId, int statusId, string action, int? matchId)
         {
             // Arrange
             var repository = Substitute.For<IDynamicRepository>();
             var service = new AutoVoidRequestQueueServiceImp(repository);
 
             // Act
-            await service.InsertQueue(siteDbGroupId, requestId, statusId, action, matchId);
+            await service.InsertQueue(siteDbGroupId, broadcastSessionId, requestId, statusId, action, matchId);
 
             // Assert
             await repository.Received(1).ExecuteAsync(Arg.Is<InsertAutoVoidRequestQueueCriteria>(x
