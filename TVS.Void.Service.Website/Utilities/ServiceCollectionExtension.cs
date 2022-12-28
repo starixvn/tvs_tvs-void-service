@@ -121,6 +121,7 @@ namespace TVS.Void.Service.Website.Utilities
             services.AddSingleton<VoidService, VoidServiceImp>();
             services.AddSingleton<ProcessVoidQueuesStage, ProcessVoidQueuesStageImp>();
             services.AddSingleton<InsertAfterVoidDataStage, InsertAfterVoidDataStageImp>();
+            services.AddSingleton<InsertAfterVoidDataPrivateService, InsertAfterVoidDataPrivateServiceImp>();
         }
 
         public static void RegisterQuartzScheduler(this IServiceCollection services)
