@@ -17,7 +17,7 @@ namespace TVS.Void.Service.Services
 
         Task<(IEnumerable<RequestModel>, IEnumerable<RequestDetail>)> GetRequestById(int requestId);
 
-        //Task<IEnumerable<RequestModel>, IEnumerable<RequestDetail>> GetVoidingHistory(int voidingHistoryId);
+        Task<VoidingHistoryModel> GetVoidDataOfVoidingHistory(int voidingHistoryId);
     }
 
     public class RequestDetailServiceImp : RequestDetailService
@@ -78,6 +78,16 @@ namespace TVS.Void.Service.Services
             };
 
             return await repository.FetchMultipleAsync<RequestModel, RequestDetail>(criteria);
+        }
+
+        public async Task<VoidingHistoryModel> GetVoidDataOfVoidingHistory(int voidingHistoryId)
+        {
+            var criteria = new GetVoidDataOfVoidingHistoryCriteria
+            {
+                VoidingHistoryIds = voidingHistoryId.ToString()
+            };
+
+            return await repository.GetAsync<VoidingHistoryModel>(criteria);
         }
     }
 }

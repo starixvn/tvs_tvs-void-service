@@ -7,7 +7,7 @@ namespace TVS.Void.Service.Services.Void
 {
     public interface InsertAfterVoidDataPrivateService
     {
-        bool IsAutoVoid(RequestModel request);
+        bool IsAutoVoid(RequestModel request, VoidingHistoryModel voidDataOfVoidingHistory);
 
         int GetMatchIdForAfterVoid(int issueTypeId, IEnumerable<RequestDetail> requestDetails,
             IEnumerable<TicketVoidingQueueModel> voidQueueResults);
@@ -17,12 +17,13 @@ namespace TVS.Void.Service.Services.Void
 
     public class InsertAfterVoidDataPrivateServiceImp : InsertAfterVoidDataPrivateService
     {
-        public bool IsAutoVoid(RequestModel request)
+        public bool IsAutoVoid(RequestModel request, VoidingHistoryModel voidDataOfVoidingHistory)
         {
             var isAutoVoidWinning = request.ActionId is RequestActionConstant.AutoVoidWinning;
             var isAutoVoidInstant = request.ActionId is RequestActionConstant.AutoVoidInstant or RequestActionConstant.AutoVoidInstant5m
                 or RequestActionConstant.AutoVoidInstant10m or RequestActionConstant.AutoVoidInstantNoPolicy;
-            return isAutoVoidWinning || isAutoVoidInstant;
+
+            return (isAutoVoidWinning || isAutoVoidInstant) && voidDataOfVoidingHistory == null;
         }
 
         public int GetMatchIdForAfterVoid(int issueTypeId, IEnumerable<RequestDetail> requestDetails, IEnumerable<TicketVoidingQueueModel> voidQueueResults)

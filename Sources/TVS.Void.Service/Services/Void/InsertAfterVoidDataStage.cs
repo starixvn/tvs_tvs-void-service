@@ -34,7 +34,8 @@ namespace TVS.Void.Service.Services.Void
                 NegativeBalanceUsers = privateService.CombineNegativeBalanceUsers(voidQueueResults)
             };
 
-            var insertedAfterVoidData = await requestDetailService.InsertAfterVoidServiceData(privateService.IsAutoVoid(request.First()), afterVoidData);
+            var voidDataOfVoidingHistory = await requestDetailService.GetVoidDataOfVoidingHistory(firstVoidQueue.VoidingHistoryId);
+            var insertedAfterVoidData = await requestDetailService.InsertAfterVoidServiceData(privateService.IsAutoVoid(request.First(), voidDataOfVoidingHistory), afterVoidData);
             logData.Add($"{nameof(RequestDetailService.InsertAfterVoidServiceData)}: {JsonSerializer.Serialize(insertedAfterVoidData)}");
         }
     }

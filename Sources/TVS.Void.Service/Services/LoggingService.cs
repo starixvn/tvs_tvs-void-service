@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Text.Encodings.Web;
-using System.Text.Json;
 using System.Threading.Tasks;
 using Fanex.Logging;
 using Fanex.Logging.Extensions;
@@ -20,7 +18,7 @@ namespace TVS.Void.Service.Services
 
         Task InfoAsync(string message);
 
-        Task InfoJsonAsync(IList<string> logData);
+        Task InfoAppendNewLineAsync(IList<string> logData);
     }
 
     [ExcludeFromCodeCoverage]
@@ -47,13 +45,9 @@ namespace TVS.Void.Service.Services
             await LogService.InfoAsync(message);
         }
 
-        public async Task InfoJsonAsync(IList<string> logData)
+        public async Task InfoAppendNewLineAsync(IList<string> logData)
         {
-            var serializeOptions = new JsonSerializerOptions
-            {
-                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-            };
-            await InfoAsync(JsonSerializer.Serialize(logData, serializeOptions));
+            await InfoAsync(string.Join($"{Environment.NewLine}*", logData));
         }
 
         private static async Task HandleException(Exception exception)

@@ -53,7 +53,7 @@ namespace TVS.Void.Service.Services.Void
             }
             catch (Exception e)
             {
-                await loggingService.InfoJsonAsync(logData);
+                await loggingService.InfoAppendNewLineAsync(logData);
                 await loggingService.ErrorAsync($"{nameof(VoidService)} Error", e);
             }
         }
@@ -70,20 +70,20 @@ namespace TVS.Void.Service.Services.Void
                 await requestDetailService.UpdateTicketVoidingHistory(firstVoidingQueue.VoidingHistoryId, ExecuteStatus.Failed);
                 await notificationService.NotifyVoidFailedToUser(firstVoidingQueue.RequestId, processVoidQueuesResult);
                 await notificationService.NotifyRequestFailedToAllUser(firstVoidingQueue.RequestId);
-                await loggingService.InfoJsonAsync(logData);
+                await loggingService.InfoAppendNewLineAsync(logData);
                 return;
             }
 
             if (processVoidQueuesResult.Any(x => x.StatusId == ExecuteStatus.Running))
             {
-                await loggingService.InfoJsonAsync(logData);
+                await loggingService.InfoAppendNewLineAsync(logData);
                 return;
             }
 
             await insertAfterVoidDataStage.Execute(processVoidQueuesResult, logData);
 
             logData.Add($"ServerTime: {DateTime.Now:MM/dd/yyyy HH:mm:ss.fff}");
-            await loggingService.InfoJsonAsync(logData);
+            await loggingService.InfoAppendNewLineAsync(logData);
         }
     }
 }

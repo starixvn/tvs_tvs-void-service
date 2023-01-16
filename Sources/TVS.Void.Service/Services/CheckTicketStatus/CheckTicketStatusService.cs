@@ -54,13 +54,13 @@ namespace TVS.Void.Service.Services.CheckTicketStatus
                 }
 
                 logData.Add($"ServerTime: {DateTime.Now:MM/dd/yyyy HH:mm:ss.fff}");
-                await loggingService.InfoJsonAsync(logData);
+                await loggingService.InfoAppendNewLineAsync(logData);
             }
         }
 
         private async Task HandleException(IList<string> logData, Exception exception)
         {
-            await loggingService.InfoJsonAsync(logData);
+            await loggingService.InfoAppendNewLineAsync(logData);
             await loggingService.ErrorAsync($"{nameof(CheckTicketStatusService)} Error", exception);
         }
     }

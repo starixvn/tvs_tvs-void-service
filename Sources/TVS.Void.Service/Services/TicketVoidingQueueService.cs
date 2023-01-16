@@ -66,7 +66,7 @@ namespace TVS.Void.Service.Services
             {
                 var singleTicketsInCurrentRequest = singleTickets.Where(x => x.RequestId == voidingHistory.RequestId);
                 var parlayTicketsInCurrentRequest = parlayTickets.Where(x => x.RequestId == voidingHistory.RequestId);
-                await InsertQueue(siteDbGroupId, voidingHistory.VoidingHistoryId, voidingHistory.RequestId,
+                await InsertQueue(siteDbGroupId, voidingHistory.RequestId, voidingHistory.VoidingHistoryId,
                     singleTicketsInCurrentRequest, parlayTicketsInCurrentRequest);
             }
         }

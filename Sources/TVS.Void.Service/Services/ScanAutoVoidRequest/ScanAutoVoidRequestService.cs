@@ -66,7 +66,7 @@ namespace TVS.Void.Service.Services.ScanAutoVoidRequest
             }
             catch (Exception e)
             {
-                await loggingService.InfoJsonAsync(logData);
+                await loggingService.InfoAppendNewLineAsync(logData);
                 await loggingService.ErrorAsync($"{nameof(ScanAutoVoidRequestService)} Error", e);
                 await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, ExecuteStatus.Failed, null);
             }
@@ -126,7 +126,7 @@ namespace TVS.Void.Service.Services.ScanAutoVoidRequest
         private async Task WriteLog(IList<string> logData)
         {
             logData.Add($"ServerTime: {DateTime.Now:MM/dd/yyyy HH:mm:ss.fff}");
-            await loggingService.InfoJsonAsync(logData);
+            await loggingService.InfoAppendNewLineAsync(logData);
         }
     }
 }

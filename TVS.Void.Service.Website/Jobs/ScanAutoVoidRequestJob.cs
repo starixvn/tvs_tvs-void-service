@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using ONEbook.UM.Services;
 using Quartz;
@@ -31,7 +32,7 @@ namespace TVS.Void.Service.Website.Jobs
 
                     if (!await maintenanceService.IsUnderMaintenanceAsync())
                     {
-                        await ExecuteSiteDbSequential();
+                        await ExecuteSiteDbParallel();
                     }
 
                     AppConfigService.AppConfig.IsScanAutoVoidRequestJobExecuting = false;
@@ -44,12 +45,16 @@ namespace TVS.Void.Service.Website.Jobs
             }
         }
 
-        private async Task ExecuteSiteDbSequential()
+        private async Task ExecuteSiteDbParallel()
         {
+            var tasks = new List<Task>();
             foreach (var server in SiteDbGroupConstant.ServerList)
             {
-                await scanningService.Execute(server.Id);
+                var task = scanningService.Execute(server.Id);
+                tasks.Add(task);
             }
+
+            await Task.WhenAll(tasks.ToArray());
         }
     }
 }
