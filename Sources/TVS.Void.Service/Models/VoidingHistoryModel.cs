@@ -3,5 +3,7 @@
     public class VoidingHistoryModel
     {
         public int VoidingHistoryId { get; set; }
+
+        public int RequestId { get; set; }
     }
 }

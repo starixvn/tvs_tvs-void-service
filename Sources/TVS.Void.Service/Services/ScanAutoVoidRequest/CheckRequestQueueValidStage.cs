@@ -24,7 +24,14 @@ namespace TVS.Void.Service.Services.ScanAutoVoidRequest
 
         public async Task<bool> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue)
         {
-            var (request, _) = await requestDetailService.GetRequestById(queue.RequestId);
+            var requestIdList = queue.RequestIds.Split(",");
+            if (requestIdList.Length > 1)
+            {
+                await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, ExecuteStatus.Done, "Too many RequestIds.");
+                return false;
+            }
+
+            var (request, _) = await requestDetailService.GetRequestById(int.Parse(requestIdList.First()));
             if (!request.Any())
             {
                 await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, ExecuteStatus.Done, "RequestId invalid.");

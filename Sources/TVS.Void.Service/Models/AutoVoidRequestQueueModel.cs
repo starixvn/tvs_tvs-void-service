@@ -2,7 +2,7 @@
 {
     public class AutoVoidRequestQueueModel
     {
-        public int RequestId { get; set; }
+        public string RequestIds { get; set; }
         public string Action { get; set; }
         public int StatusId { get; set; }
         public int QueueId { get; set; }

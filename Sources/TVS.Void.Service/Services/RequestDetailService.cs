@@ -9,13 +9,15 @@ namespace TVS.Void.Service.Services
 {
     public interface RequestDetailService
     {
-        Task<VoidingHistoryModel> InsertVoidingHistory(int requestId, int siteDbGroupId, string broadcastSessionId);
+        Task<IEnumerable<VoidingHistoryModel>> InsertVoidingHistory(string requestIds, int siteDbGroupId, string broadcastSessionId);
 
         Task<AfterVoidServiceModel> InsertAfterVoidServiceData(bool isAutoVoid, AfterVoidServiceModel afterVoidData);
 
         Task UpdateTicketVoidingHistory(int voidingHistoryId, int statusId);
 
         Task<(IEnumerable<RequestModel>, IEnumerable<RequestDetail>)> GetRequestById(int requestId);
+
+        //Task<IEnumerable<RequestModel>, IEnumerable<RequestDetail>> GetVoidingHistory(int voidingHistoryId);
     }
 
     public class RequestDetailServiceImp : RequestDetailService
@@ -27,17 +29,17 @@ namespace TVS.Void.Service.Services
             this.repository = repository;
         }
 
-        public async Task<VoidingHistoryModel> InsertVoidingHistory(int requestId, int siteDbGroupId, string broadcastSessionId)
+        public async Task<IEnumerable<VoidingHistoryModel>> InsertVoidingHistory(string requestIds, int siteDbGroupId, string broadcastSessionId)
         {
             var criteria = new InsertVoidingHistoryCriteria
             {
-                RequestId = requestId,
+                RequestIds = requestIds,
                 UserId = AutoVoidConstant.ActorId,
                 SiteDbGroupId = siteDbGroupId,
                 BroadcastSessionId = broadcastSessionId
             };
 
-            return await repository.GetAsync<VoidingHistoryModel>(criteria);
+            return await repository.FetchAsync<VoidingHistoryModel>(criteria);
         }
 
         public async Task<AfterVoidServiceModel> InsertAfterVoidServiceData(bool isAutoVoid, AfterVoidServiceModel afterVoidData)

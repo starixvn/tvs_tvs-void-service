@@ -26,13 +26,11 @@ namespace TVS.Void.Service.Services.CheckTicketStatus
         {
             if (requests.Any())
             {
-                logData.Add($"{nameof(InsertAutoVoidQueueStage)}[{siteDbGroupId}]: {JsonSerializer.Serialize(requests)}");
+                var requestIds = string.Join(",", requests.Select(x => x.RequestId));
+                // DB must check exist queue Status = New => not insert
+                await autoVoidRequestQueueService.InsertQueue(siteDbGroupId, broadcastSessionId, requestIds, ExecuteStatus.New, AutoVoidConstant.QueueActionCal, null);
 
-                foreach (var request in requests)
-                {
-                    // DB must check exist queue Status = New => not insert
-                    await autoVoidRequestQueueService.InsertQueue(siteDbGroupId, broadcastSessionId, request.RequestId, ExecuteStatus.New, AutoVoidConstant.QueueActionCal, null);
-                }
+                logData.Add($"{nameof(InsertAutoVoidQueueStage)}[{siteDbGroupId}]: {JsonSerializer.Serialize(requests)}");
             }
         }
     }

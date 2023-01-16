@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Fanex.Data.Repository;
@@ -13,6 +14,9 @@ namespace TVS.Void.Service.Services
         Task<IEnumerable<TicketVoidingQueueModel>> GetQueues(int siteDbGroupId, int? voidingHistoryId);
 
         Task InsertQueue(int siteDbGroupId, int requestId, int voidingHistoryId,
+            IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets);
+
+        Task InsertQueueForRequests(int siteDbGroupId, IEnumerable<VoidingHistoryModel> voidingHistoryList,
             IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets);
 
         Task<TicketVoidingQueueModel> ProcessVoidQueue(int siteDbGroupId, int queueId);
@@ -53,6 +57,18 @@ namespace TVS.Void.Service.Services
                 IP = AutoVoidConstant.IPAddress,
             };
             await repository.ExecuteAsync(criteria);
+        }
+
+        public async Task InsertQueueForRequests(int siteDbGroupId, IEnumerable<VoidingHistoryModel> voidingHistoryList,
+            IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets)
+        {
+            foreach (var voidingHistory in voidingHistoryList)
+            {
+                var singleTicketsInCurrentRequest = singleTickets.Where(x => x.RequestId == voidingHistory.RequestId);
+                var parlayTicketsInCurrentRequest = parlayTickets.Where(x => x.RequestId == voidingHistory.RequestId);
+                await InsertQueue(siteDbGroupId, voidingHistory.VoidingHistoryId, voidingHistory.RequestId,
+                    singleTicketsInCurrentRequest, parlayTicketsInCurrentRequest);
+            }
         }
 
         public async Task<TicketVoidingQueueModel> ProcessVoidQueue(int siteDbGroupId, int queueId)

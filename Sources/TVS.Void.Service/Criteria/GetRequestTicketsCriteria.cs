@@ -6,7 +6,7 @@ namespace TVS.Void.Service.Criteria
     {
         public int? SiteDbGroupId { get; set; }
 
-        public int? RequestId { get; set; }
+        public string RequestIds { get; set; }
 
         public override string GetSettingKey() => "TicketVoiding_AutoVoidRequest_Ticket_Select";
 

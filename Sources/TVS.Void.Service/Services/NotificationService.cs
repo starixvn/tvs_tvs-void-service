@@ -13,7 +13,7 @@ namespace TVS.Void.Service.Services
 {
     public interface NotificationService
     {
-        Task NotifyRequestRunningToAllUser(int requestId);
+        Task NotifyRequestRunningToAllUser(IEnumerable<VoidingHistoryModel> voidingHistoryList);
 
         Task NotifyVoidFailedToUser(int requestId, IEnumerable<TicketVoidingQueueModel> voidQueueResults);
 
@@ -33,11 +33,12 @@ namespace TVS.Void.Service.Services
             this.loggingService = loggingService;
         }
 
-        public async Task NotifyRequestRunningToAllUser(int requestId)
+        public async Task NotifyRequestRunningToAllUser(IEnumerable<VoidingHistoryModel> voidingHistoryList)
         {
             try
             {
-                var runningRequests = new List<RequestStatus> { new() { RequestId = requestId, Status = RequestStatusConstant.Running } };
+                var runningRequests = voidingHistoryList.Select(x
+                    => new RequestStatus { RequestId = x.RequestId, Status = RequestStatusConstant.Running });
                 await ticketVoidingSystemHttpClientService.SignalRUpdateRequestStatusToAllUsers(runningRequests);
                 await hubContext.Clients.All.updateRequestStatus(runningRequests);
             }

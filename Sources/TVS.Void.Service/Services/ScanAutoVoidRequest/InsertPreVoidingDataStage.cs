@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using TVS.Void.Service.Models;
 
@@ -36,18 +37,27 @@ namespace TVS.Void.Service.Services.ScanAutoVoidRequest
                 return "No ticket found.";
             }
 
-            var voidingHistory = await requestDetailService.InsertVoidingHistory(queue.RequestId, siteDbGroupId, queue.BroadcastSessionId);
-            logData.Add($"{nameof(voidingHistory.VoidingHistoryId)}: {voidingHistory.VoidingHistoryId}");
+            var requestIds = string.Join(",", DistinctRequestIdList(validVoidSingleTickets, validVoidParlayTickets));
+            var voidingHistoryList = await requestDetailService.InsertVoidingHistory(requestIds, siteDbGroupId, queue.BroadcastSessionId);
+            logData.Add($"{nameof(voidingHistoryList)}: {JsonSerializer.Serialize(voidingHistoryList)}");
 
-            await notificationService.NotifyRequestRunningToAllUser(queue.RequestId);
-            await ticketVoidingQueueService.InsertQueue(siteDbGroupId, queue.RequestId, voidingHistory.VoidingHistoryId,
+            await notificationService.NotifyRequestRunningToAllUser(voidingHistoryList);
+            await ticketVoidingQueueService.InsertQueueForRequests(siteDbGroupId, voidingHistoryList,
                 validVoidSingleTickets, validVoidParlayTickets);
-            logData.Add("InsertQueue-OK");
+            logData.Add("InsertQueues-OK");
 
             await requestTicketService.UpdateIsProcessed(validVoidSingleTickets, validVoidParlayTickets);
             logData.Add($"{nameof(RequestTicketService.UpdateIsProcessed)}-AfterInsertVoidQueue-OK");
 
             return string.Empty;
+        }
+
+        private static IEnumerable<int> DistinctRequestIdList(IEnumerable<RequestDetailTicketModel> validVoidSingleTickets, IEnumerable<RequestDetailTicketModel> validVoidParlayTickets)
+        {
+            var requestIdInSingleTickets = validVoidSingleTickets.Select(x => x.RequestId).Distinct();
+            var requestIdInParlayTickets = validVoidParlayTickets.Select(x => x.RequestId).Distinct();
+
+            return requestIdInSingleTickets.Union(requestIdInParlayTickets);
         }
     }
 }

@@ -10,8 +10,8 @@ namespace TVS.Void.Service.Services
 {
     public interface RequestTicketService
     {
-        Task<(IEnumerable<RequestDetailTicketModel>, IEnumerable<RequestDetailTicketModel>)> GetTicketsByRequestIdAndSiteDbGroupId(
-            int siteDbGroupId, int requestId);
+        Task<(IEnumerable<RequestDetailTicketModel>, IEnumerable<RequestDetailTicketModel>)> GetTicketsByRequestsAndSiteDbGroupId(
+            int siteDbGroupId, string requestIds);
 
         Task<(IEnumerable<RequestDetailTicketModel>, IEnumerable<RequestDetailTicketModel>)> GetTicketInAllRequests();
 
@@ -30,22 +30,22 @@ namespace TVS.Void.Service.Services
             this.repository = repository;
         }
 
-        public async Task<(IEnumerable<RequestDetailTicketModel>, IEnumerable<RequestDetailTicketModel>)> GetTicketsByRequestIdAndSiteDbGroupId(int siteDbGroupId, int requestId)
+        public async Task<(IEnumerable<RequestDetailTicketModel>, IEnumerable<RequestDetailTicketModel>)> GetTicketsByRequestsAndSiteDbGroupId(int siteDbGroupId, string requestIds)
         {
-            return await GetTicketsInRequest(siteDbGroupId, requestId);
+            return await GetTicketsInRequests(siteDbGroupId, requestIds);
         }
 
         public async Task<(IEnumerable<RequestDetailTicketModel>, IEnumerable<RequestDetailTicketModel>)> GetTicketInAllRequests()
         {
-            return await GetTicketsInRequest(null, null);
+            return await GetTicketsInRequests(null, null);
         }
 
-        private async Task<(IEnumerable<RequestDetailTicketModel>, IEnumerable<RequestDetailTicketModel>)> GetTicketsInRequest(int? siteDbGroupId, int? requestId)
+        private async Task<(IEnumerable<RequestDetailTicketModel>, IEnumerable<RequestDetailTicketModel>)> GetTicketsInRequests(int? siteDbGroupId, string requestIds)
         {
             var criteria = new GetRequestTicketsCriteria
             {
                 SiteDbGroupId = siteDbGroupId,
-                RequestId = requestId,
+                RequestIds = requestIds,
             };
 
             var (singleTickets, parlayTickets) =
