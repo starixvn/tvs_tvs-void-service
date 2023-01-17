@@ -19,7 +19,7 @@ namespace TVS.Void.Service.Tests.Services.Void
             var service = new InsertAfterVoidDataPrivateServiceImp();
 
             // Act
-            var actual = service.IsAutoVoid(fakeRequest);
+            var actual = service.IsAutoVoid(fakeRequest, null);
 
             // Assert
             Assert.True(actual);
@@ -35,7 +35,7 @@ namespace TVS.Void.Service.Tests.Services.Void
             var service = new InsertAfterVoidDataPrivateServiceImp();
 
             // Act
-            var actual = service.IsAutoVoid(fakeRequest);
+            var actual = service.IsAutoVoid(fakeRequest, new VoidingHistoryModel());
 
             // Assert
             Assert.False(actual);

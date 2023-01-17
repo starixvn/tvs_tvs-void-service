@@ -39,10 +39,10 @@ namespace TVS.Void.Service.Services.CheckTicketStatus
 
         private async Task ExecuteNormalFlow(IList<string> logData)
         {
-            logData.Add(nameof(CheckTicketStatusService));
             var (singleTickets, parlayTickets) = await requestTicketService.GetTicketInAllRequests();
             if (singleTickets.Any() || parlayTickets.Any())
             {
+                logData.Add($"{nameof(CheckTicketStatusService)} - {nameof(singleTickets)}.Count: {singleTickets.Count()} - {nameof(parlayTickets)}.Count: {parlayTickets.Count()}");
                 var broadcastSessionId = Guid.NewGuid().ToString();
                 foreach (var server in SiteDbGroupConstant.ServerList)
                 {

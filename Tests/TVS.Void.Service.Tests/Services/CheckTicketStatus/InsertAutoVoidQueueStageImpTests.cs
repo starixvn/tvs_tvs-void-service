@@ -47,8 +47,9 @@ namespace TVS.Void.Service.Tests.Services.CheckTicketStatus
             await stage.Execute(fakeSiteDbGroupId, fakeRequests, fakeBroadcastSessionId, new List<string>());
 
             // Assert
-            await autoVoidRequestQueueService.Received(fakeRequests.Count)
-                .InsertQueue(Arg.Is<int>(x => x == fakeSiteDbGroupId), Arg.Is<string>(x => x == fakeBroadcastSessionId), Arg.Any<int>(), Arg.Any<int>(), Arg.Any<string>(), Arg.Is<int?>(x => x == null));
+            await autoVoidRequestQueueService.Received(1)
+                .InsertQueue(Arg.Is<int>(x => x == fakeSiteDbGroupId), Arg.Is<string>(x => x == fakeBroadcastSessionId),
+                    Arg.Is<string>(x => x == "113,224"), Arg.Any<int>(), Arg.Any<string>(), Arg.Is<int?>(x => x == null));
         }
     }
 }

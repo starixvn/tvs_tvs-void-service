@@ -54,7 +54,7 @@ namespace TVS.Void.Service.Tests.Services.Void
             await requestDetailService.ReceivedWithAnyArgs(1).UpdateTicketVoidingHistory(default, default);
             await notificationService.ReceivedWithAnyArgs(1).NotifyVoidFailedToUser(default, default);
             await notificationService.ReceivedWithAnyArgs(1).NotifyRequestFailedToAllUser(default);
-            await loggingService.ReceivedWithAnyArgs(1).InfoJsonAsync(default);
+            await loggingService.ReceivedWithAnyArgs(1).InfoAppendNewLineAsync(default);
         }
 
         [Theory]
@@ -84,7 +84,7 @@ namespace TVS.Void.Service.Tests.Services.Void
             await requestDetailService.DidNotReceiveWithAnyArgs().UpdateTicketVoidingHistory(default, default);
             await notificationService.DidNotReceiveWithAnyArgs().NotifyVoidFailedToUser(default, default);
             await notificationService.DidNotReceiveWithAnyArgs().NotifyRequestFailedToAllUser(default);
-            await loggingService.ReceivedWithAnyArgs(1).InfoJsonAsync(default);
+            await loggingService.ReceivedWithAnyArgs(1).InfoAppendNewLineAsync(default);
         }
 
         [Theory]
@@ -117,7 +117,7 @@ namespace TVS.Void.Service.Tests.Services.Void
             await notificationService.DidNotReceiveWithAnyArgs().NotifyRequestFailedToAllUser(default);
             await insertAfterVoidDataStage.Received(1).Execute(Arg.Is<IEnumerable<TicketVoidingQueueModel>>(x => x == fakeProcessResults),
                     Arg.Any<IList<string>>());
-            await loggingService.ReceivedWithAnyArgs(1).InfoJsonAsync(default);
+            await loggingService.ReceivedWithAnyArgs(1).InfoAppendNewLineAsync(default);
         }
 
         [Fact]
@@ -138,7 +138,7 @@ namespace TVS.Void.Service.Tests.Services.Void
 
             // Assert
             await ticketVoidingQueueService.Received(1).GetQueues(Arg.Is<int>(x => x == fakeSiteDbGroupId), Arg.Is<int?>(x => x == null));
-            await loggingService.ReceivedWithAnyArgs(1).InfoJsonAsync(default);
+            await loggingService.ReceivedWithAnyArgs(1).InfoAppendNewLineAsync(default);
             await loggingService.ReceivedWithAnyArgs(1).ErrorAsync(default, default);
         }
     }

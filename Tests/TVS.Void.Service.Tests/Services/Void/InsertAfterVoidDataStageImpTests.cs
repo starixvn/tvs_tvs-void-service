@@ -16,7 +16,7 @@ namespace TVS.Void.Service.Tests.Services.Void
             var requestDetailService = Substitute.For<RequestDetailService>();
             requestDetailService.GetRequestById(default)
                 .ReturnsForAnyArgs((new List<RequestModel> { new() { RequestId = 112 } }, new List<RequestDetail>()));
-            privateService.IsAutoVoid(default).ReturnsForAnyArgs(true);
+            privateService.IsAutoVoid(default, default).ReturnsForAnyArgs(true);
             var processStage = new InsertAfterVoidDataStageImp(requestDetailService, privateService);
 
             // Act

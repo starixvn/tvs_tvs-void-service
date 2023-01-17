@@ -13,7 +13,7 @@ namespace TVS.Void.Service.Tests.Services.ScanAutoVoidRequest
         {
             AutoVoidRequestQueueModel? queue = null;
             const int siteDbGroupId = 0;
-            var checkRequestQueueValidStage = Substitute.For<CheckRequestQueueValidStage>();
+            var checkRequestQueueValidStage = Substitute.For<CheckVoidInstantRequestQueueValidStage>();
             var getTicketsStage = Substitute.For<GetTicketsStage>();
             var checkTicketAllowToVoidStage = Substitute.For<CheckTicketAllowToVoidStage>();
             var reCalculateTicketsStage = Substitute.For<ReCalculateTicketsStage>();
@@ -44,7 +44,7 @@ namespace TVS.Void.Service.Tests.Services.ScanAutoVoidRequest
                 Action = action
             };
             const int siteDbGroupId = 0;
-            var checkRequestQueueValidStage = Substitute.For<CheckRequestQueueValidStage>();
+            var checkRequestQueueValidStage = Substitute.For<CheckVoidInstantRequestQueueValidStage>();
             var getTicketsStage = Substitute.For<GetTicketsStage>();
             var checkTicketAllowToVoidStage = Substitute.For<CheckTicketAllowToVoidStage>();
             var reCalculateTicketsStage = Substitute.For<ReCalculateTicketsStage>();
@@ -66,7 +66,7 @@ namespace TVS.Void.Service.Tests.Services.ScanAutoVoidRequest
 
             await autoVoidRequestQueueService.Received(1).GetQueue(Arg.Any<int>());
             await checkRequestQueueValidStage.Received(1).Execute(Arg.Any<int>(), Arg.Any<AutoVoidRequestQueueModel>());
-            await loggingService.Received(1).InfoJsonAsync(Arg.Any<IList<string>>());
+            await loggingService.Received(1).InfoAppendNewLineAsync(Arg.Any<IList<string>>());
         }
 
         [Fact]
@@ -77,7 +77,7 @@ namespace TVS.Void.Service.Tests.Services.ScanAutoVoidRequest
                 Action = AutoVoidConstant.QueueActionVoidInstant
             };
             const int siteDbGroupId = 0;
-            var checkRequestQueueValidStage = Substitute.For<CheckRequestQueueValidStage>();
+            var checkRequestQueueValidStage = Substitute.For<CheckVoidInstantRequestQueueValidStage>();
             var getTicketsStage = Substitute.For<GetTicketsStage>();
             var checkTicketAllowToVoidStage = Substitute.For<CheckTicketAllowToVoidStage>();
             var reCalculateTicketsStage = Substitute.For<ReCalculateTicketsStage>();
@@ -100,7 +100,7 @@ namespace TVS.Void.Service.Tests.Services.ScanAutoVoidRequest
             await autoVoidRequestQueueService.Received(1).GetQueue(Arg.Any<int>());
             await checkRequestQueueValidStage.Received(1).Execute(Arg.Any<int>(), Arg.Any<AutoVoidRequestQueueModel>());
             await getTicketsStage.Received(0).Execute(Arg.Any<int>(), Arg.Any<AutoVoidRequestQueueModel>(), Arg.Any<IList<string>>());
-            await loggingService.Received(0).InfoJsonAsync(Arg.Any<IList<string>>());
+            await loggingService.Received(0).InfoAppendNewLineAsync(Arg.Any<IList<string>>());
         }
 
         [Fact]
@@ -111,7 +111,7 @@ namespace TVS.Void.Service.Tests.Services.ScanAutoVoidRequest
                 Action = AutoVoidConstant.QueueActionVoidInstant
             };
             const int siteDbGroupId = 0;
-            var checkRequestQueueValidStage = Substitute.For<CheckRequestQueueValidStage>();
+            var checkRequestQueueValidStage = Substitute.For<CheckVoidInstantRequestQueueValidStage>();
             var getTicketsStage = Substitute.For<GetTicketsStage>();
             var checkTicketAllowToVoidStage = Substitute.For<CheckTicketAllowToVoidStage>();
             var reCalculateTicketsStage = Substitute.For<ReCalculateTicketsStage>();
@@ -134,7 +134,7 @@ namespace TVS.Void.Service.Tests.Services.ScanAutoVoidRequest
             await autoVoidRequestQueueService.Received(1).GetQueue(Arg.Any<int>());
             await checkRequestQueueValidStage.Received(1).Execute(Arg.Any<int>(), Arg.Any<AutoVoidRequestQueueModel>());
             await getTicketsStage.Received(1).Execute(Arg.Any<int>(), Arg.Any<AutoVoidRequestQueueModel>(), Arg.Any<IList<string>>());
-            await loggingService.Received(0).InfoJsonAsync(Arg.Any<IList<string>>());
+            await loggingService.Received(0).InfoAppendNewLineAsync(Arg.Any<IList<string>>());
         }
 
         [Fact]
@@ -142,7 +142,7 @@ namespace TVS.Void.Service.Tests.Services.ScanAutoVoidRequest
         {
             var queue = new AutoVoidRequestQueueModel { Action = "" };
             const int siteDbGroupId = 0;
-            var checkRequestQueueValidStage = Substitute.For<CheckRequestQueueValidStage>();
+            var checkRequestQueueValidStage = Substitute.For<CheckVoidInstantRequestQueueValidStage>();
             var getTicketsStage = Substitute.For<GetTicketsStage>();
             var checkTicketAllowToVoidStage = Substitute.For<CheckTicketAllowToVoidStage>();
             var reCalculateTicketsStage = Substitute.For<ReCalculateTicketsStage>();
@@ -164,7 +164,7 @@ namespace TVS.Void.Service.Tests.Services.ScanAutoVoidRequest
             await autoVoidRequestQueueService.Received(1).GetQueue(Arg.Any<int>());
             await checkTicketAllowToVoidStage.Received(1).Execute(Arg.Any<int>(), Arg.Any<IEnumerable<RequestDetailTicketModel>>(),
                 Arg.Any<IEnumerable<RequestDetailTicketModel>>(), Arg.Any<IList<string>>());
-            await loggingService.Received(1).InfoJsonAsync(Arg.Any<IList<string>>());
+            await loggingService.Received(1).InfoAppendNewLineAsync(Arg.Any<IList<string>>());
         }
 
         [Fact]
@@ -172,7 +172,7 @@ namespace TVS.Void.Service.Tests.Services.ScanAutoVoidRequest
         {
             var queue = new AutoVoidRequestQueueModel { Action = "" };
             const int siteDbGroupId = 0;
-            var checkRequestQueueValidStage = Substitute.For<CheckRequestQueueValidStage>();
+            var checkRequestQueueValidStage = Substitute.For<CheckVoidInstantRequestQueueValidStage>();
             var getTicketsStage = Substitute.For<GetTicketsStage>();
             var checkTicketAllowToVoidStage = Substitute.For<CheckTicketAllowToVoidStage>();
             var reCalculateTicketsStage = Substitute.For<ReCalculateTicketsStage>();
@@ -190,7 +190,7 @@ namespace TVS.Void.Service.Tests.Services.ScanAutoVoidRequest
             await service.Execute(siteDbGroupId);
 
             await autoVoidRequestQueueService.Received(1).GetQueue(Arg.Any<int>());
-            await loggingService.Received(0).InfoJsonAsync(Arg.Any<IList<string>>());
+            await loggingService.Received(0).InfoAppendNewLineAsync(Arg.Any<IList<string>>());
         }
 
         [Fact]
@@ -201,7 +201,7 @@ namespace TVS.Void.Service.Tests.Services.ScanAutoVoidRequest
                 Action = AutoVoidConstant.QueueActionVoidInstant
             };
             const int siteDbGroupId = 0;
-            var checkRequestQueueValidStage = Substitute.For<CheckRequestQueueValidStage>();
+            var checkRequestQueueValidStage = Substitute.For<CheckVoidInstantRequestQueueValidStage>();
             var getTicketsStage = Substitute.For<GetTicketsStage>();
             var checkTicketAllowToVoidStage = Substitute.For<CheckTicketAllowToVoidStage>();
             var reCalculateTicketsStage = Substitute.For<ReCalculateTicketsStage>();
@@ -221,7 +221,7 @@ namespace TVS.Void.Service.Tests.Services.ScanAutoVoidRequest
 
             await autoVoidRequestQueueService.Received(1).GetQueue(Arg.Any<int>());
             await checkRequestQueueValidStage.Received(1).Execute(Arg.Any<int>(), Arg.Any<AutoVoidRequestQueueModel>());
-            await loggingService.Received(1).InfoJsonAsync(Arg.Any<IList<string>>());
+            await loggingService.Received(1).InfoAppendNewLineAsync(Arg.Any<IList<string>>());
             await loggingService.Received(1).ErrorAsync(Arg.Any<string>(), Arg.Any<Exception>());
         }
     }

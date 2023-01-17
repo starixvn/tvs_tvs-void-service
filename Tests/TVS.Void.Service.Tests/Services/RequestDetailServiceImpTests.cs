@@ -9,23 +9,23 @@ namespace TVS.Void.Service.Tests.Services
     public class RequestDetailServiceImpTests
     {
         [Theory]
-        [InlineData(1, 1, "123xyz")]
-        [InlineData(0, 0, "")]
-        public async Task InsertVoidingHistory_ShouldReturnExpectedData(int requestId, int siteDbGroupId, string broadcastSessionId)
+        [InlineData("2,3", 1, "123xyz")]
+        [InlineData("1", 0, "")]
+        public async Task InsertVoidingHistory_ShouldReturnExpectedData(string requestIds, int siteDbGroupId, string broadcastSessionId)
         {
             // Arrange
-            var fakeVoidingHistory = new VoidingHistoryModel { VoidingHistoryId = 112 };
+            var fakeVoidingHistory = new List<VoidingHistoryModel> { new() { VoidingHistoryId = 112 } };
             var repository = Substitute.For<IDynamicRepository>();
-            repository.GetAsync<VoidingHistoryModel>(default).ReturnsForAnyArgs(fakeVoidingHistory);
+            repository.FetchAsync<VoidingHistoryModel>(default).ReturnsForAnyArgs(fakeVoidingHistory);
             var service = new RequestDetailServiceImp(repository);
 
             // Act
-            var actual = await service.InsertVoidingHistory(requestId, siteDbGroupId, broadcastSessionId);
+            var actual = await service.InsertVoidingHistory(requestIds, siteDbGroupId, broadcastSessionId);
 
             // Assert
-            await repository.Received(1).GetAsync<VoidingHistoryModel>
+            await repository.Received(1).FetchAsync<VoidingHistoryModel>
             (Arg.Is<InsertVoidingHistoryCriteria>(x =>
-                x.RequestId == requestId));
+                x.RequestIds == requestIds));
             Assert.StrictEqual(fakeVoidingHistory, actual);
         }
 

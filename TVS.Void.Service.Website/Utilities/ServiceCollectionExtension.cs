@@ -112,7 +112,7 @@ namespace TVS.Void.Service.Website.Utilities
             services.AddSingleton<InsertAutoVoidQueueStage, InsertAutoVoidQueueStageImp>();
 
             services.AddSingleton<ScanAutoVoidRequestService, ScanAutoVoidRequestServiceImp>();
-            services.AddSingleton<CheckRequestQueueValidStage, CheckRequestQueueValidStageImp>();
+            services.AddSingleton<CheckVoidInstantRequestQueueValidStage, CheckVoidInstantRequestQueueValidStageImp>();
             services.AddSingleton<GetTicketsStage, GetTicketsStageImp>();
             services.AddSingleton<CheckTicketAllowToVoidStage, CheckTicketAllowToVoidStageImp>();
             services.AddSingleton<ReCalculateTicketsStage, ReCalculateTicketsStageImp>();

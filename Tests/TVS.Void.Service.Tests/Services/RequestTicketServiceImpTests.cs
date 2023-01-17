@@ -10,9 +10,9 @@ namespace TVS.Void.Service.Tests.Services
     public class RequestTicketServiceImpTests
     {
         [Theory]
-        [InlineData(1, 2)]
-        [InlineData(0, 0)]
-        public async Task GetTicketsByRequestIdAndSiteDbGroupId_ShouldReturnExpectedData(int siteDbGroupId, int requestId)
+        [InlineData(1, "2,3")]
+        [InlineData(0, "1")]
+        public async Task GetTicketsByRequestsAndSiteDbGroupId_ShouldReturnExpectedData(int siteDbGroupId, string requestIds)
         {
             // Arrange
             var fakeSingleTickets = new List<RequestDetailTicketModel> { new() { TransId = 113 } };
@@ -22,11 +22,11 @@ namespace TVS.Void.Service.Tests.Services
             var service = new RequestTicketServiceImp(repository);
 
             // Act
-            var actual = await service.GetTicketsByRequestIdAndSiteDbGroupId(siteDbGroupId, requestId);
+            var actual = await service.GetTicketsByRequestsAndSiteDbGroupId(siteDbGroupId, requestIds);
 
             // Assert
             await repository.Received(1).FetchMultipleAsync<RequestDetailTicketModel, RequestDetailTicketModel>
-                (Arg.Is<GetRequestTicketsCriteria>(x => x.SiteDbGroupId == siteDbGroupId && x.RequestId == requestId));
+                (Arg.Is<GetRequestTicketsCriteria>(x => x.SiteDbGroupId == siteDbGroupId && x.RequestIds == requestIds));
             Assert.StrictEqual((fakeSingleTickets, fakeParlayTickets), actual);
         }
 
@@ -45,7 +45,7 @@ namespace TVS.Void.Service.Tests.Services
 
             // Assert
             await repository.Received(1).FetchMultipleAsync<RequestDetailTicketModel, RequestDetailTicketModel>
-                (Arg.Is<GetRequestTicketsCriteria>(x => x.SiteDbGroupId == null && x.RequestId == null));
+                (Arg.Is<GetRequestTicketsCriteria>(x => x.SiteDbGroupId == null && x.RequestIds == null));
             Assert.StrictEqual((fakeSingleTickets, fakeParlayTickets), actual);
         }
 

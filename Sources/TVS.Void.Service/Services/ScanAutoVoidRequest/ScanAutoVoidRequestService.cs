@@ -15,7 +15,7 @@ namespace TVS.Void.Service.Services.ScanAutoVoidRequest
 
     public class ScanAutoVoidRequestServiceImp : ScanAutoVoidRequestService
     {
-        private readonly CheckRequestQueueValidStage checkRequestQueueValidStage;
+        private readonly CheckVoidInstantRequestQueueValidStage checkRequestQueueValidStage;
         private readonly GetTicketsStage getTicketsStage;
         private readonly CheckTicketAllowToVoidStage checkTicketAllowToVoidStage;
         private readonly ReCalculateTicketsStage reCalculateTicketsStage;
@@ -24,7 +24,7 @@ namespace TVS.Void.Service.Services.ScanAutoVoidRequest
         private readonly AutoVoidRequestQueueService autoVoidRequestQueueService;
         private readonly LoggingService loggingService;
 
-        public ScanAutoVoidRequestServiceImp(CheckRequestQueueValidStage checkRequestQueueValidStage, GetTicketsStage getTicketsStage,
+        public ScanAutoVoidRequestServiceImp(CheckVoidInstantRequestQueueValidStage checkRequestQueueValidStage, GetTicketsStage getTicketsStage,
             CheckTicketAllowToVoidStage checkTicketAllowToVoidStage, ReCalculateTicketsStage reCalculateTicketsStage,
             InsertPreVoidingDataStage insertPreVoidingDataStage, AutoVoidRequestQueueService autoVoidRequestQueueService, LoggingService loggingService)
         {

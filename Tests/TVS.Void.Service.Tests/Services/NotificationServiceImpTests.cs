@@ -26,7 +26,7 @@ namespace TVS.Void.Service.Tests.Services
             var service = new NotificationServiceImp(ticketVoidingSystemHttpClientService, hubContext, default);
 
             // Act
-            await service.NotifyRequestRunningToAllUser(requestId);
+            await service.NotifyRequestRunningToAllUser(new List<VoidingHistoryModel> { new VoidingHistoryModel { RequestId = requestId } });
 
             // Assert
             await ticketVoidingSystemHttpClientService.Received(1)
@@ -48,7 +48,7 @@ namespace TVS.Void.Service.Tests.Services
             var service = new NotificationServiceImp(ticketVoidingSystemHttpClientService, default, loggingService);
 
             // Act
-            await service.NotifyRequestRunningToAllUser(requestId);
+            await service.NotifyRequestRunningToAllUser(new List<VoidingHistoryModel> { new VoidingHistoryModel { RequestId = requestId } });
 
             // Assert
             await ticketVoidingSystemHttpClientService.Received(1)

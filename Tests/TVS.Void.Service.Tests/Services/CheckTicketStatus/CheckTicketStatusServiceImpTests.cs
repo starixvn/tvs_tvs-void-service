@@ -29,7 +29,7 @@ namespace TVS.Void.Service.Tests.Services.CheckTicketStatus
             await insertAutoVoidQueueStage.DidNotReceiveWithAnyArgs()
                 .Execute(Arg.Any<int>(), Arg.Any<IEnumerable<RequestModel>>(),
                      Arg.Any<string>(), Arg.Any<List<string>>());
-            await loggingService.DidNotReceiveWithAnyArgs().InfoJsonAsync(default);
+            await loggingService.DidNotReceiveWithAnyArgs().InfoAppendNewLineAsync(default);
         }
 
         [Theory]
@@ -55,7 +55,7 @@ namespace TVS.Void.Service.Tests.Services.CheckTicketStatus
             await insertAutoVoidQueueStage.Received(totalSiteDbCount)
                 .Execute(Arg.Any<int>(), Arg.Is<IEnumerable<RequestModel>>(x => x == fakeRequestsList),
                     Arg.Any<string>(), Arg.Any<List<string>>());
-            await loggingService.ReceivedWithAnyArgs(1).InfoJsonAsync(default);
+            await loggingService.ReceivedWithAnyArgs(1).InfoAppendNewLineAsync(default);
         }
 
         [Fact]
@@ -75,7 +75,7 @@ namespace TVS.Void.Service.Tests.Services.CheckTicketStatus
             // Assert
             await requestTicketService.Received(1).GetTicketInAllRequests();
             await insertAutoVoidQueueStage.DidNotReceiveWithAnyArgs().Execute(default, default, default, default);
-            await loggingService.ReceivedWithAnyArgs(1).InfoJsonAsync(default);
+            await loggingService.ReceivedWithAnyArgs(1).InfoAppendNewLineAsync(default);
             await loggingService.ReceivedWithAnyArgs(1).ErrorAsync(default, default);
         }
 

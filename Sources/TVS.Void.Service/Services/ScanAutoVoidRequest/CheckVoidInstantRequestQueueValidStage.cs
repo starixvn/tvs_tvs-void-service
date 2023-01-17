@@ -6,17 +6,17 @@ using TVS.Void.Service.Models;
 
 namespace TVS.Void.Service.Services.ScanAutoVoidRequest
 {
-    public interface CheckRequestQueueValidStage
+    public interface CheckVoidInstantRequestQueueValidStage
     {
         Task<bool> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue);
     }
 
-    public class CheckRequestQueueValidStageImp : CheckRequestQueueValidStage
+    public class CheckVoidInstantRequestQueueValidStageImp : CheckVoidInstantRequestQueueValidStage
     {
         private readonly AutoVoidRequestQueueService autoVoidRequestQueueService;
         private readonly RequestDetailService requestDetailService;
 
-        public CheckRequestQueueValidStageImp(AutoVoidRequestQueueService autoVoidRequestQueueService, RequestDetailService requestDetailService)
+        public CheckVoidInstantRequestQueueValidStageImp(AutoVoidRequestQueueService autoVoidRequestQueueService, RequestDetailService requestDetailService)
         {
             this.autoVoidRequestQueueService = autoVoidRequestQueueService;
             this.requestDetailService = requestDetailService;
