@@ -52,6 +52,29 @@ namespace TVS.Void.Service.Tests.Services
             Assert.Equal(1, counter);
         }
 
+        [Fact()]
+        public async Task InsertQueueForRequests_ShouldExecuteRepositorySuccessful()
+        {
+            // Arrange
+            const int fakeSiteDbGroupId = 1;
+            var fakeVoidingHistoryList = new List<VoidingHistoryModel>
+            {
+                new() { RequestId = 123, VoidingHistoryId = 222 }, new() { RequestId = 234, VoidingHistoryId = 345 }
+            };
+            var counter = 0;
+            var repository = Substitute.For<IDynamicRepository>();
+            repository.When(x => x.ExecuteAsync(Arg.Any<InsertTicketVoidingQueueCriteria>()))
+                .Do(x => counter++);
+            var service = new TicketVoidingQueueServiceImp(repository);
+
+            // Act
+            await service.InsertQueueForRequests(fakeSiteDbGroupId, fakeVoidingHistoryList, new List<RequestDetailTicketModel>(), new List<RequestDetailTicketModel>());
+
+            // Assert
+            await repository.Received(2).ExecuteAsync(Arg.Is<InsertTicketVoidingQueueCriteria>(x => x.SiteDbGroupId == fakeSiteDbGroupId));
+            Assert.Equal(fakeVoidingHistoryList.Count, counter);
+        }
+
         [Fact]
         public async Task ProcessVoidQueue_ShouldReturnExpectedData()
         {
