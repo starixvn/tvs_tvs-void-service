@@ -1,9 +1,8 @@
-﻿namespace TVS.Void.Service.Models
-{
-    public class VoidingHistoryModel
-    {
-        public int VoidingHistoryId { get; set; }
+﻿namespace TVS.Void.Service.Models;
 
-        public int RequestId { get; set; }
-    }
+public class VoidingHistoryModel
+{
+    public int VoidingHistoryId { get; set; }
+
+    public int RequestId { get; set; }
 }

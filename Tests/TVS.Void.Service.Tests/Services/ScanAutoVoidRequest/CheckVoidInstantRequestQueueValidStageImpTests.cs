@@ -3,109 +3,108 @@ using TVS.Void.Service.Models;
 using TVS.Void.Service.Services;
 using TVS.Void.Service.Services.ScanAutoVoidRequest;
 
-namespace TVS.Void.Service.Tests.Services.ScanAutoVoidRequest
+namespace TVS.Void.Service.Tests.Services.ScanAutoVoidRequest;
+
+public class CheckVoidInstantRequestQueueValidStageImpTests
 {
-    public class CheckVoidInstantRequestQueueValidStageImpTests
+    [Fact]
+    public async Task Execute_RequestValid_ReturnTrue()
     {
-        [Fact]
-        public async Task Execute_RequestValid_ReturnTrue()
+        const int siteDbGroupId = 0;
+        var queue = new AutoVoidRequestQueueModel
         {
-            const int siteDbGroupId = 0;
-            var queue = new AutoVoidRequestQueueModel
-            {
-                RequestIds = "222",
-                Action = "CAL"
-            };
-            var requests = new List<RequestModel>
-            {
-                new()
-                {
-                    RequestId = 222,
-                    ActionName = "CAL"
-                }
-            };
-            var autoVoidRequestQueueService = Substitute.For<AutoVoidRequestQueueService>();
-            var requestDetailService = Substitute.For<RequestDetailService>();
-            requestDetailService.GetRequestById(default).ReturnsForAnyArgs((requests, null));
-            var service = new CheckVoidInstantRequestQueueValidStageImp(autoVoidRequestQueueService, requestDetailService);
-
-            var actual = await service.Execute(siteDbGroupId, queue);
-
-            await requestDetailService.Received(1).GetRequestById(Arg.Any<int>());
-            Assert.True(actual);
-        }
-
-        [Fact]
-        public async Task Execute_TooManyRequestIds_ReturnFalse()
+            RequestIds = "222",
+            Action = "CAL"
+        };
+        var requests = new List<RequestModel>
         {
-            var countUpdateQueue = 0;
-            const int siteDbGroupId = 0;
-            var queue = new AutoVoidRequestQueueModel
+            new()
             {
-                RequestIds = "11,22",
-                Action = "CAL"
-            };
-            var autoVoidRequestQueueService = Substitute.For<AutoVoidRequestQueueService>();
-            var requestDetailService = Substitute.For<RequestDetailService>();
-            autoVoidRequestQueueService
-                .WhenForAnyArgs(x => x.UpdateQueue(default, default, default, default))
-                .Do(x => countUpdateQueue++);
-            var service = new CheckVoidInstantRequestQueueValidStageImp(autoVoidRequestQueueService, requestDetailService);
+                RequestId = 222,
+                ActionName = "CAL"
+            }
+        };
+        var autoVoidRequestQueueService = Substitute.For<AutoVoidRequestQueueService>();
+        var requestDetailService = Substitute.For<RequestDetailService>();
+        requestDetailService.GetRequestById(default).ReturnsForAnyArgs((requests, null));
+        var service = new CheckVoidInstantRequestQueueValidStageImp(autoVoidRequestQueueService, requestDetailService);
 
-            var actual = await service.Execute(siteDbGroupId, queue);
+        var actual = await service.Execute(siteDbGroupId, queue);
 
-            await requestDetailService.DidNotReceiveWithAnyArgs().GetRequestById(default);
-            Assert.Equal(1, countUpdateQueue);
-            Assert.False(actual);
-        }
+        await requestDetailService.Received(1).GetRequestById(Arg.Any<int>());
+        Assert.True(actual);
+    }
 
-        [Fact]
-        public async Task Execute_RequestInvalid_ReturnFalse()
+    [Fact]
+    public async Task Execute_TooManyRequestIds_ReturnFalse()
+    {
+        var countUpdateQueue = 0;
+        const int siteDbGroupId = 0;
+        var queue = new AutoVoidRequestQueueModel
         {
-            const int siteDbGroupId = 0;
-            var queue = new AutoVoidRequestQueueModel
-            {
-                RequestIds = "1",
-                Action = "CAL"
-            };
-            var requests = new List<RequestModel>();
-            var autoVoidRequestQueueService = Substitute.For<AutoVoidRequestQueueService>();
-            var requestDetailService = Substitute.For<RequestDetailService>();
-            requestDetailService.GetRequestById(default).ReturnsForAnyArgs((requests, null));
-            var service = new CheckVoidInstantRequestQueueValidStageImp(autoVoidRequestQueueService, requestDetailService);
+            RequestIds = "11,22",
+            Action = "CAL"
+        };
+        var autoVoidRequestQueueService = Substitute.For<AutoVoidRequestQueueService>();
+        var requestDetailService = Substitute.For<RequestDetailService>();
+        autoVoidRequestQueueService
+            .WhenForAnyArgs(x => x.UpdateQueue(default, default, default, default))
+            .Do(x => countUpdateQueue++);
+        var service = new CheckVoidInstantRequestQueueValidStageImp(autoVoidRequestQueueService, requestDetailService);
 
-            var actual = await service.Execute(siteDbGroupId, queue);
+        var actual = await service.Execute(siteDbGroupId, queue);
 
-            await requestDetailService.Received(1).GetRequestById(Arg.Any<int>());
-            Assert.False(actual);
-        }
+        await requestDetailService.DidNotReceiveWithAnyArgs().GetRequestById(default);
+        Assert.Equal(1, countUpdateQueue);
+        Assert.False(actual);
+    }
 
-        [Fact]
-        public async Task Execute_RequestWasEdited_ReturnFalse()
+    [Fact]
+    public async Task Execute_RequestInvalid_ReturnFalse()
+    {
+        const int siteDbGroupId = 0;
+        var queue = new AutoVoidRequestQueueModel
         {
-            const int siteDbGroupId = 0;
-            var queue = new AutoVoidRequestQueueModel
-            {
-                RequestIds = "1",
-                Action = "CAL"
-            };
-            var requests = new List<RequestModel>
-            {
-                new()
-                {
-                    ActionName = "CAL-HT"
-                }
-            };
-            var autoVoidRequestQueueService = Substitute.For<AutoVoidRequestQueueService>();
-            var requestDetailService = Substitute.For<RequestDetailService>();
-            requestDetailService.GetRequestById(default).ReturnsForAnyArgs((requests, null));
-            var service = new CheckVoidInstantRequestQueueValidStageImp(autoVoidRequestQueueService, requestDetailService);
+            RequestIds = "1",
+            Action = "CAL"
+        };
+        var requests = new List<RequestModel>();
+        var autoVoidRequestQueueService = Substitute.For<AutoVoidRequestQueueService>();
+        var requestDetailService = Substitute.For<RequestDetailService>();
+        requestDetailService.GetRequestById(default).ReturnsForAnyArgs((requests, null));
+        var service = new CheckVoidInstantRequestQueueValidStageImp(autoVoidRequestQueueService, requestDetailService);
 
-            var actual = await service.Execute(siteDbGroupId, queue);
+        var actual = await service.Execute(siteDbGroupId, queue);
 
-            await requestDetailService.Received(1).GetRequestById(Arg.Any<int>());
-            await autoVoidRequestQueueService.Received(1).UpdateQueue(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<int?>(), Arg.Any<string>());
-            Assert.False(actual);
-        }
+        await requestDetailService.Received(1).GetRequestById(Arg.Any<int>());
+        Assert.False(actual);
+    }
+
+    [Fact]
+    public async Task Execute_RequestWasEdited_ReturnFalse()
+    {
+        const int siteDbGroupId = 0;
+        var queue = new AutoVoidRequestQueueModel
+        {
+            RequestIds = "1",
+            Action = "CAL"
+        };
+        var requests = new List<RequestModel>
+        {
+            new()
+            {
+                ActionName = "CAL-HT"
+            }
+        };
+        var autoVoidRequestQueueService = Substitute.For<AutoVoidRequestQueueService>();
+        var requestDetailService = Substitute.For<RequestDetailService>();
+        requestDetailService.GetRequestById(default).ReturnsForAnyArgs((requests, null));
+        var service = new CheckVoidInstantRequestQueueValidStageImp(autoVoidRequestQueueService, requestDetailService);
+
+        var actual = await service.Execute(siteDbGroupId, queue);
+
+        await requestDetailService.Received(1).GetRequestById(Arg.Any<int>());
+        await autoVoidRequestQueueService.Received(1).UpdateQueue(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<int?>(), Arg.Any<string>());
+        Assert.False(actual);
     }
 }

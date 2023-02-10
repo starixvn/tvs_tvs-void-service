@@ -1,19 +1,18 @@
 ﻿using Fanex.Data.Repository;
 
-namespace TVS.Void.Service.Criteria
+namespace TVS.Void.Service.Criteria;
+
+public class InsertVoidingHistoryCriteria : CriteriaBase
 {
-    public class InsertVoidingHistoryCriteria : CriteriaBase
-    {
-        public string RequestIds { get; set; }
+    public string RequestIds { get; set; }
 
-        public int UserId { get; set; }
+    public int UserId { get; set; }
 
-        public int SiteDbGroupId { get; set; }
+    public int SiteDbGroupId { get; set; }
 
-        public string BroadcastSessionId { get; set; }
+    public string BroadcastSessionId { get; set; }
 
-        public override string GetSettingKey() => "TicketVoiding_VoidingHistory_Insert";
+    public override string GetSettingKey() => "TicketVoiding_VoidingHistory_Insert";
 
-        public override bool IsValid() => true;
-    }
+    public override bool IsValid() => true;
 }

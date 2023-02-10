@@ -9,72 +9,71 @@ using TicketVoidingSystem.Services;
 using TicketVoidingSystem.SignalR;
 using TVS.Void.Service.Models;
 
-namespace TVS.Void.Service.Services
+namespace TVS.Void.Service.Services;
+
+public interface NotificationService
 {
-    public interface NotificationService
+    Task NotifyRequestRunningToAllUser(IEnumerable<VoidingHistoryModel> voidingHistoryList);
+
+    Task NotifyVoidFailedToUser(int requestId, IEnumerable<TicketVoidingQueueModel> voidQueueResults);
+
+    Task NotifyRequestFailedToAllUser(int requestId);
+}
+
+public class NotificationServiceImp : NotificationService
+{
+    private readonly TicketVoidingSystemHttpClientService ticketVoidingSystemHttpClientService;
+    private readonly IHubContext<NotificationHub, ClientEvent> hubContext;
+    private readonly LoggingService loggingService;
+
+    public NotificationServiceImp(TicketVoidingSystemHttpClientService ticketVoidingSystemHttpClientService, IHubContext<NotificationHub, ClientEvent> hubContext, LoggingService loggingService)
     {
-        Task NotifyRequestRunningToAllUser(IEnumerable<VoidingHistoryModel> voidingHistoryList);
-
-        Task NotifyVoidFailedToUser(int requestId, IEnumerable<TicketVoidingQueueModel> voidQueueResults);
-
-        Task NotifyRequestFailedToAllUser(int requestId);
+        this.ticketVoidingSystemHttpClientService = ticketVoidingSystemHttpClientService;
+        this.hubContext = hubContext;
+        this.loggingService = loggingService;
     }
 
-    public class NotificationServiceImp : NotificationService
+    public async Task NotifyRequestRunningToAllUser(IEnumerable<VoidingHistoryModel> voidingHistoryList)
     {
-        private readonly TicketVoidingSystemHttpClientService ticketVoidingSystemHttpClientService;
-        private readonly IHubContext<NotificationHub, ClientEvent> hubContext;
-        private readonly LoggingService loggingService;
-
-        public NotificationServiceImp(TicketVoidingSystemHttpClientService ticketVoidingSystemHttpClientService, IHubContext<NotificationHub, ClientEvent> hubContext, LoggingService loggingService)
+        try
         {
-            this.ticketVoidingSystemHttpClientService = ticketVoidingSystemHttpClientService;
-            this.hubContext = hubContext;
-            this.loggingService = loggingService;
+            var runningRequests = voidingHistoryList.Select(x
+                => new RequestStatus { RequestId = x.RequestId, Status = RequestStatusConstant.Running });
+            await ticketVoidingSystemHttpClientService.SignalRUpdateRequestStatusToAllUsers(runningRequests);
+            await hubContext.Clients.All.updateRequestStatus(runningRequests);
         }
-
-        public async Task NotifyRequestRunningToAllUser(IEnumerable<VoidingHistoryModel> voidingHistoryList)
+        catch (Exception e)
         {
-            try
-            {
-                var runningRequests = voidingHistoryList.Select(x
-                    => new RequestStatus { RequestId = x.RequestId, Status = RequestStatusConstant.Running });
-                await ticketVoidingSystemHttpClientService.SignalRUpdateRequestStatusToAllUsers(runningRequests);
-                await hubContext.Clients.All.updateRequestStatus(runningRequests);
-            }
-            catch (Exception e)
-            {
-                await loggingService.ErrorAsync(e.Message);
-            }
+            await loggingService.ErrorAsync(e.Message);
         }
+    }
 
-        public async Task NotifyVoidFailedToUser(int requestId, IEnumerable<TicketVoidingQueueModel> voidQueueResults)
+    public async Task NotifyVoidFailedToUser(int requestId, IEnumerable<TicketVoidingQueueModel> voidQueueResults)
+    {
+        try
         {
-            try
-            {
-                var voidResultHasUserInfo = voidQueueResults.First(x => !string.IsNullOrWhiteSpace(x.UserName));
-                var errorMessage = $"Failed to void Request ID: {requestId}, please contact IT for support. (Error: VOID_SERVICE)";
-                await ticketVoidingSystemHttpClientService.SignalRNotifyErrorMessageToUser(voidResultHasUserInfo.UserName, errorMessage);
-                await hubContext.Clients.User(voidResultHasUserInfo.UserName).showErrorMessage(errorMessage);
-            }
-            catch (Exception e)
-            {
-                await loggingService.ErrorAsync(e.Message);
-            }
+            var voidResultHasUserInfo = voidQueueResults.First(x => !string.IsNullOrWhiteSpace(x.UserName));
+            var errorMessage = $"Failed to void Request ID: {requestId}, please contact IT for support. (Error: VOID_SERVICE)";
+            await ticketVoidingSystemHttpClientService.SignalRNotifyErrorMessageToUser(voidResultHasUserInfo.UserName, errorMessage);
+            await hubContext.Clients.User(voidResultHasUserInfo.UserName).showErrorMessage(errorMessage);
         }
-
-        public async Task NotifyRequestFailedToAllUser(int requestId)
+        catch (Exception e)
         {
-            try
-            {
-                var failedRequests = new List<RequestStatus> { new() { RequestId = requestId, Status = RequestStatusConstant.Failed } };
-                await ticketVoidingSystemHttpClientService.SignalRUpdateRequestStatusToAllUsers(failedRequests);
-                await hubContext.Clients.All.updateRequestStatus(failedRequests);
-            }
-            catch (Exception e)
-            {
-                await loggingService.ErrorAsync(e.Message);
-            }
+            await loggingService.ErrorAsync(e.Message);
+        }
+    }
+
+    public async Task NotifyRequestFailedToAllUser(int requestId)
+    {
+        try
+        {
+            var failedRequests = new List<RequestStatus> { new() { RequestId = requestId, Status = RequestStatusConstant.Failed } };
+            await ticketVoidingSystemHttpClientService.SignalRUpdateRequestStatusToAllUsers(failedRequests);
+            await hubContext.Clients.All.updateRequestStatus(failedRequests);
+        }
+        catch (Exception e)
+        {
+            await loggingService.ErrorAsync(e.Message);
         }
     }
 }

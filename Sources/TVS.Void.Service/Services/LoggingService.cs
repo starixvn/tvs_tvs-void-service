@@ -6,58 +6,57 @@ using Fanex.Logging;
 using Fanex.Logging.Extensions;
 using Fanex.Logging.Extensions.Database;
 
-namespace TVS.Void.Service.Services
+namespace TVS.Void.Service.Services;
+
+public interface LoggingService
 {
-    public interface LoggingService
+    Task ErrorAsync(string message, Exception exception);
+
+    Task ErrorAsync(Exception exception);
+
+    Task ErrorAsync(string message);
+
+    Task InfoAsync(string message);
+
+    Task InfoAppendNewLineAsync(IList<string> logData);
+}
+
+[ExcludeFromCodeCoverage]
+public class LoggingServiceImp : LoggingService
+{
+    public async Task ErrorAsync(string message, Exception exception)
     {
-        Task ErrorAsync(string message, Exception exception);
-
-        Task ErrorAsync(Exception exception);
-
-        Task ErrorAsync(string message);
-
-        Task InfoAsync(string message);
-
-        Task InfoAppendNewLineAsync(IList<string> logData);
+        var logException = new Exception(message, exception);
+        await HandleException(logException);
     }
 
-    [ExcludeFromCodeCoverage]
-    public class LoggingServiceImp : LoggingService
+    public async Task ErrorAsync(Exception exception)
     {
-        public async Task ErrorAsync(string message, Exception exception)
-        {
-            var logException = new Exception(message, exception);
-            await HandleException(logException);
-        }
+        await HandleException(exception);
+    }
 
-        public async Task ErrorAsync(Exception exception)
-        {
-            await HandleException(exception);
-        }
+    public async Task ErrorAsync(string message)
+    {
+        await LogService.ErrorAsync(message);
+    }
 
-        public async Task ErrorAsync(string message)
-        {
-            await LogService.ErrorAsync(message);
-        }
+    public async Task InfoAsync(string message)
+    {
+        await LogService.InfoAsync(message);
+    }
 
-        public async Task InfoAsync(string message)
-        {
-            await LogService.InfoAsync(message);
-        }
+    public async Task InfoAppendNewLineAsync(IList<string> logData)
+    {
+        await InfoAsync(string.Join($"{Environment.NewLine}*", logData));
+    }
 
-        public async Task InfoAppendNewLineAsync(IList<string> logData)
-        {
-            await InfoAsync(string.Join($"{Environment.NewLine}*", logData));
-        }
-
-        private static async Task HandleException(Exception exception)
-        {
-            var logMessage = new LogMessage(exception.Message)
-                .AddSection("Database Info", DatabaseInfoGetters.GetDbExceptionInfo(exception))
-                .AddSection("Server Info", CommonInfoGetters.GetServerInfo())
-                .AddSection("Exception Info", CommonInfoGetters.GetExceptionInfo(exception.InnerException))
-                .ToString();
-            await LogService.ErrorAsync(logMessage);
-        }
+    private static async Task HandleException(Exception exception)
+    {
+        var logMessage = new LogMessage(exception.Message)
+            .AddSection("Database Info", DatabaseInfoGetters.GetDbExceptionInfo(exception))
+            .AddSection("Server Info", CommonInfoGetters.GetServerInfo())
+            .AddSection("Exception Info", CommonInfoGetters.GetExceptionInfo(exception.InnerException))
+            .ToString();
+        await LogService.ErrorAsync(logMessage);
     }
 }

@@ -6,55 +6,54 @@ using Fanex.Data.Repository;
 using TVS.Void.Service.Criteria.MultiSiteDb;
 using TVS.Void.Service.Models;
 
-namespace TVS.Void.Service.Services.ScanAutoVoidRequest
+namespace TVS.Void.Service.Services.ScanAutoVoidRequest;
+
+public interface CheckTicketAllowToVoidStage
 {
-    public interface CheckTicketAllowToVoidStage
+    Task<CheckStatusTicketOutput> Execute(int siteDbGroupId,
+        IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets, IList<string> logData);
+}
+
+public class CheckTicketAllowToVoidStageImp : CheckTicketAllowToVoidStage
+{
+    private readonly IDynamicRepository repository;
+
+    public CheckTicketAllowToVoidStageImp(IDynamicRepository repository)
     {
-        Task<CheckStatusTicketOutput> Execute(int siteDbGroupId,
-            IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets, IList<string> logData);
+        this.repository = repository;
     }
 
-    public class CheckTicketAllowToVoidStageImp : CheckTicketAllowToVoidStage
+    public async Task<CheckStatusTicketOutput> Execute(int siteDbGroupId,
+        IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets, IList<string> logData)
     {
-        private readonly IDynamicRepository repository;
-
-        public CheckTicketAllowToVoidStageImp(IDynamicRepository repository)
+        var criteria = new CheckTicketsAllowToVoidCriteria
         {
-            this.repository = repository;
-        }
+            SiteDbGroupId = siteDbGroupId,
+            SingleTicketsJson = JsonSerializer.Serialize(singleTickets),
+            ParlayTicketsJson = JsonSerializer.Serialize(parlayTickets)
+        };
 
-        public async Task<CheckStatusTicketOutput> Execute(int siteDbGroupId,
-            IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets, IList<string> logData)
+        var mappingTypes = new[]
         {
-            var criteria = new CheckTicketsAllowToVoidCriteria
-            {
-                SiteDbGroupId = siteDbGroupId,
-                SingleTicketsJson = JsonSerializer.Serialize(singleTickets),
-                ParlayTicketsJson = JsonSerializer.Serialize(parlayTickets)
-            };
+            typeof (RequestDetailTicketModel),
+            typeof (RequestDetailTicketModel),
+            typeof(RequestDetailTicketModel),
+            typeof(RequestDetailTicketModel),
+        };
 
-            var mappingTypes = new[]
-            {
-                typeof (RequestDetailTicketModel),
-                typeof (RequestDetailTicketModel),
-                typeof(RequestDetailTicketModel),
-                typeof(RequestDetailTicketModel),
-            };
+        var objectsArray = await repository.FetchMultipleAsync(criteria, mappingTypes);
 
-            var objectsArray = await repository.FetchMultipleAsync(criteria, mappingTypes);
+        var outputData = new CheckStatusTicketOutput
+        {
+            ValidVoidSingleTickets = objectsArray[0].Cast<RequestDetailTicketModel>(),
+            ValidVoidParlayTickets = objectsArray[1].Cast<RequestDetailTicketModel>(),
+            SingleTicketsResettle = objectsArray[2].Cast<RequestDetailTicketModel>(),
+            ParlayTicketsResettle = objectsArray[3].Cast<RequestDetailTicketModel>(),
+        };
 
-            var outputData = new CheckStatusTicketOutput
-            {
-                ValidVoidSingleTickets = objectsArray[0].Cast<RequestDetailTicketModel>(),
-                ValidVoidParlayTickets = objectsArray[1].Cast<RequestDetailTicketModel>(),
-                SingleTicketsResettle = objectsArray[2].Cast<RequestDetailTicketModel>(),
-                ParlayTicketsResettle = objectsArray[3].Cast<RequestDetailTicketModel>(),
-            };
+        logData.Add($"{nameof(CheckTicketAllowToVoidStage)} - VVSingle: {outputData.ValidVoidSingleTickets.Count()} - VVParlay: {outputData.ValidVoidParlayTickets.Count()} " +
+                    $"- SingleResettle: {outputData.SingleTicketsResettle.Count()} - ParlayResettle: {outputData.ParlayTicketsResettle.Count()}");
 
-            logData.Add($"{nameof(CheckTicketAllowToVoidStage)} - VVSingle: {outputData.ValidVoidSingleTickets.Count()} - VVParlay: {outputData.ValidVoidParlayTickets.Count()} " +
-                               $"- SingleResettle: {outputData.SingleTicketsResettle.Count()} - ParlayResettle: {outputData.ParlayTicketsResettle.Count()}");
-
-            return outputData;
-        }
+        return outputData;
     }
 }

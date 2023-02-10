@@ -5,89 +5,88 @@ using TVS.Void.Service.Constants;
 using TVS.Void.Service.Criteria;
 using TVS.Void.Service.Models;
 
-namespace TVS.Void.Service.Services
+namespace TVS.Void.Service.Services;
+
+public interface RequestDetailService
 {
-    public interface RequestDetailService
+    Task<IEnumerable<VoidingHistoryModel>> InsertVoidingHistory(string requestIds, int siteDbGroupId, string broadcastSessionId);
+
+    Task<AfterVoidServiceModel> InsertAfterVoidServiceData(bool isAutoVoid, AfterVoidServiceModel afterVoidData);
+
+    Task UpdateTicketVoidingHistory(int voidingHistoryId, int statusId);
+
+    Task<(IEnumerable<RequestModel>, IEnumerable<RequestDetail>)> GetRequestById(int requestId);
+
+    Task<VoidingHistoryModel> GetVoidDataOfVoidingHistory(int voidingHistoryId);
+}
+
+public class RequestDetailServiceImp : RequestDetailService
+{
+    private readonly IDynamicRepository repository;
+
+    public RequestDetailServiceImp(IDynamicRepository repository)
     {
-        Task<IEnumerable<VoidingHistoryModel>> InsertVoidingHistory(string requestIds, int siteDbGroupId, string broadcastSessionId);
-
-        Task<AfterVoidServiceModel> InsertAfterVoidServiceData(bool isAutoVoid, AfterVoidServiceModel afterVoidData);
-
-        Task UpdateTicketVoidingHistory(int voidingHistoryId, int statusId);
-
-        Task<(IEnumerable<RequestModel>, IEnumerable<RequestDetail>)> GetRequestById(int requestId);
-
-        Task<VoidingHistoryModel> GetVoidDataOfVoidingHistory(int voidingHistoryId);
+        this.repository = repository;
     }
 
-    public class RequestDetailServiceImp : RequestDetailService
+    public async Task<IEnumerable<VoidingHistoryModel>> InsertVoidingHistory(string requestIds, int siteDbGroupId, string broadcastSessionId)
     {
-        private readonly IDynamicRepository repository;
-
-        public RequestDetailServiceImp(IDynamicRepository repository)
+        var criteria = new InsertVoidingHistoryCriteria
         {
-            this.repository = repository;
-        }
+            RequestIds = requestIds,
+            UserId = AutoVoidConstant.ActorId,
+            SiteDbGroupId = siteDbGroupId,
+            BroadcastSessionId = broadcastSessionId
+        };
 
-        public async Task<IEnumerable<VoidingHistoryModel>> InsertVoidingHistory(string requestIds, int siteDbGroupId, string broadcastSessionId)
+        return await repository.FetchAsync<VoidingHistoryModel>(criteria);
+    }
+
+    public async Task<AfterVoidServiceModel> InsertAfterVoidServiceData(bool isAutoVoid, AfterVoidServiceModel afterVoidData)
+    {
+        var criteria = new InsertAfterVoidServiceDataCriteria
         {
-            var criteria = new InsertVoidingHistoryCriteria
-            {
-                RequestIds = requestIds,
-                UserId = AutoVoidConstant.ActorId,
-                SiteDbGroupId = siteDbGroupId,
-                BroadcastSessionId = broadcastSessionId
-            };
+            IsAutoVoid = isAutoVoid,
+            RequestId = afterVoidData.RequestId,
+            VoidingHistoryId = afterVoidData.VoidingHistoryId,
+            MatchId = afterVoidData.MatchId,
+            NegativeBalanceUsers = afterVoidData.NegativeBalanceUsers
+        };
 
-            return await repository.FetchAsync<VoidingHistoryModel>(criteria);
-        }
+        var result = await repository.GetAsync<AfterVoidServiceModel>(criteria);
+        return result;
+    }
 
-        public async Task<AfterVoidServiceModel> InsertAfterVoidServiceData(bool isAutoVoid, AfterVoidServiceModel afterVoidData)
+    public async Task UpdateTicketVoidingHistory(int voidingHistoryId, int statusId)
+    {
+        var command = new UpdateTicketVoidingHistoryCriteria
         {
-            var criteria = new InsertAfterVoidServiceDataCriteria
-            {
-                IsAutoVoid = isAutoVoid,
-                RequestId = afterVoidData.RequestId,
-                VoidingHistoryId = afterVoidData.VoidingHistoryId,
-                MatchId = afterVoidData.MatchId,
-                NegativeBalanceUsers = afterVoidData.NegativeBalanceUsers
-            };
+            VoidingHistoryId = voidingHistoryId,
+            StatusId = statusId,
+            ReasonId = null,
+            MessageId = null
+        };
 
-            var result = await repository.GetAsync<AfterVoidServiceModel>(criteria);
-            return result;
-        }
+        await repository.ExecuteAsync(command);
+    }
 
-        public async Task UpdateTicketVoidingHistory(int voidingHistoryId, int statusId)
+    public async Task<(IEnumerable<RequestModel>, IEnumerable<RequestDetail>)> GetRequestById(int requestId)
+    {
+        var criteria = new GetRequestCriteria
         {
-            var command = new UpdateTicketVoidingHistoryCriteria
-            {
-                VoidingHistoryId = voidingHistoryId,
-                StatusId = statusId,
-                ReasonId = null,
-                MessageId = null
-            };
+            RequestId = requestId
+        };
 
-            await repository.ExecuteAsync(command);
-        }
+        return await repository.FetchMultipleAsync<RequestModel, RequestDetail>(criteria);
+    }
 
-        public async Task<(IEnumerable<RequestModel>, IEnumerable<RequestDetail>)> GetRequestById(int requestId)
+    public async Task<VoidingHistoryModel> GetVoidDataOfVoidingHistory(int voidingHistoryId)
+    {
+        var criteria = new GetVoidDataOfVoidingHistoryCriteria
         {
-            var criteria = new GetRequestCriteria
-            {
-                RequestId = requestId
-            };
+            VoidingHistoryIds = voidingHistoryId.ToString()
+        };
 
-            return await repository.FetchMultipleAsync<RequestModel, RequestDetail>(criteria);
-        }
-
-        public async Task<VoidingHistoryModel> GetVoidDataOfVoidingHistory(int voidingHistoryId)
-        {
-            var criteria = new GetVoidDataOfVoidingHistoryCriteria
-            {
-                VoidingHistoryIds = voidingHistoryId.ToString()
-            };
-
-            return await repository.GetAsync<VoidingHistoryModel>(criteria);
-        }
+        return await repository.GetAsync<VoidingHistoryModel>(criteria);
     }
 }

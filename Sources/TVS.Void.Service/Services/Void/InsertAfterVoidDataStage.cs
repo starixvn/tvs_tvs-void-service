@@ -4,39 +4,38 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using TVS.Void.Service.Models;
 
-namespace TVS.Void.Service.Services.Void
+namespace TVS.Void.Service.Services.Void;
+
+public interface InsertAfterVoidDataStage
 {
-    public interface InsertAfterVoidDataStage
+    Task Execute(IEnumerable<TicketVoidingQueueModel> voidQueueResults, IList<string> logData);
+}
+
+public class InsertAfterVoidDataStageImp : InsertAfterVoidDataStage
+{
+    private readonly InsertAfterVoidDataPrivateService privateService;
+    private readonly RequestDetailService requestDetailService;
+
+    public InsertAfterVoidDataStageImp(RequestDetailService requestDetailService, InsertAfterVoidDataPrivateService privateService)
     {
-        Task Execute(IEnumerable<TicketVoidingQueueModel> voidQueueResults, IList<string> logData);
+        this.requestDetailService = requestDetailService;
+        this.privateService = privateService;
     }
 
-    public class InsertAfterVoidDataStageImp : InsertAfterVoidDataStage
+    public async Task Execute(IEnumerable<TicketVoidingQueueModel> voidQueueResults, IList<string> logData)
     {
-        private readonly InsertAfterVoidDataPrivateService privateService;
-        private readonly RequestDetailService requestDetailService;
-
-        public InsertAfterVoidDataStageImp(RequestDetailService requestDetailService, InsertAfterVoidDataPrivateService privateService)
+        var firstVoidQueue = voidQueueResults.First();
+        var (request, requestDetails) = await requestDetailService.GetRequestById(firstVoidQueue.RequestId);
+        var afterVoidData = new AfterVoidServiceModel
         {
-            this.requestDetailService = requestDetailService;
-            this.privateService = privateService;
-        }
+            RequestId = firstVoidQueue.RequestId,
+            VoidingHistoryId = firstVoidQueue.VoidingHistoryId,
+            MatchId = privateService.GetMatchIdForAfterVoid(firstVoidQueue.VoidingHistoryId, requestDetails, voidQueueResults),
+            NegativeBalanceUsers = privateService.CombineNegativeBalanceUsers(voidQueueResults)
+        };
 
-        public async Task Execute(IEnumerable<TicketVoidingQueueModel> voidQueueResults, IList<string> logData)
-        {
-            var firstVoidQueue = voidQueueResults.First();
-            var (request, requestDetails) = await requestDetailService.GetRequestById(firstVoidQueue.RequestId);
-            var afterVoidData = new AfterVoidServiceModel
-            {
-                RequestId = firstVoidQueue.RequestId,
-                VoidingHistoryId = firstVoidQueue.VoidingHistoryId,
-                MatchId = privateService.GetMatchIdForAfterVoid(firstVoidQueue.VoidingHistoryId, requestDetails, voidQueueResults),
-                NegativeBalanceUsers = privateService.CombineNegativeBalanceUsers(voidQueueResults)
-            };
-
-            var voidDataOfVoidingHistory = await requestDetailService.GetVoidDataOfVoidingHistory(firstVoidQueue.VoidingHistoryId);
-            var insertedAfterVoidData = await requestDetailService.InsertAfterVoidServiceData(privateService.IsAutoVoid(request.First(), voidDataOfVoidingHistory), afterVoidData);
-            logData.Add($"{nameof(RequestDetailService.InsertAfterVoidServiceData)}: {JsonSerializer.Serialize(insertedAfterVoidData)}");
-        }
+        var voidDataOfVoidingHistory = await requestDetailService.GetVoidDataOfVoidingHistory(firstVoidQueue.VoidingHistoryId);
+        var insertedAfterVoidData = await requestDetailService.InsertAfterVoidServiceData(privateService.IsAutoVoid(request.First(), voidDataOfVoidingHistory), afterVoidData);
+        logData.Add($"{nameof(RequestDetailService.InsertAfterVoidServiceData)}: {JsonSerializer.Serialize(insertedAfterVoidData)}");
     }
 }

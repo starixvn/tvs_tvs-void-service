@@ -4,47 +4,46 @@ using System.Threading.Tasks;
 using TicketVoidingSystem.Constants;
 using TVS.Void.Service.Models;
 
-namespace TVS.Void.Service.Services.ScanAutoVoidRequest
+namespace TVS.Void.Service.Services.ScanAutoVoidRequest;
+
+public interface GetTicketsStage
 {
-    public interface GetTicketsStage
+    Task<(bool IsContinueFlow, GetTicketsStageOutput OutputData)> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue, IList<string> logData);
+}
+
+public class GetTicketsStageImp : GetTicketsStage
+{
+    private readonly AutoVoidRequestQueueService autoVoidRequestQueueService;
+    private readonly RequestTicketService requestTicketService;
+
+    public GetTicketsStageImp(AutoVoidRequestQueueService autoVoidRequestQueueService, RequestTicketService requestTicketService)
     {
-        Task<(bool IsContinueFlow, GetTicketsStageOutput OutputData)> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue, IList<string> logData);
+        this.autoVoidRequestQueueService = autoVoidRequestQueueService;
+        this.requestTicketService = requestTicketService;
     }
 
-    public class GetTicketsStageImp : GetTicketsStage
+    public async Task<(bool, GetTicketsStageOutput)> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue, IList<string> logData)
     {
-        private readonly AutoVoidRequestQueueService autoVoidRequestQueueService;
-        private readonly RequestTicketService requestTicketService;
+        var (singleTickets, parlayTickets)
+            = await requestTicketService.GetTicketsByRequestsAndSiteDbGroupId(siteDbGroupId, queue.RequestIds);
+        logData.Add($"{nameof(GetTicketsStage)} - SingleCount: {singleTickets.Count()} - ParlayCount: {parlayTickets.Count()}");
 
-        public GetTicketsStageImp(AutoVoidRequestQueueService autoVoidRequestQueueService, RequestTicketService requestTicketService)
+        if (!singleTickets.Any() && !parlayTickets.Any())
         {
-            this.autoVoidRequestQueueService = autoVoidRequestQueueService;
-            this.requestTicketService = requestTicketService;
+            await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, ExecuteStatus.Done, "No ticket found.");
+            return (false, null);
         }
 
-        public async Task<(bool, GetTicketsStageOutput)> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue, IList<string> logData)
+        return (true, new GetTicketsStageOutput
         {
-            var (singleTickets, parlayTickets)
-                = await requestTicketService.GetTicketsByRequestsAndSiteDbGroupId(siteDbGroupId, queue.RequestIds);
-            logData.Add($"{nameof(GetTicketsStage)} - SingleCount: {singleTickets.Count()} - ParlayCount: {parlayTickets.Count()}");
-
-            if (!singleTickets.Any() && !parlayTickets.Any())
-            {
-                await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, ExecuteStatus.Done, "No ticket found.");
-                return (false, null);
-            }
-
-            return (true, new GetTicketsStageOutput
-            {
-                SingleTickets = singleTickets,
-                ParlayTickets = parlayTickets
-            });
-        }
+            SingleTickets = singleTickets,
+            ParlayTickets = parlayTickets
+        });
     }
+}
 
-    public class GetTicketsStageOutput
-    {
-        public IEnumerable<RequestDetailTicketModel> SingleTickets { get; set; }
-        public IEnumerable<RequestDetailTicketModel> ParlayTickets { get; set; }
-    }
+public class GetTicketsStageOutput
+{
+    public IEnumerable<RequestDetailTicketModel> SingleTickets { get; set; }
+    public IEnumerable<RequestDetailTicketModel> ParlayTickets { get; set; }
 }
