@@ -17,13 +17,9 @@
         <Setting Key="DBSIG.TicketVoiding_AutoVoidRequest_Queue_Insert" SpName="TicketVoiding_AutoVoidRequest_Queue_Insert" DbName="DBSIG.bodb02.bodbAdminNet" TimeOut="600" />
         <Setting Key="DBSIG2.TicketVoiding_AutoVoidRequest_Queue_Insert" SpName="TicketVoiding_AutoVoidRequest_Queue_Insert" DbName="DBSIG2.bodb02.bodbAdminNet" TimeOut="600" />
 
-        <Setting Key="DBCTG.Nap_SpecialDelete_MarkedTickets_Update" SpName="Nap_SpecialDelete_MarkedTickets_Update" DbName="DBCTG.bodb02.bodbAdminNet" TimeOut="600" />
-        <Setting Key="DBSIG.Nap_SpecialDelete_MarkedTickets_Update" SpName="Nap_SpecialDelete_MarkedTickets_Update" DbName="DBSIG.bodb02.bodbAdminNet" TimeOut="600" />
-        <Setting Key="DBSIG2.Nap_SpecialDelete_MarkedTickets_Update" SpName="Nap_SpecialDelete_MarkedTickets_Update" DbName="DBSIG2.bodb02.bodbAdminNet" TimeOut="600" />
-
-        <Setting Key="DBCTG.TicketVoiding_ReCalculate_Single_PreUpdate" SpName="TicketVoiding_ReCalculate_Single_PreUpdate" DbName="DBCTG.bodb02.bodbAdminNet" TimeOut="600" />
-        <Setting Key="DBSIG.TicketVoiding_ReCalculate_Single_PreUpdate" SpName="TicketVoiding_ReCalculate_Single_PreUpdate" DbName="DBSIG.bodb02.bodbAdminNet" TimeOut="600" />
-        <Setting Key="DBSIG2.TicketVoiding_ReCalculate_Single_PreUpdate" SpName="TicketVoiding_ReCalculate_Single_PreUpdate" DbName="DBSIG2.bodb02.bodbAdminNet" TimeOut="600" />
+        <Setting Key="DBCTG.TicketVoiding_Auto_Unmark_ReCalculate" SpName="TicketVoiding_Auto_Unmark_ReCalculate" DbName="DBCTG.bodb02.bodbAdminNet" TimeOut="600" />
+        <Setting Key="DBSIG.TicketVoiding_Auto_Unmark_ReCalculate" SpName="TicketVoiding_Auto_Unmark_ReCalculate" DbName="DBSIG.bodb02.bodbAdminNet" TimeOut="600" />
+        <Setting Key="DBSIG2.TicketVoiding_Auto_Unmark_ReCalculate" SpName="TicketVoiding_Auto_Unmark_ReCalculate" DbName="DBSIG2.bodb02.bodbAdminNet" TimeOut="600" />
 
         <Setting Key="DBCTG.TicketVoiding_Queue_Select" SpName="TicketVoiding_Queue_Select" DbName="DBCTG.bodb02.bodbAdminNet" TimeOut="600" />
         <Setting Key="DBSIG.TicketVoiding_Queue_Select" SpName="TicketVoiding_Queue_Select" DbName="DBSIG.bodb02.bodbAdminNet" TimeOut="600" />
