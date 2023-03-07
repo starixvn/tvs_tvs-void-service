@@ -15,8 +15,8 @@ public interface RequestTicketService
 
     Task<(IEnumerable<RequestDetailTicketModel>, IEnumerable<RequestDetailTicketModel>)> GetTicketInAllRequests();
 
-    Task<IEnumerable<RequestModel>> CheckStatusTicketForInsertAutoVoidQueue(int siteDbGroupId,
-        IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets);
+    Task<(IEnumerable<RequestModel> ValidRequests, IEnumerable<RequestDetailTicketModel> InvalidSingleTickets, IEnumerable<RequestDetailTicketModel> InvalidParlayTickets)>
+        CheckStatusTicketForInsertAutoVoidQueue(int siteDbGroupId, IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets);
 
     Task UpdateIsProcessed(IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets);
 }
@@ -53,8 +53,8 @@ public class RequestTicketServiceImp : RequestTicketService
         return (singleTickets, parlayTickets);
     }
 
-    public async Task<IEnumerable<RequestModel>> CheckStatusTicketForInsertAutoVoidQueue(int siteDbGroupId,
-        IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets)
+    public async Task<(IEnumerable<RequestModel> ValidRequests, IEnumerable<RequestDetailTicketModel> InvalidSingleTickets, IEnumerable<RequestDetailTicketModel> InvalidParlayTickets)>
+        CheckStatusTicketForInsertAutoVoidQueue(int siteDbGroupId, IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets)
     {
         var criteria = new CheckStatusTicketCriteria
         {
@@ -63,7 +63,7 @@ public class RequestTicketServiceImp : RequestTicketService
             ParlayTicketsJson = JsonSerializer.Serialize(parlayTickets)
         };
 
-        return await repository.FetchAsync<RequestModel>(criteria);
+        return await repository.FetchMultipleAsync<RequestModel, RequestDetailTicketModel, RequestDetailTicketModel>(criteria);
     }
 
     public async Task UpdateIsProcessed(IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets)

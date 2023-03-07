@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using TicketVoidingSystem.Constants;
 
@@ -49,8 +50,10 @@ public class CheckTicketStatusServiceImp : CheckTicketStatusService
                 var singleTicketsInServer = singleTickets.Where(x => x.SiteDbGroupId == server.Id);
                 var parlayTicketsInServer = parlayTickets.Where(x => x.SiteDbGroupId == server.Id);
 
-                var requestsList = await requestTicketService.CheckStatusTicketForInsertAutoVoidQueue(server.Id, singleTicketsInServer, parlayTicketsInServer);
-                await insertAutoVoidQueueStage.Execute(server.Id, requestsList, broadcastSessionId, logData);
+                var checkResult = await requestTicketService.CheckStatusTicketForInsertAutoVoidQueue(server.Id, singleTicketsInServer, parlayTicketsInServer);
+                await insertAutoVoidQueueStage.Execute(server.Id, checkResult.ValidRequests, broadcastSessionId, logData);
+                await requestTicketService.UpdateIsProcessed(checkResult.InvalidSingleTickets, checkResult.InvalidParlayTickets);
+                logData.Add($"[{server.Id}]{nameof(requestTicketService.CheckStatusTicketForInsertAutoVoidQueue)} - {JsonSerializer.Serialize(checkResult)}");
             }
 
             logData.Add($"ServerTime: {DateTime.Now:MM/dd/yyyy HH:mm:ss.fff}");

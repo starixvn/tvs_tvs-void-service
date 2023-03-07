@@ -44,7 +44,7 @@ public class ReCalculateTicketsStageImp : ReCalculateTicketsStage
 
                 var result = await ExecuteReCalculateTickets(siteDbGroupId, matchId, singleTransIdText);
                 logData.Add($"UnMarkAndReCalcSingle - MatchId:{matchId} - SingleTransId:{singleTransIdText} - Result:{JsonSerializer.Serialize(result)}");
-                await requestTicketService.UpdateIsProcessed(singleTicketsResettle, null);
+                await requestTicketService.UpdateIsProcessed(singleTicketsResettle, new List<RequestDetailTicketModel>());
                 logData.Add($"{nameof(RequestTicketService.UpdateIsProcessed)}-AfterUnmarkAndReCalcSingle-OK");
             }
         }
@@ -59,8 +59,8 @@ public class ReCalculateTicketsStageImp : ReCalculateTicketsStage
             var parlayTransIdText = string.Join(",", mainParlayTickets.Select(x => x.TransId));
 
             var result = await ExecuteReCalculateTickets(siteDbGroupId, mainParlayMatchId, parlayTransIdText);
-            logData.Add($"UnMarkAndReCalcMainParlay - MatchId:{mainParlayTickets} - MainParlayTransId:{parlayTransIdText} - Result:{JsonSerializer.Serialize(result)}");
-            await requestTicketService.UpdateIsProcessed(null, mainParlayTickets);
+            logData.Add($"UnMarkAndReCalcMainParlay - MatchId:{mainParlayMatchId} - MainParlayTransId:{parlayTransIdText} - Result:{JsonSerializer.Serialize(result)}");
+            await requestTicketService.UpdateIsProcessed(new List<RequestDetailTicketModel>(), mainParlayTickets);
             logData.Add($"{nameof(RequestTicketService.UpdateIsProcessed)}-AfterUnmarkAndReCalcMainParlay-OK");
         }
     }
