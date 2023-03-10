@@ -1,6 +1,5 @@
 ﻿using Fanex.Data.Repository;
 using NSubstitute;
-using TicketVoidingSystem.Models;
 using TVS.Void.Service.Criteria.MultiSiteDb;
 using TVS.Void.Service.Models;
 using TVS.Void.Service.Services;
@@ -27,7 +26,7 @@ public class ReCalculateTicketsStageImpTests
         await service.Execute(siteDbGroupId, singleTickets, parlayTickets, new List<string>());
 
         await repository.Received(1)
-            .FetchAsync<Result>(Arg.Is<UnMarkTicketsCriteria>(x => x.SiteDbGroupId == siteDbGroupId));
+            .FetchAsync<UnMarkReCalculateResult>(Arg.Is<UnMarkAndReCalculateTicketsCriteria>(x => x.SiteDbGroupId == siteDbGroupId));
     }
 
     [Fact]
@@ -47,6 +46,6 @@ public class ReCalculateTicketsStageImpTests
         await service.Execute(siteDbGroupId, singleTickets, parlayTickets, new List<string>());
 
         await repository.Received(1)
-            .FetchAsync<Result>(Arg.Is<UnMarkTicketsCriteria>(x => x.SiteDbGroupId == siteDbGroupId));
+           .FetchAsync<UnMarkReCalculateResult>(Arg.Is<UnMarkAndReCalculateTicketsCriteria>(x => x.SiteDbGroupId == siteDbGroupId));
     }
 }

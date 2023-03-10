@@ -17,7 +17,7 @@ public class CheckTicketStatusServiceImpTests
         var insertAutoVoidQueueStage = Substitute.For<InsertAutoVoidQueueStage>();
         var loggingService = Substitute.For<LoggingService>();
         requestTicketService.GetTicketInAllRequests().ReturnsForAnyArgs((new List<RequestDetailTicketModel>(), new List<RequestDetailTicketModel>()));
-        requestTicketService.CheckStatusTicketForInsertAutoVoidQueue(default, default, default).ReturnsForAnyArgs(fakeRequestsList);
+        requestTicketService.CheckStatusTicketForInsertAutoVoidQueue(default, default, default).ReturnsForAnyArgs((fakeRequestsList, default, default));
         var service = new CheckTicketStatusServiceImp(requestTicketService, insertAutoVoidQueueStage, loggingService);
 
         // Act
@@ -43,7 +43,7 @@ public class CheckTicketStatusServiceImpTests
         var insertAutoVoidQueueStage = Substitute.For<InsertAutoVoidQueueStage>();
         var loggingService = Substitute.For<LoggingService>();
         requestTicketService.GetTicketInAllRequests().ReturnsForAnyArgs((singleTickets, parlayTickets));
-        requestTicketService.CheckStatusTicketForInsertAutoVoidQueue(default, default, default).ReturnsForAnyArgs(fakeRequestsList);
+        requestTicketService.CheckStatusTicketForInsertAutoVoidQueue(default, default, default).ReturnsForAnyArgs((fakeRequestsList, default, default));
         var service = new CheckTicketStatusServiceImp(requestTicketService, insertAutoVoidQueueStage, loggingService);
 
         // Act

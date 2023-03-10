@@ -92,4 +92,22 @@ public class RequestDetailServiceImpTests
             (Arg.Is<GetRequestCriteria>(x => x.RequestId == requestId));
         Assert.StrictEqual((fakeRequests, fakeRequestsDetail), actual);
     }
+
+    [Fact]
+    public async Task GetVoidDataOfVoidingHistory_RepositoryHasCalled()
+    {
+        // Arrange
+        var voidingHistory = new VoidingHistoryModel();
+        var repository = Substitute.For<IDynamicRepository>();
+        repository.GetAsync<VoidingHistoryModel>(default).ReturnsForAnyArgs(voidingHistory);
+        var service = new RequestDetailServiceImp(repository);
+
+        // Act
+        var actual = await service.GetVoidDataOfVoidingHistory(1);
+
+        // Assert
+        await repository.Received(1).GetAsync<VoidingHistoryModel>
+        (Arg.Is<GetVoidDataOfVoidingHistoryCriteria>(x => x.VoidingHistoryIds == "1"));
+        Assert.StrictEqual(voidingHistory, actual);
+    }
 }

@@ -57,7 +57,8 @@ public class RequestTicketServiceImpTests
         // Arrange
         var fakeRequests = new List<RequestModel> { new() { RequestId = 112 } };
         var repository = Substitute.For<IDynamicRepository>();
-        repository.FetchAsync<RequestModel>(default).ReturnsForAnyArgs(fakeRequests);
+        repository.FetchMultipleAsync<RequestModel, RequestDetailTicketModel, RequestDetailTicketModel>(default)
+            .ReturnsForAnyArgs((fakeRequests, new List<RequestDetailTicketModel>(), new List<RequestDetailTicketModel>()));
         var service = new RequestTicketServiceImp(repository);
 
         // Act
@@ -65,9 +66,9 @@ public class RequestTicketServiceImpTests
             await service.CheckStatusTicketForInsertAutoVoidQueue(siteDbGroupId, singleTickets, parlayTickets);
 
         // Assert
-        await repository.Received(1).FetchAsync<RequestModel>
+        await repository.Received(1).FetchMultipleAsync<RequestModel, RequestDetailTicketModel, RequestDetailTicketModel>
             (Arg.Is<CheckStatusTicketCriteria>(x => x.SiteDbGroupId == siteDbGroupId));
-        Assert.StrictEqual(fakeRequests, actual);
+        Assert.StrictEqual(fakeRequests, actual.ValidRequests);
     }
 
     [Theory]
