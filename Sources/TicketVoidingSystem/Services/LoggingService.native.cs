@@ -6,7 +6,7 @@ using Fanex.Logging;
 using Fanex.Logging.Extensions;
 using Fanex.Logging.Extensions.Database;
 
-namespace TVS.Void.Service.Services;
+namespace TicketVoidingSystem.Services;
 
 public interface LoggingService
 {
