@@ -10,80 +10,79 @@ using Fanex.Logging;
 using Microsoft.Extensions.Configuration;
 using TicketVoidingSystem.Models;
 
-namespace TicketVoidingSystem.Services
+namespace TicketVoidingSystem.Services;
+
+public interface TicketVoidingSystemHttpClientService
 {
-    public interface TicketVoidingSystemHttpClientService
+    Task SignalRUpdateRequestStatusToAllUsers(IEnumerable<RequestStatus> status);
+
+    Task SignalRNotifyErrorMessageToUser(string userName, string message);
+
+    Task SignalRNotifyVoidResultToUser(string userName, IEnumerable<Result> results);
+}
+
+[ExcludeFromCodeCoverage]
+public class TicketVoidingSystemHttpClientServiceImp : TicketVoidingSystemHttpClientService
+{
+    private readonly HttpClient httpClient;
+    private readonly string ticketVoidingSystemUrl;
+
+    public TicketVoidingSystemHttpClientServiceImp(HttpClient client, IConfiguration configuration)
     {
-        Task SignalRUpdateRequestStatusToAllUsers(IEnumerable<RequestStatus> status);
-
-        Task SignalRNotifyErrorMessageToUser(string userName, string message);
-
-        Task SignalRNotifyVoidResultToUser(string userName, IEnumerable<Result> results);
+        ticketVoidingSystemUrl = configuration.GetSection("TicketVoidingSystemUrl").Value;
+        httpClient = client;
+        httpClient.BaseAddress = new Uri(ticketVoidingSystemUrl);
+        httpClient.Timeout = TimeSpan.FromMinutes(5);
+        httpClient.DefaultRequestHeaders.Clear();
+        httpClient.DefaultRequestHeaders.Add("Accept", MediaTypeNames.Application.Json);
     }
 
-    [ExcludeFromCodeCoverage]
-    public class TicketVoidingSystemHttpClientServiceImp : TicketVoidingSystemHttpClientService
+    public async Task SignalRUpdateRequestStatusToAllUsers(IEnumerable<RequestStatus> status)
     {
-        private readonly HttpClient httpClient;
-        private readonly string ticketVoidingSystemUrl;
-
-        public TicketVoidingSystemHttpClientServiceImp(HttpClient client, IConfiguration configuration)
+        const string actionName = "SignalRApi/UpdateRequestStatusToAllUsers";
+        using var response = await httpClient.PostAsync(actionName, CreateRequestStringContent(new { status }));
+        if (response.IsSuccessStatusCode)
         {
-            ticketVoidingSystemUrl = configuration.GetSection("TicketVoidingSystemUrl").Value;
-            httpClient = client;
-            httpClient.BaseAddress = new Uri(ticketVoidingSystemUrl);
-            httpClient.Timeout = TimeSpan.FromMinutes(5);
-            httpClient.DefaultRequestHeaders.Clear();
-            httpClient.DefaultRequestHeaders.Add("Accept", MediaTypeNames.Application.Json);
+            return;
         }
 
-        public async Task SignalRUpdateRequestStatusToAllUsers(IEnumerable<RequestStatus> status)
-        {
-            const string actionName = "SignalRApi/UpdateRequestStatusToAllUsers";
-            using var response = await httpClient.PostAsync(actionName, CreateRequestStringContent(new { status }));
-            if (response.IsSuccessStatusCode)
-            {
-                return;
-            }
+        await LogService.ErrorAsync($"{ticketVoidingSystemUrl}{actionName}" +
+                                    $"{Environment.NewLine}Response:{Environment.NewLine}{response}");
+    }
 
-            await LogService.ErrorAsync($"{ticketVoidingSystemUrl}{actionName}" +
-                             $"{Environment.NewLine}Response:{Environment.NewLine}{response}");
+    public async Task SignalRNotifyErrorMessageToUser(string userName, string message)
+    {
+        const string actionName = "SignalRApi/NotifyErrorMessageToUser";
+        using var response = await httpClient.PostAsync(actionName, CreateRequestStringContent(new { userName, message }));
+        if (response.IsSuccessStatusCode)
+        {
+            return;
         }
 
-        public async Task SignalRNotifyErrorMessageToUser(string userName, string message)
-        {
-            const string actionName = "SignalRApi/NotifyErrorMessageToUser";
-            using var response = await httpClient.PostAsync(actionName, CreateRequestStringContent(new { userName, message }));
-            if (response.IsSuccessStatusCode)
-            {
-                return;
-            }
+        await LogService.ErrorAsync($"{ticketVoidingSystemUrl}{actionName}" +
+                                    $"{Environment.NewLine}Response:{Environment.NewLine}{response}");
+    }
 
-            await LogService.ErrorAsync($"{ticketVoidingSystemUrl}{actionName}" +
-                                        $"{Environment.NewLine}Response:{Environment.NewLine}{response}");
+    public async Task SignalRNotifyVoidResultToUser(string userName, IEnumerable<Result> results)
+    {
+        const string actionName = "SignalRApi/NotifyVoidResultToUser";
+        using var response = await httpClient.PostAsync(actionName, CreateRequestStringContent(new { userName, results }));
+        if (response.IsSuccessStatusCode)
+        {
+            return;
         }
 
-        public async Task SignalRNotifyVoidResultToUser(string userName, IEnumerable<Result> results)
-        {
-            const string actionName = "SignalRApi/NotifyVoidResultToUser";
-            using var response = await httpClient.PostAsync(actionName, CreateRequestStringContent(new { userName, results }));
-            if (response.IsSuccessStatusCode)
-            {
-                return;
-            }
+        await LogService.ErrorAsync($"{ticketVoidingSystemUrl}{actionName}" +
+                                    $"{Environment.NewLine}Response:{Environment.NewLine}{response}");
+    }
 
-            await LogService.ErrorAsync($"{ticketVoidingSystemUrl}{actionName}" +
-                                        $"{Environment.NewLine}Response:{Environment.NewLine}{response}");
-        }
+    private static StringContent CreateRequestStringContent<T>(T data)
+    {
+        var dataJson = new StringContent(
+            JsonSerializer.Serialize(data, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }),
+            Encoding.UTF8,
+            MediaTypeNames.Application.Json);
 
-        private static StringContent CreateRequestStringContent<T>(T data)
-        {
-            var dataJson = new StringContent(
-                JsonSerializer.Serialize(data, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }),
-                Encoding.UTF8,
-                MediaTypeNames.Application.Json);
-
-            return dataJson;
-        }
+        return dataJson;
     }
 }

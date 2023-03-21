@@ -3,77 +3,67 @@ using Fanex.Data.Repository;
 using TVS.Void.Service.Criteria.MultiSiteDb;
 using TVS.Void.Service.Models;
 
-namespace TVS.Void.Service.Services
+namespace TVS.Void.Service.Services;
+
+public interface AutoVoidRequestQueueService
 {
-    public interface AutoVoidRequestQueueService
+    Task<AutoVoidRequestQueueModel> GetQueue(int siteDbGroupId);
+
+    Task UpdateQueue(int siteDbGroupId, int queueId, int? statusId, string errorMessage);
+
+    Task InsertQueue(int siteDbGroupId, string broadcastSessionId, string requestIds, int statusId, string action, int? matchId);
+}
+
+public class AutoVoidRequestQueueServiceImp : AutoVoidRequestQueueService
+{
+    private readonly IDynamicRepository repository;
+
+    public AutoVoidRequestQueueServiceImp(IDynamicRepository repository)
     {
-        Task<AutoVoidRequestQueueModel> GetQueue(int siteDbGroupId, string broadcastSessionId);
-
-        Task UpdateQueue(int siteDbGroupId, int queueId, string broadcastSessionId, int? statusId, bool? isUpdateStartTime, string errorMessage);
-
-        Task InsertQueue(int siteDbGroupId, string broadcastSessionId, int requestId, int matchId, int statusId, string action);
+        this.repository = repository;
     }
 
-    public class AutoVoidRequestQueueServiceImp : AutoVoidRequestQueueService
+    public async Task<AutoVoidRequestQueueModel> GetQueue(int siteDbGroupId)
     {
-        private readonly IDynamicRepository repository;
-
-        public AutoVoidRequestQueueServiceImp(IDynamicRepository repository)
+        var criteria = new GetAutoVoidRequestQueueCriteria
         {
-            this.repository = repository;
+            SiteDbGroupId = siteDbGroupId,
+        };
+
+        var result = await repository.GetAsync<AutoVoidRequestQueueModel>(criteria);
+        if (result != null)
+        {
+            result.SiteDbGroupId = siteDbGroupId;
         }
 
-        /// <summary>
-        /// If broadcastSessionId == null, only get valid queue
-        /// </summary>
-        /// <param name="siteDbGroupId"></param>
-        /// <param name="broadcastSessionId"></param>
-        /// <returns></returns>
-        public async Task<AutoVoidRequestQueueModel> GetQueue(int siteDbGroupId, string broadcastSessionId)
+        return result;
+    }
+
+    public async Task UpdateQueue(int siteDbGroupId, int queueId, int? statusId, string errorMessage)
+    {
+        var criteria = new UpdateAutoVoidRequestQueueCriteria
         {
-            var criteria = new GetAutoVoidRequestQueueCriteria
-            {
-                SiteDbGroupId = siteDbGroupId,
-                BroadcastSessionId = broadcastSessionId
-            };
+            SiteDbGroupId = siteDbGroupId,
+            QueueId = queueId,
+            StatusId = statusId,
+            ErrMsg = errorMessage
+        };
 
-            var result = await repository.GetAsync<AutoVoidRequestQueueModel>(criteria);
-            if (result != null)
-            {
-                result.SiteDbGroupId = siteDbGroupId;
-            }
+        await repository.ExecuteAsync(criteria);
+    }
 
-            return result;
-        }
-
-        public async Task UpdateQueue(int siteDbGroupId, int queueId, string broadcastSessionId, int? statusId, bool? isUpdateStartTime, string errorMessage)
+    public async Task InsertQueue(int siteDbGroupId, string broadcastSessionId, string requestIds, int statusId, string action, int? matchId)
+    {
+        var criteria = new InsertAutoVoidRequestQueueCriteria
         {
-            var criteria = new UpdateAutoVoidRequestQueueCriteria
-            {
-                SiteDbGroupId = siteDbGroupId,
-                QueueId = queueId,
-                BroadcastSessionId = broadcastSessionId,
-                StatusId = statusId,
-                IsUpdateStartTime = isUpdateStartTime,
-                ErrMsg = errorMessage
-            };
+            SiteDbGroupId = siteDbGroupId,
+            BroadcastSessionId = broadcastSessionId,
+            RequestIds = requestIds,
+            StatusId = statusId,
+            Action = action,
+            MatchId = matchId
+        };
 
-            await repository.ExecuteAsync(criteria);
-        }
-
-        public async Task InsertQueue(int siteDbGroupId, string broadcastSessionId, int requestId, int matchId, int statusId, string action)
-        {
-            var criteria = new InsertAutoVoidRequestQueueCriteria
-            {
-                SiteDbGroupId = siteDbGroupId,
-                BroadcastSessionId = broadcastSessionId,
-                RequestId = requestId,
-                MatchId = matchId,
-                StatusId = statusId,
-                Action = action
-            };
-
-            await repository.ExecuteAsync(criteria);
-        }
+        await repository.ExecuteAsync(criteria);
     }
 }

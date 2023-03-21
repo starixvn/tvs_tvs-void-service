@@ -1,9 +1,10 @@
-﻿using TVS.Void.Service.Models;
+﻿using System.Diagnostics.CodeAnalysis;
+using TVS.Void.Service.Models;
 
-namespace TVS.Void.Service.Services
+namespace TVS.Void.Service.Services;
+
+[ExcludeFromCodeCoverage]
+public static class AppConfigService
 {
-    public static class AppConfigService
-    {
-        public static ConfigSettingModel AppConfig { get; set; }
-    }
+    public static ConfigSettingModel AppConfig { get; set; }
 }

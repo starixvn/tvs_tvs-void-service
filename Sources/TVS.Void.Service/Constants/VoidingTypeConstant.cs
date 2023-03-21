@@ -1,8 +1,7 @@
-﻿namespace TVS.Void.Service.Constants
+﻿namespace TVS.Void.Service.Constants;
+
+public static class VoidingTypeConstant
 {
-    public static class VoidingTypeConstant
-    {
-        public const byte Single = 1;
-        public const byte Parlay = 2;
-    }
+    public const byte Single = 1;
+    public const byte Parlay = 2;
 }
