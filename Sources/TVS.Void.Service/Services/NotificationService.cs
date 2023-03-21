@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using TicketVoidingSystem.Constants;
 using TicketVoidingSystem.Models;
 using TicketVoidingSystem.Services;
 using TicketVoidingSystem.SignalR;
+using TVS.Void.Service.Constants;
 using TVS.Void.Service.Models;
 
 namespace TVS.Void.Service.Services;
@@ -15,7 +17,7 @@ public interface NotificationService
 {
     Task NotifyRequestRunningToAllUser(IEnumerable<VoidingHistoryModel> voidingHistoryList);
 
-    Task NotifyVoidFailedToUser(int requestId, IEnumerable<TicketVoidingQueueModel> voidQueueResults);
+    Task NotifyVoidFailedToUser(int requestId, IList<TicketVoidingQueueModel> voidQueueResults);
 
     Task NotifyRequestFailedToAllUser(int requestId);
 }
@@ -48,14 +50,19 @@ public class NotificationServiceImp : NotificationService
         }
     }
 
-    public async Task NotifyVoidFailedToUser(int requestId, IEnumerable<TicketVoidingQueueModel> voidQueueResults)
+    public async Task NotifyVoidFailedToUser(int requestId, IList<TicketVoidingQueueModel> voidQueueResults)
     {
         try
         {
+            var notifyMessage = new StringBuilder();
             var voidResultHasUserInfo = voidQueueResults.First(x => !string.IsNullOrWhiteSpace(x.UserName));
-            var errorMessage = $"Failed to void Request ID: {requestId}, please contact IT for support. (Error: VOID_SERVICE)";
-            await ticketVoidingSystemHttpClientService.SignalRNotifyErrorMessageToUser(voidResultHasUserInfo.UserName, errorMessage);
-            await hubContext.Clients.User(voidResultHasUserInfo.UserName).showErrorMessage(errorMessage);
+            notifyMessage.AppendLine($"Failed to void Request ID: {requestId}, please contact IT for support. (Error: VOID_SERVICE)");
+            if (voidQueueResults.Any(x => x.VoidingTypeId == VoidingTypeConstant.Cricket && x.StatusId == ExecuteStatus.Failed))
+            {
+                notifyMessage.AppendLine(Messages.FailedApiVoidCricket);
+            }
+            await ticketVoidingSystemHttpClientService.SignalRNotifyErrorMessageToUser(voidResultHasUserInfo.UserName, notifyMessage.ToString());
+            await hubContext.Clients.User(voidResultHasUserInfo.UserName).showErrorMessage(notifyMessage.ToString());
         }
         catch (Exception e)
         {

@@ -8,6 +8,7 @@ public class CheckStatusTicketCriteria : CriteriaBase
 {
     public string SingleTicketsJson { get; set; }
     public string ParlayTicketsJson { get; set; }
+    public string CricketTicketsJson { get; set; }
 
     [SpParam(Ignored = true)]
     public int SiteDbGroupId { get; set; }

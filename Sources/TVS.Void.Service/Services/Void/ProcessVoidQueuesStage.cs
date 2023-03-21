@@ -1,25 +1,28 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using TicketVoidingSystem.Constants;
+using TVS.Void.Service.Constants;
 using TVS.Void.Service.Models;
 
 namespace TVS.Void.Service.Services.Void;
 
 public interface ProcessVoidQueuesStage
 {
-    Task<IEnumerable<TicketVoidingQueueModel>> Execute(int siteDbGroupId, IEnumerable<TicketVoidingQueueModel> voidingQueues);
+    Task<IList<TicketVoidingQueueModel>> Execute(int siteDbGroupId, IEnumerable<TicketVoidingQueueModel> voidingQueues);
 }
 
 public class ProcessVoidQueuesStageImp : ProcessVoidQueuesStage
 {
     private readonly TicketVoidingQueueService ticketVoidingQueueService;
+    private readonly NetPositionService netPositionService;
 
-    public ProcessVoidQueuesStageImp(TicketVoidingQueueService ticketVoidingQueueService)
+    public ProcessVoidQueuesStageImp(TicketVoidingQueueService ticketVoidingQueueService, NetPositionService netPositionService)
     {
         this.ticketVoidingQueueService = ticketVoidingQueueService;
+        this.netPositionService = netPositionService;
     }
 
-    public async Task<IEnumerable<TicketVoidingQueueModel>> Execute(int siteDbGroupId, IEnumerable<TicketVoidingQueueModel> voidingQueues)
+    public async Task<IList<TicketVoidingQueueModel>> Execute(int siteDbGroupId, IEnumerable<TicketVoidingQueueModel> voidingQueues)
     {
         var processResult = new List<TicketVoidingQueueModel>();
         foreach (var queue in voidingQueues)
@@ -30,10 +33,29 @@ public class ProcessVoidQueuesStageImp : ProcessVoidQueuesStage
                 continue;
             }
 
-            var voidResult = await ticketVoidingQueueService.ProcessVoidQueue(siteDbGroupId, queue.QueueId);
+            var voidResult = await ExecuteSingleQueue(siteDbGroupId, queue);
+
             processResult.Add(voidResult);
         }
 
         return processResult;
+    }
+
+    public async Task<TicketVoidingQueueModel> ExecuteSingleQueue(int siteDbGroupId, TicketVoidingQueueModel queue)
+    {
+        if (queue.VoidingTypeId != VoidingTypeConstant.Cricket)
+        {
+            return await ticketVoidingQueueService.ProcessVoidQueue(siteDbGroupId, queue.QueueId, null);
+        }
+
+        var isCalledNetPosition = await netPositionService.UpdateNetPosition(queue.TransIds, ActionApiType.Void, AutoVoidConstant.ActorId);
+        var voidResult = await ticketVoidingQueueService.ProcessVoidQueue(siteDbGroupId, queue.QueueId, isCalledNetPosition);
+
+        if (voidResult.StatusId == ExecuteStatus.Failed && isCalledNetPosition)
+        {
+            await netPositionService.RollBackNetPosition(queue.TransIds, ActionApiType.Void, voidResult.ErrorMsg, AutoVoidConstant.ActorId);
+        }
+
+        return voidResult;
     }
 }

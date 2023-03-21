@@ -7,6 +7,7 @@ namespace TVS.Void.Service.Criteria.MultiSiteDb;
 public class ProcessVoidQueueCriteria : CriteriaBase
 {
     public int QueueId { get; set; }
+    public bool? IsCalledNetPosition { get; set; }
 
     [SpParam(Ignored = true)]
     public int SiteDbGroupId { get; set; }

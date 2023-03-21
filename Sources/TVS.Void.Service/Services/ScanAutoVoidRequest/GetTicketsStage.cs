@@ -24,7 +24,7 @@ public class GetTicketsStageImp : GetTicketsStage
 
     public async Task<(bool, GetTicketsStageOutput)> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue, IList<string> logData)
     {
-        var (singleTickets, parlayTickets)
+        var (singleTickets, parlayTickets, cricketTickets)
             = await requestTicketService.GetTicketsByRequestsAndSiteDbGroupId(siteDbGroupId, queue.RequestIds);
         logData.Add($"{nameof(GetTicketsStage)} - SingleCount: {singleTickets.Count()} - ParlayCount: {parlayTickets.Count()}");
 
@@ -37,7 +37,8 @@ public class GetTicketsStageImp : GetTicketsStage
         return (true, new GetTicketsStageOutput
         {
             SingleTickets = singleTickets,
-            ParlayTickets = parlayTickets
+            ParlayTickets = parlayTickets,
+            CricketTickets = cricketTickets,
         });
     }
 }
@@ -46,4 +47,5 @@ public class GetTicketsStageOutput
 {
     public IEnumerable<RequestDetailTicketModel> SingleTickets { get; set; }
     public IEnumerable<RequestDetailTicketModel> ParlayTickets { get; set; }
+    public IEnumerable<RequestDetailTicketModel> CricketTickets { get; set; }
 }

@@ -41,19 +41,22 @@ public class CheckTicketStatusServiceImp : CheckTicketStatusService
 
     private async Task ExecuteNormalFlow(IList<string> logData)
     {
-        var (singleTickets, parlayTickets) = await requestTicketService.GetTicketInAllRequests();
+        var (singleTickets, parlayTickets, cricketTickets) = await requestTicketService.GetTicketInAllRequests();
         if (singleTickets.Any() || parlayTickets.Any())
         {
-            logData.Add($"{nameof(CheckTicketStatusService)} - {nameof(singleTickets)}.Count: {singleTickets.Count()} - {nameof(parlayTickets)}.Count: {parlayTickets.Count()}");
+            logData.Add(
+                $"{nameof(CheckTicketStatusService)} - {nameof(singleTickets)}.Count: {singleTickets.Count()} - "
+                + $"{nameof(parlayTickets)}.Count: {parlayTickets.Count()} - {nameof(cricketTickets)}.Count: {cricketTickets.Count()}");
             var broadcastSessionId = Guid.NewGuid().ToString();
             foreach (var server in SiteDbGroupConstant.ServerList)
             {
                 var singleTicketsInServer = singleTickets.Where(x => x.SiteDbGroupId == server.Id);
                 var parlayTicketsInServer = parlayTickets.Where(x => x.SiteDbGroupId == server.Id);
+                var cricketTicketsInServer = cricketTickets.Where(x => x.SiteDbGroupId == server.Id);
 
-                var checkResult = await requestTicketService.CheckStatusTicketForInsertAutoVoidQueue(server.Id, singleTicketsInServer, parlayTicketsInServer);
+                var checkResult = await requestTicketService.CheckStatusTicketForInsertAutoVoidQueue(server.Id, singleTicketsInServer, parlayTicketsInServer, cricketTicketsInServer);
                 await insertAutoVoidQueueStage.Execute(server.Id, checkResult.ValidRequests, broadcastSessionId, logData);
-                await requestTicketService.UpdateIsProcessed(checkResult.InvalidSingleTickets, checkResult.InvalidParlayTickets);
+                await requestTicketService.UpdateIsProcessed(checkResult.InvalidSingleTickets, checkResult.InvalidParlayTickets, checkResult.InvalidCricketTickets);
                 logData.Add($"[{server.Id}]{nameof(requestTicketService.CheckStatusTicketForInsertAutoVoidQueue)} - {JsonSerializer.Serialize(checkResult)}");
             }
 
