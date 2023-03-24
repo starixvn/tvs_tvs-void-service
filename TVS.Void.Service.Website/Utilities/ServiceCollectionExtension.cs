@@ -102,7 +102,7 @@ public static class ServiceCollectionExtension
         services.AddSingleton<IDynamicRepository, DynamicRepository>();
 
         services.AddSingleton<LoggingService, LoggingServiceImp>();
-        services.AddSingleton<ApiService, ApiServiceImp>();
+        services.AddSingleton<NetPositionHttpClientService, NetPositionHttpClientServiceImp>();
         services.AddSingleton<AutoVoidRequestQueueService, AutoVoidRequestQueueServiceImp>();
         services.AddSingleton<RequestDetailService, RequestDetailServiceImp>();
         services.AddSingleton<TicketVoidingQueueService, TicketVoidingQueueServiceImp>();

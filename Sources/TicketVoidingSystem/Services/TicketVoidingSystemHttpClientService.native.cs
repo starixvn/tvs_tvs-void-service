@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
 using System.Net.Mime;
-using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
 using Fanex.Logging;
 using TicketVoidingSystem.Models;
+using TicketVoidingSystem.Utilities;
 
 namespace TicketVoidingSystem.Services;
 
@@ -39,7 +38,7 @@ public class TicketVoidingSystemHttpClientServiceImp : TicketVoidingSystemHttpCl
     public async Task SignalRUpdateRequestStatusToAllUsers(IEnumerable<RequestStatus> status)
     {
         const string actionName = "SignalRApi/UpdateRequestStatusToAllUsers";
-        using var response = await httpClient.PostAsync(actionName, CreateRequestStringContent(new { status }));
+        using var response = await httpClient.PostAsync(actionName, Helper.CreateRequestStringContent(new { status }));
         if (response.IsSuccessStatusCode)
         {
             return;
@@ -52,7 +51,7 @@ public class TicketVoidingSystemHttpClientServiceImp : TicketVoidingSystemHttpCl
     public async Task SignalRNotifyErrorMessageToUser(string userName, string message)
     {
         const string actionName = "SignalRApi/NotifyErrorMessageToUser";
-        using var response = await httpClient.PostAsync(actionName, CreateRequestStringContent(new { userName, message }));
+        using var response = await httpClient.PostAsync(actionName, Helper.CreateRequestStringContent(new { userName, message }));
         if (response.IsSuccessStatusCode)
         {
             return;
@@ -65,7 +64,7 @@ public class TicketVoidingSystemHttpClientServiceImp : TicketVoidingSystemHttpCl
     public async Task SignalRNotifyVoidResultToUser(string userName, IEnumerable<Result> results)
     {
         const string actionName = "SignalRApi/NotifyVoidResultToUser";
-        using var response = await httpClient.PostAsync(actionName, CreateRequestStringContent(new { userName, results }));
+        using var response = await httpClient.PostAsync(actionName, Helper.CreateRequestStringContent(new { userName, results }));
         if (response.IsSuccessStatusCode)
         {
             return;
@@ -73,15 +72,5 @@ public class TicketVoidingSystemHttpClientServiceImp : TicketVoidingSystemHttpCl
 
         await LogService.ErrorAsync($"{ticketVoidingSystemUrl}{actionName}" +
                                     $"{Environment.NewLine}Response:{Environment.NewLine}{response}");
-    }
-
-    private static StringContent CreateRequestStringContent<T>(T data)
-    {
-        var dataJson = new StringContent(
-            JsonSerializer.Serialize(data, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }),
-            Encoding.UTF8,
-            MediaTypeNames.Application.Json);
-
-        return dataJson;
     }
 }

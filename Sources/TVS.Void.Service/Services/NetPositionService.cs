@@ -16,12 +16,12 @@ public interface NetPositionService
 
 public class NetPositionServiceImp : NetPositionService
 {
-    private readonly ApiService apiService;
+    private readonly NetPositionHttpClientService netPositionHttpClientService;
     private readonly IDynamicRepository repository;
 
-    public NetPositionServiceImp(ApiService apiService, IDynamicRepository repository)
+    public NetPositionServiceImp(NetPositionHttpClientService netPositionHttpClientService, IDynamicRepository repository)
     {
-        this.apiService = apiService;
+        this.netPositionHttpClientService = netPositionHttpClientService;
         this.repository = repository;
     }
 
@@ -46,7 +46,7 @@ public class NetPositionServiceImp : NetPositionService
     private async Task<bool> ExecuteNetPosition(UpdateNetPositionLogCommand command)
     {
         command.StartTime = DateTime.Now;
-        var result = await apiService.ExecuteNetPositionApi(command.TransIds, command.Action);
+        var result = await netPositionHttpClientService.PostRequest(command.TransIds, command.Action);
         command.EndTime = DateTime.Now;
 
         if (result.IsSuccessful)
