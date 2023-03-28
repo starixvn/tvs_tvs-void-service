@@ -26,16 +26,17 @@ public class InsertAfterVoidDataStageImp : InsertAfterVoidDataStage
     {
         var firstVoidQueue = voidQueueResults.First();
         var (request, requestDetails) = await requestDetailService.GetRequestById(firstVoidQueue.RequestId);
+        var firstRequest = request.First();
         var afterVoidData = new AfterVoidServiceModel
         {
             RequestId = firstVoidQueue.RequestId,
             VoidingHistoryId = firstVoidQueue.VoidingHistoryId,
-            MatchId = privateService.GetMatchIdForAfterVoid(firstVoidQueue.VoidingHistoryId, requestDetails, voidQueueResults),
+            MatchId = privateService.GetMatchIdForAfterVoid(firstRequest.IssueTypeId, requestDetails, voidQueueResults),
             NegativeBalanceUsers = privateService.CombineNegativeBalanceUsers(voidQueueResults)
         };
 
         var voidDataOfVoidingHistory = await requestDetailService.GetVoidDataOfVoidingHistory(firstVoidQueue.VoidingHistoryId);
-        var insertedAfterVoidData = await requestDetailService.InsertAfterVoidServiceData(privateService.IsAutoVoid(request.First(), voidDataOfVoidingHistory), afterVoidData);
+        var insertedAfterVoidData = await requestDetailService.InsertAfterVoidServiceData(privateService.IsAutoVoid(firstRequest, voidDataOfVoidingHistory), afterVoidData);
         logData.Add($"{nameof(RequestDetailService.InsertAfterVoidServiceData)}: {JsonSerializer.Serialize(insertedAfterVoidData)}");
     }
 }
