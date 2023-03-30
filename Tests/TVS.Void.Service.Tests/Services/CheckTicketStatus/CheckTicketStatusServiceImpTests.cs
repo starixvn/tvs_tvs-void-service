@@ -17,8 +17,15 @@ public class CheckTicketStatusServiceImpTests
         var requestTicketService = Substitute.For<RequestTicketService>();
         var insertAutoVoidQueueStage = Substitute.For<InsertAutoVoidQueueStage>();
         var loggingService = Substitute.For<LoggingService>();
-        requestTicketService.GetTicketInAllRequests().ReturnsForAnyArgs((new List<RequestDetailTicketModel>(), new List<RequestDetailTicketModel>()));
-        requestTicketService.CheckStatusTicketForInsertAutoVoidQueue(default, default, default).ReturnsForAnyArgs((fakeRequestsList, default, default));
+        var output = new CheckStatusTicketInsertAutoVoidQueueOutput
+        {
+            ValidRequests = fakeRequestsList,
+            InvalidCricketTickets = new List<RequestDetailTicketModel>(),
+            InvalidParlayTickets = new List<RequestDetailTicketModel>(),
+            InvalidSingleTickets = new List<RequestDetailTicketModel>(),
+        };
+        requestTicketService.GetTicketInAllRequests().ReturnsForAnyArgs((new List<RequestDetailTicketModel>(), new List<RequestDetailTicketModel>(), new List<RequestDetailTicketModel>()));
+        requestTicketService.CheckStatusTicketForInsertAutoVoidQueue(default, default, default, default).ReturnsForAnyArgs(output);
         var service = new CheckTicketStatusServiceImp(requestTicketService, insertAutoVoidQueueStage, loggingService);
 
         // Act
@@ -26,7 +33,7 @@ public class CheckTicketStatusServiceImpTests
 
         // Assert
         await requestTicketService.Received(1).GetTicketInAllRequests();
-        await requestTicketService.DidNotReceiveWithAnyArgs().CheckStatusTicketForInsertAutoVoidQueue(Arg.Any<int>(), Arg.Any<IEnumerable<RequestDetailTicketModel>>(), Arg.Any<IEnumerable<RequestDetailTicketModel>>());
+        await requestTicketService.DidNotReceiveWithAnyArgs().CheckStatusTicketForInsertAutoVoidQueue(default, default, default);
         await insertAutoVoidQueueStage.DidNotReceiveWithAnyArgs()
             .Execute(Arg.Any<int>(), Arg.Any<IEnumerable<RequestModel>>(),
                 Arg.Any<string>(), Arg.Any<List<string>>());

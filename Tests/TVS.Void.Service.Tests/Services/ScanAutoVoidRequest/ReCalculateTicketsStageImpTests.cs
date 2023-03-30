@@ -23,7 +23,7 @@ public class ReCalculateTicketsStageImpTests
 
         var service = new ReCalculateTicketsStageImp(repository, requestTicketService);
 
-        await service.Execute(siteDbGroupId, singleTickets, parlayTickets, new List<string>());
+        await service.Execute(siteDbGroupId, singleTickets, parlayTickets, new List<RequestDetailTicketModel>(), new List<string>());
 
         await repository.Received(1)
             .FetchAsync<UnMarkReCalculateResult>(Arg.Is<UnMarkAndReCalculateTicketsCriteria>(x => x.SiteDbGroupId == siteDbGroupId));
@@ -43,7 +43,7 @@ public class ReCalculateTicketsStageImpTests
 
         var service = new ReCalculateTicketsStageImp(repository, requestTicketService);
 
-        await service.Execute(siteDbGroupId, singleTickets, parlayTickets, new List<string>());
+        await service.Execute(siteDbGroupId, singleTickets, parlayTickets, new List<RequestDetailTicketModel>(), new List<string>());
 
         await repository.Received(1)
            .FetchAsync<UnMarkReCalculateResult>(Arg.Is<UnMarkAndReCalculateTicketsCriteria>(x => x.SiteDbGroupId == siteDbGroupId));
