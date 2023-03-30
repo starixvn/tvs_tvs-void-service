@@ -3,7 +3,6 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Fanex.Data.Repository;
-using TicketVoidingSystem.Constants;
 using TVS.Void.Service.Constants;
 using TVS.Void.Service.Criteria.MultiSiteDb;
 using TVS.Void.Service.Models;
@@ -20,13 +19,11 @@ public interface ReCalculateTicketsStage
 public class ReCalculateTicketsStageImp : ReCalculateTicketsStage
 {
     private readonly RequestTicketService requestTicketService;
-    private readonly NetPositionService netPositionService;
     private readonly IDynamicRepository repository;
 
-    public ReCalculateTicketsStageImp(IDynamicRepository repository, RequestTicketService requestTicketService, NetPositionService netPositionService)
+    public ReCalculateTicketsStageImp(IDynamicRepository repository, RequestTicketService requestTicketService)
     {
         this.repository = repository;
-        this.netPositionService = netPositionService;
         this.requestTicketService = requestTicketService;
     }
 
@@ -48,27 +45,11 @@ public class ReCalculateTicketsStageImp : ReCalculateTicketsStage
             var matches = ticketCanBeResettle.Select(x => x.MatchId).Distinct();
             foreach (var matchId in matches)
             {
-                var singleTicketsInCurrentMatch = singleTicketsResettle.Where(x => x.MatchId == matchId).Select(x => x.TransId);
-                var cricketTicketsInCurrentMatch = cricketTicketsResettle.Where(x => x.MatchId == matchId).Select(x => x.TransId);
-                var ticketsCanBeReCalculate = singleTicketsInCurrentMatch;
+                var ticketCanBeResettleInCurrentMatch = ticketCanBeResettle.Where(x => x.MatchId == matchId);
+                var transIdText = string.Join(",", ticketCanBeResettleInCurrentMatch.Select(x => x.TransId));
 
-                var isCallNetPosition = await netPositionService.UpdateNetPosition(string.Join(",", cricketTicketsInCurrentMatch), ActionApiType.Void, AutoVoidConstant.ActorId);
-                if (!isCallNetPosition)
-                {
-                    logData.Add($"{Messages.FailedApiVoidCricket} - CricketTransId: {string.Join(",", cricketTicketsInCurrentMatch)}");
-                }
-                else
-                {
-                    ticketsCanBeReCalculate = singleTicketsInCurrentMatch.Union(cricketTicketsInCurrentMatch);
-                }
-
-                var result = await ExecuteReCalculateTickets(siteDbGroupId, matchId, string.Join(",", ticketsCanBeReCalculate));
-                if (result.Any(x => !x.IsSuccessful))
-                {
-                    await netPositionService.RollBackNetPosition(string.Join(",", cricketTicketsInCurrentMatch), ActionApiType.Void,
-                        result.First(x => !x.IsSuccessful).ErrorMsg, AutoVoidConstant.ActorId);
-                }
-                logData.Add($"UnMarkAndReCalcSingle - MatchId:{matchId} - SingleTransId:{string.Join(",", singleTicketsInCurrentMatch)} - Result:{JsonSerializer.Serialize(result)}");
+                var result = await ExecuteReCalculateTickets(siteDbGroupId, matchId, transIdText);
+                logData.Add($"UnMarkAndReCalcSingle - MatchId:{matchId} - SingleTransId:{transIdText} - Result:{JsonSerializer.Serialize(result)}");
                 await requestTicketService.UpdateIsProcessed(singleTicketsResettle, new List<RequestDetailTicketModel>(), cricketTicketsResettle);
                 logData.Add($"{nameof(RequestTicketService.UpdateIsProcessed)}-AfterUnmarkAndReCalcSingle-OK");
             }
