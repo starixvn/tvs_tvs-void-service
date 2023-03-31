@@ -18,7 +18,7 @@ using ONEbook.UM.Services;
 using ONEbook.UM.Transport;
 using Quartz;
 using Sentry;
-using TVS.Void.Service.Models;
+using TicketVoidingSystem.Services;
 using TVS.Void.Service.Services;
 using TVS.Void.Service.Services.CheckTicketStatus;
 using TVS.Void.Service.Services.ScanAutoVoidRequest;
@@ -31,9 +31,9 @@ namespace TVS.Void.Service.Website.Utilities;
 [ExcludeFromCodeCoverage]
 public static class ServiceCollectionExtension
 {
-    public static void LoadConfig(this IServiceCollection services)
+    public static void LoadConfig(this IServiceCollection services, IConfiguration configuration)
     {
-        AppConfigService.AppConfig = new ConfigSettingModel();
+        AppSettingService.InitSetting(configuration);
     }
 
     public static void RegisterFanexData(this IServiceCollection services, IConfiguration configuration)
@@ -54,15 +54,15 @@ public static class ServiceCollectionExtension
             .Run();
     }
 
-    public static void RegisterSentry(this IServiceCollection services, IConfiguration configuration)
+    public static void RegisterSentry(this IServiceCollection services)
     {
         LogManager
-            .SetDefaultLogCategory(configuration.GetSection("CategorySentryLog").Value)
+            .SetDefaultLogCategory(AppSettingService.AppSetting.CategorySentryLog)
             .Use(new List<ILogEngine>
             {
                 new SentryLogging(new SentryEngineOptions
                 {
-                    Dsn = new Dsn(configuration.GetSection("SentryClientKey").Value)
+                    Dsn = new Dsn(AppSettingService.AppSetting.SentryClientKey)
                 })
             });
     }
@@ -86,14 +86,14 @@ public static class ServiceCollectionExtension
         services.AddSingleton<IMaintenanceService, MaintenanceService>();
     }
 
-    public static void RegisterSignalR(this IServiceCollection services, IConfiguration configuration)
+    public static void RegisterSignalR(this IServiceCollection services)
     {
         services.AddSignalR().AddStackExchangeRedis(options =>
         {
-            options.Configuration.EndPoints.Add(configuration.GetSection("RedisConfig:EndPoint").Value);
-            options.Configuration.Password = configuration.GetSection("RedisConfig:Password").Value;
-            options.Configuration.DefaultDatabase = int.Parse(configuration.GetSection("RedisConfig:DefaultDatabase").Value);
-            options.Configuration.ChannelPrefix = configuration.GetSection("RedisConfig:ChannelPrefix").Value;
+            options.Configuration.EndPoints.Add(AppSettingService.AppSetting.RedisConfig.EndPoint);
+            options.Configuration.Password = AppSettingService.AppSetting.RedisConfig.Password;
+            options.Configuration.DefaultDatabase = AppSettingService.AppSetting.RedisConfig.DefaultDatabase;
+            options.Configuration.ChannelPrefix = AppSettingService.AppSetting.RedisConfig.SignalRChannelPrefix;
         });
     }
 

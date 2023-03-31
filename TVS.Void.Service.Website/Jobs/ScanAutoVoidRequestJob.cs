@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using ONEbook.UM.Services;
 using Quartz;
 using TicketVoidingSystem.Constants;
+using TicketVoidingSystem.Services;
 using TVS.Void.Service.Services;
 using TVS.Void.Service.Services.ScanAutoVoidRequest;
 
@@ -26,21 +27,21 @@ public class ScanAutoVoidRequestJob : IJob
     {
         try
         {
-            if (!AppConfigService.AppConfig.IsScanAutoVoidRequestJobExecuting)
+            if (!AppSettingService.AppSetting.IsScanAutoVoidRequestJobExecuting)
             {
-                AppConfigService.AppConfig.IsScanAutoVoidRequestJobExecuting = true;
+                AppSettingService.AppSetting.IsScanAutoVoidRequestJobExecuting = true;
 
                 if (!await maintenanceService.IsUnderMaintenanceAsync())
                 {
                     await ExecuteSiteDbParallel();
                 }
 
-                AppConfigService.AppConfig.IsScanAutoVoidRequestJobExecuting = false;
+                AppSettingService.AppSetting.IsScanAutoVoidRequestJobExecuting = false;
             }
         }
         catch (Exception ex)
         {
-            AppConfigService.AppConfig.IsScanAutoVoidRequestJobExecuting = false;
+            AppSettingService.AppSetting.IsScanAutoVoidRequestJobExecuting = false;
             await loggingService.ErrorAsync($"{nameof(ScanAutoVoidRequestJob)} execute failed!", ex);
         }
     }

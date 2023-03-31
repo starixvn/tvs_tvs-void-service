@@ -7,7 +7,6 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Fanex.Logging;
-using Microsoft.Extensions.Configuration;
 using TicketVoidingSystem.Models;
 
 namespace TicketVoidingSystem.Services;
@@ -27,9 +26,9 @@ public class TicketVoidingSystemHttpClientServiceImp : TicketVoidingSystemHttpCl
     private readonly HttpClient httpClient;
     private readonly string ticketVoidingSystemUrl;
 
-    public TicketVoidingSystemHttpClientServiceImp(HttpClient client, IConfiguration configuration)
+    public TicketVoidingSystemHttpClientServiceImp(HttpClient client)
     {
-        ticketVoidingSystemUrl = configuration.GetSection("TicketVoidingSystemUrl").Value;
+        ticketVoidingSystemUrl = AppSettingService.AppSetting.TicketVoidingSystemUrl;
         httpClient = client;
         httpClient.BaseAddress = new Uri(ticketVoidingSystemUrl);
         httpClient.Timeout = TimeSpan.FromMinutes(5);

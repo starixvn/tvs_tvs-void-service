@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using ONEbook.UM.Services;
 using Quartz;
 using TicketVoidingSystem.Constants;
+using TicketVoidingSystem.Services;
 using TVS.Void.Service.Services;
 using TVS.Void.Service.Services.Void;
 
@@ -26,21 +27,21 @@ public class VoidJob : IJob
     {
         try
         {
-            if (!AppConfigService.AppConfig.IsVoidJobExecuting)
+            if (!AppSettingService.AppSetting.IsVoidJobExecuting)
             {
-                AppConfigService.AppConfig.IsVoidJobExecuting = true;
+                AppSettingService.AppSetting.IsVoidJobExecuting = true;
 
                 if (!await maintenanceService.IsUnderMaintenanceAsync())
                 {
                     await ExecuteSiteDbParallel();
                 }
 
-                AppConfigService.AppConfig.IsVoidJobExecuting = false;
+                AppSettingService.AppSetting.IsVoidJobExecuting = false;
             }
         }
         catch (Exception ex)
         {
-            AppConfigService.AppConfig.IsVoidJobExecuting = false;
+            AppSettingService.AppSetting.IsVoidJobExecuting = false;
             await loggingService.ErrorAsync("VoidJob execute failed!", ex);
         }
     }

@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using ONEbook.UM.Services;
 using Quartz;
+using TicketVoidingSystem.Services;
 using TVS.Void.Service.Services;
 using TVS.Void.Service.Services.CheckTicketStatus;
 
@@ -24,21 +25,21 @@ public class CheckTicketStatusJob : IJob
     {
         try
         {
-            if (!AppConfigService.AppConfig.IsCheckTicketStatusJobExecuting)
+            if (!AppSettingService.AppSetting.IsCheckTicketStatusJobExecuting)
             {
-                AppConfigService.AppConfig.IsCheckTicketStatusJobExecuting = true;
+                AppSettingService.AppSetting.IsCheckTicketStatusJobExecuting = true;
 
                 if (!await maintenanceService.IsUnderMaintenanceAsync())
                 {
                     await checkTicketStatusService.Execute();
                 }
 
-                AppConfigService.AppConfig.IsCheckTicketStatusJobExecuting = false;
+                AppSettingService.AppSetting.IsCheckTicketStatusJobExecuting = false;
             }
         }
         catch (Exception ex)
         {
-            AppConfigService.AppConfig.IsCheckTicketStatusJobExecuting = false;
+            AppSettingService.AppSetting.IsCheckTicketStatusJobExecuting = false;
             await loggingService.ErrorAsync("CheckTicketStatusJob execute failed!", ex);
         }
     }

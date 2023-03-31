@@ -2,8 +2,8 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using TVS.Void.Service.Models;
-using TVS.Void.Service.Services;
+using TicketVoidingSystem.Models;
+using TicketVoidingSystem.Services;
 
 namespace TVS.Void.Service.Website.Controllers;
 
@@ -21,9 +21,9 @@ public class HomeController : Controller
     public IActionResult Index()
     {
         var jobStatus =
-            $"{{{nameof(ConfigSettingModel.IsCheckTicketStatusJobExecuting)}: {AppConfigService.AppConfig.IsCheckTicketStatusJobExecuting}," +
-            $" {nameof(ConfigSettingModel.IsScanAutoVoidRequestJobExecuting)}: {AppConfigService.AppConfig.IsScanAutoVoidRequestJobExecuting}," +
-            $" {nameof(ConfigSettingModel.IsVoidJobExecuting)}: {AppConfigService.AppConfig.IsVoidJobExecuting} - {DateTime.Now}}}";
+            $"{{{nameof(AppSettingModel.IsCheckTicketStatusJobExecuting)}: {AppSettingService.AppSetting.IsCheckTicketStatusJobExecuting}," +
+            $" {nameof(AppSettingModel.IsScanAutoVoidRequestJobExecuting)}: {AppSettingService.AppSetting.IsScanAutoVoidRequestJobExecuting}," +
+            $" {nameof(AppSettingModel.IsVoidJobExecuting)}: {AppSettingService.AppSetting.IsVoidJobExecuting} - {DateTime.Now}}}";
         logger.LogInformation(jobStatus);
         return Ok("Ok-200-TVS.Void.Service");
     }
