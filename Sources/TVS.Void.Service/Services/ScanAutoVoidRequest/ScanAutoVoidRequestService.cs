@@ -108,7 +108,7 @@ public class ScanAutoVoidRequestServiceImp : ScanAutoVoidRequestService
             checkTicketResult.ParlayTicketsResettle, checkTicketResult.CricketTicketsResettle, logData);
 
         var queueErrorMessage = await insertPreVoidingDataStage.Execute(siteDbGroupId, queue,
-            checkTicketResult.ValidVoidSingleTickets, checkTicketResult.ValidVoidParlayTickets, checkTicketResult.CricketTicketsResettle, logData);
+            checkTicketResult.ValidVoidSingleTickets, checkTicketResult.ValidVoidParlayTickets, checkTicketResult.ValidVoidCricketTickets, logData);
 
         await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, ExecuteStatus.Done, queueErrorMessage);
         await WriteLog(logData);

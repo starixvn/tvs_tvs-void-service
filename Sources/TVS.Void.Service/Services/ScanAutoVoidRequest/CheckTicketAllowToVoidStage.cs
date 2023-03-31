@@ -39,6 +39,8 @@ public class CheckTicketAllowToVoidStageImp : CheckTicketAllowToVoidStage
             typeof (RequestDetailTicketModel),
             typeof (RequestDetailTicketModel),
             typeof (RequestDetailTicketModel),
+            typeof (RequestDetailTicketModel),
+            typeof (RequestDetailTicketModel),
             typeof (RequestDetailTicketModel)
         };
 
