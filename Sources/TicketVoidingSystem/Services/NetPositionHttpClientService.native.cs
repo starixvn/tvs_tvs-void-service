@@ -3,7 +3,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Mime;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
 using TicketVoidingSystem.Constants;
 using TicketVoidingSystem.Models;
 using TicketVoidingSystem.Utilities;
@@ -19,14 +18,12 @@ public interface NetPositionHttpClientService
 public class NetPositionHttpClientServiceImp : NetPositionHttpClientService
 {
     private readonly HttpClient httpClient;
-    private readonly string netPositionUrl;
     private readonly LoggingService loggingService;
 
-    public NetPositionHttpClientServiceImp(HttpClient client, IConfiguration configuration, LoggingService loggingService)
+    public NetPositionHttpClientServiceImp(HttpClient client, LoggingService loggingService)
     {
-        netPositionUrl = configuration.GetSection("NetPositionUrl").Value;
         httpClient = client;
-        httpClient.BaseAddress = new Uri(netPositionUrl);
+        httpClient.BaseAddress = new Uri(AppSettingService.AppSetting.NetPositionUrl);
         httpClient.Timeout = TimeSpan.FromMinutes(5);
         httpClient.DefaultRequestHeaders.Clear();
         httpClient.DefaultRequestHeaders.Add("Accept", MediaTypeNames.Application.Json);
@@ -48,7 +45,7 @@ public class NetPositionHttpClientServiceImp : NetPositionHttpClientService
 
             if (!response.IsSuccessStatusCode)
             {
-                await loggingService.ErrorAsync($"{netPositionUrl}{actionName}" +
+                await loggingService.ErrorAsync($"{AppSettingService.AppSetting.NetPositionUrl}{actionName}" +
                                                 $"{Environment.NewLine}Response:{Environment.NewLine}{response}");
             }
 

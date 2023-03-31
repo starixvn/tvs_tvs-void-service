@@ -41,13 +41,18 @@ public class ProcessVoidQueuesStageImp : ProcessVoidQueuesStage
         return processResult;
     }
 
-    public async Task<TicketVoidingQueueModel> ExecuteSingleQueue(int siteDbGroupId, TicketVoidingQueueModel queue)
+    private async Task<TicketVoidingQueueModel> ExecuteSingleQueue(int siteDbGroupId, TicketVoidingQueueModel queue)
     {
-        if (queue.VoidingTypeId != VoidingTypeConstant.Cricket)
+        if (queue.VoidingTypeId == VoidingTypeConstant.Cricket)
         {
-            return await ticketVoidingQueueService.ProcessVoidQueue(siteDbGroupId, queue.QueueId, null);
+            return await ExecuteQueueForCricketTickets(siteDbGroupId, queue);
         }
 
+        return await ticketVoidingQueueService.ProcessVoidQueue(siteDbGroupId, queue.QueueId, null);
+    }
+
+    private async Task<TicketVoidingQueueModel> ExecuteQueueForCricketTickets(int siteDbGroupId, TicketVoidingQueueModel queue)
+    {
         var isCalledNetPosition = await netPositionService.UpdateNetPosition(queue.TransIds, ActionApiType.Void, AutoVoidConstant.ActorId);
         var voidResult = await ticketVoidingQueueService.ProcessVoidQueue(siteDbGroupId, queue.QueueId, isCalledNetPosition);
 
