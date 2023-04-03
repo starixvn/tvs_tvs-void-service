@@ -12,22 +12,23 @@ public class CheckTicketAllowToVoidStageImpTests
     public async Task Execute_ReturnExpected()
     {
         const int siteDbGroupId = 0;
-        var singleTickets = new List<RequestDetailTicketModel>();
-        var parlayTickets = new List<RequestDetailTicketModel>();
-        IEnumerable<object>[] fakeData = { singleTickets, singleTickets, singleTickets, singleTickets };
+        var tickets = new List<RequestDetailTicketModel>();
+        IEnumerable<object>[] fakeData = { tickets, tickets, tickets, tickets, tickets, tickets };
         var expected = new CheckStatusTicketOutput
         {
-            ValidVoidSingleTickets = singleTickets,
-            ValidVoidParlayTickets = singleTickets,
-            SingleTicketsResettle = singleTickets,
-            ParlayTicketsResettle = singleTickets
+            ValidVoidSingleTickets = tickets,
+            SingleTicketsResettle = tickets,
+            ValidVoidParlayTickets = tickets,
+            ParlayTicketsResettle = tickets,
+            ValidVoidCricketTickets = tickets,
+            CricketTicketsResettle = tickets
         };
         var repository = Substitute.For<IDynamicRepository>();
         repository.FetchMultipleAsync(default, default)
             .ReturnsForAnyArgs(fakeData);
         var service = new CheckTicketAllowToVoidStageImp(repository);
 
-        var actual = await service.Execute(siteDbGroupId, singleTickets, parlayTickets, new List<string>());
+        var actual = await service.Execute(siteDbGroupId, tickets, tickets, tickets, new List<string>());
 
         await repository.Received(1)
             .FetchMultipleAsync(Arg.Any<CheckTicketsAllowToVoidCriteria>(), Arg.Any<Type[]>());

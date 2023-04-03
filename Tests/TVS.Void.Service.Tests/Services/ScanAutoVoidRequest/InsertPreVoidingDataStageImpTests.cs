@@ -14,6 +14,7 @@ public class InsertPreVoidingDataStageImpTests
         const int siteDbGroupId = 0;
         var singleTickets = new List<RequestDetailTicketModel> { new() };
         var parlayTickets = new List<RequestDetailTicketModel>();
+        var cricketTickets = new List<RequestDetailTicketModel>();
         var queue = new AutoVoidRequestQueueModel();
         var requestDetailService = Substitute.For<RequestDetailService>();
         var ticketVoidingQueueService = Substitute.For<TicketVoidingQueueService>();
@@ -23,7 +24,7 @@ public class InsertPreVoidingDataStageImpTests
 
         var service = new InsertPreVoidingDataStageImp(requestDetailService, ticketVoidingQueueService, requestTicketService, notificationService);
 
-        var actual = await service.Execute(siteDbGroupId, queue, singleTickets, parlayTickets, new List<string>());
+        var actual = await service.Execute(siteDbGroupId, queue, singleTickets, parlayTickets, cricketTickets, new List<string>());
 
         await requestDetailService.Received(1).InsertVoidingHistory(Arg.Any<string>(), Arg.Any<int>(), Arg.Any<string>());
         Assert.Equal(expected, actual);
@@ -35,10 +36,11 @@ public class InsertPreVoidingDataStageImpTests
         const string expected = "No ticket found.";
         var singleTickets = new List<RequestDetailTicketModel>();
         var parlayTickets = new List<RequestDetailTicketModel>();
+        var cricketTickets = new List<RequestDetailTicketModel>();
 
         var service = new InsertPreVoidingDataStageImp(default, default, default, default);
 
-        var actual = await service.Execute(default, default, singleTickets, parlayTickets, default);
+        var actual = await service.Execute(default, default, singleTickets, parlayTickets, cricketTickets, default);
 
         Assert.Equal(expected, actual);
     }

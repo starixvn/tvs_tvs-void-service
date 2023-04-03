@@ -16,11 +16,12 @@ public class GetTicketsStageImpTests
             new()
         };
         var parlayTickets = new List<RequestDetailTicketModel>();
+        var cricketTickets = new List<RequestDetailTicketModel>();
         var queue = new AutoVoidRequestQueueModel();
         var autoVoidRequestQueueService = Substitute.For<AutoVoidRequestQueueService>();
         var requestTicketService = Substitute.For<RequestTicketService>();
         requestTicketService.GetTicketsByRequestsAndSiteDbGroupId(default, default)
-            .ReturnsForAnyArgs((singleTickets, parlayTickets));
+            .ReturnsForAnyArgs((singleTickets, parlayTickets, cricketTickets));
         var service = new GetTicketsStageImp(autoVoidRequestQueueService, requestTicketService);
 
         var actual = await service.Execute(siteDbGroupId, queue, new List<string>());
@@ -38,11 +39,12 @@ public class GetTicketsStageImpTests
         const int siteDbGroupId = 0;
         var singleTickets = new List<RequestDetailTicketModel>();
         var parlayTickets = new List<RequestDetailTicketModel>();
+        var cricketTickets = new List<RequestDetailTicketModel>();
         var queue = new AutoVoidRequestQueueModel();
         var autoVoidRequestQueueService = Substitute.For<AutoVoidRequestQueueService>();
         var requestTicketService = Substitute.For<RequestTicketService>();
         requestTicketService.GetTicketsByRequestsAndSiteDbGroupId(default, default)
-            .ReturnsForAnyArgs((singleTickets, parlayTickets));
+            .ReturnsForAnyArgs((singleTickets, parlayTickets, cricketTickets));
         var service = new GetTicketsStageImp(autoVoidRequestQueueService, requestTicketService);
 
         var actual = await service.Execute(siteDbGroupId, queue, new List<string>());

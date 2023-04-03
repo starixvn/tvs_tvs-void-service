@@ -85,7 +85,7 @@ public class NotificationServiceImpTests
 
     [Theory]
     [MemberData(nameof(NotifyVoidFailedToUserThrowExceptionTestData))]
-    public async Task NotifyVoidFailedToUser_ShouldExecuteCatchExceptionBlock(int requestId, IEnumerable<TicketVoidingQueueModel> voidQueueResults)
+    public async Task NotifyVoidFailedToUser_ShouldExecuteCatchExceptionBlock(int requestId, IList<TicketVoidingQueueModel> voidQueueResults)
     {
         // Arrange
         var loggingService = Substitute.For<LoggingService>();
