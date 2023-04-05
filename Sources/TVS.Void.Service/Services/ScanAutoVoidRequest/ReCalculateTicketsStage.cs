@@ -39,7 +39,7 @@ public class ReCalculateTicketsStageImp : ReCalculateTicketsStage
         IEnumerable<RequestDetailTicketModel> singleTicketsResettle,
         IEnumerable<RequestDetailTicketModel> cricketTicketsResettle, ICollection<string> logData)
     {
-        if (singleTicketsResettle.Any())
+        if (singleTicketsResettle.Any() || cricketTicketsResettle.Any())
         {
             var ticketCanBeResettle = singleTicketsResettle.Union(cricketTicketsResettle);
             var matches = ticketCanBeResettle.Select(x => x.MatchId).Distinct();

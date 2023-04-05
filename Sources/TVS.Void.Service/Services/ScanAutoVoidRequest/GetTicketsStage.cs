@@ -28,7 +28,7 @@ public class GetTicketsStageImp : GetTicketsStage
             = await requestTicketService.GetTicketsByRequestsAndSiteDbGroupId(siteDbGroupId, queue.RequestIds);
         logData.Add($"{nameof(GetTicketsStage)} - SingleCount: {singleTickets.Count()} - ParlayCount: {parlayTickets.Count()}");
 
-        if (!singleTickets.Any() && !parlayTickets.Any())
+        if (!singleTickets.Any() && !parlayTickets.Any() && !cricketTickets.Any())
         {
             await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, ExecuteStatus.Done, "No ticket found.");
             return (false, null);
@@ -38,7 +38,7 @@ public class GetTicketsStageImp : GetTicketsStage
         {
             SingleTickets = singleTickets,
             ParlayTickets = parlayTickets,
-            CricketTickets = cricketTickets,
+            CricketTickets = cricketTickets
         });
     }
 }
