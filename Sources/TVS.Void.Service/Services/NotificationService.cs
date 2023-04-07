@@ -56,10 +56,10 @@ public class NotificationServiceImp : NotificationService
         {
             var notifyMessage = new StringBuilder();
             var voidResultHasUserInfo = voidQueueResults.First(x => !string.IsNullOrWhiteSpace(x.UserName));
-            notifyMessage.AppendLine($"Failed to void Request ID: {requestId}, please contact IT for support. (Error: VOID_SERVICE)");
+            notifyMessage.AppendLine($"Failed to void Request ID: {requestId}, please contact IT for support. (Error: VOID_SERVICE).");
             if (voidQueueResults.Any(x => x.VoidingTypeId == VoidingTypeConstant.Cricket && x.StatusId == ExecuteStatus.Failed))
             {
-                notifyMessage.AppendLine(Messages.FailedApiVoidCricket);
+                notifyMessage.AppendLine($" {Messages.FailedApiVoidCricket}");
             }
             await ticketVoidingSystemHttpClientService.SignalRNotifyErrorMessageToUser(voidResultHasUserInfo.UserName, notifyMessage.ToString());
             await hubContext.Clients.User(voidResultHasUserInfo.UserName).showErrorMessage(notifyMessage.ToString());
