@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using TicketVoidingSystem.Constants;
+using TicketVoidingSystem.Services;
 using TVS.Void.Service.Models;
 
 namespace TVS.Void.Service.Services.Void;
@@ -23,7 +24,7 @@ public class VoidServiceImp : VoidService
     private readonly LoggingService loggingService;
 
     public VoidServiceImp(TicketVoidingQueueService ticketVoidingQueueService, RequestDetailService requestDetailService, ProcessVoidQueuesStage processVoidQueuesStage,
-        InsertAfterVoidDataStage insertAfterVoidDataStage, NotificationService notificationService, LoggingService loggingService)
+        InsertAfterVoidDataStage insertAfterVoidDataStage, NotificationService notificationService, NetPositionService netPositionService, LoggingService loggingService)
     {
         this.ticketVoidingQueueService = ticketVoidingQueueService;
         this.requestDetailService = requestDetailService;
@@ -44,7 +45,7 @@ public class VoidServiceImp : VoidService
         await ExecuteWhenHaveQueues(siteDbGroupId, voidingQueues);
     }
 
-    private async Task ExecuteWhenHaveQueues(int siteDbGroupId, IEnumerable<TicketVoidingQueueModel> voidingQueues)
+    private async Task ExecuteWhenHaveQueues(int siteDbGroupId, IList<TicketVoidingQueueModel> voidingQueues)
     {
         var logData = new List<string>();
         try
@@ -58,7 +59,7 @@ public class VoidServiceImp : VoidService
         }
     }
 
-    private async Task ExecuteNormalFlow(int siteDbGroupId, IEnumerable<TicketVoidingQueueModel> voidingQueues, IList<string> logData)
+    private async Task ExecuteNormalFlow(int siteDbGroupId, IList<TicketVoidingQueueModel> voidingQueues, IList<string> logData)
     {
         logData.Add($"{nameof(VoidService)}[{siteDbGroupId}]: {JsonSerializer.Serialize(voidingQueues)}");
         var processVoidQueuesResult = await processVoidQueuesStage.Execute(siteDbGroupId, voidingQueues);

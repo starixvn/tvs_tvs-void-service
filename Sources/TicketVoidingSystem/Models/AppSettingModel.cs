@@ -19,6 +19,8 @@ public class AppSettingModel
     //
     public string TicketVoidingSystemUrl { get; init; }
 
+    public string NetPositionUrl { get; init; }
+
     public string IgnoreSiteDb { get; init; }
 }
 

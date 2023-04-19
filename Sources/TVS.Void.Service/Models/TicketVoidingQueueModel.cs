@@ -12,4 +12,6 @@ public class TicketVoidingQueueModel
     public int UserId { get; set; }
     public string UserName { get; set; }
     public string NegativeBalanceUsers { get; set; }
+    public string TransIds { get; set; }
+    public string ErrorMsg { get; set; }
 }

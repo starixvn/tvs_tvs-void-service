@@ -23,6 +23,7 @@ public static class AppSettingService
             TicketVoidingSystemUrl = configuration.GetValue<string>(nameof(AppSettingModel.TicketVoidingSystemUrl)),
             CategorySentryLog = configuration.GetValue<string>(nameof(AppSettingModel.CategorySentryLog)),
             SentryClientKey = configuration.GetValue<string>(nameof(AppSettingModel.SentryClientKey)),
+            NetPositionUrl = configuration.GetValue<string>(nameof(AppSettingModel.NetPositionUrl)),
             IgnoreSiteDb = configuration.GetValue<string>(nameof(AppSettingModel.IgnoreSiteDb))
         };
 

@@ -11,15 +11,15 @@ namespace TVS.Void.Service.Services;
 
 public interface TicketVoidingQueueService
 {
-    Task<IEnumerable<TicketVoidingQueueModel>> GetQueues(int siteDbGroupId, int? voidingHistoryId);
+    Task<IList<TicketVoidingQueueModel>> GetQueues(int siteDbGroupId, int? voidingHistoryId);
 
-    Task InsertQueue(int siteDbGroupId, int requestId, int voidingHistoryId,
-        IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets);
+    Task InsertQueue(int siteDbGroupId, int requestId, int voidingHistoryId, IEnumerable<RequestDetailTicketModel> singleTickets,
+        IEnumerable<RequestDetailTicketModel> parlayTickets, IEnumerable<RequestDetailTicketModel> cricketTickets);
 
-    Task InsertQueueForRequests(int siteDbGroupId, IEnumerable<VoidingHistoryModel> voidingHistoryList,
-        IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets);
+    Task InsertQueueForRequests(int siteDbGroupId, IEnumerable<VoidingHistoryModel> voidingHistoryList, IEnumerable<RequestDetailTicketModel> singleTickets,
+        IEnumerable<RequestDetailTicketModel> parlayTickets, IEnumerable<RequestDetailTicketModel> cricketTickets);
 
-    Task<TicketVoidingQueueModel> ProcessVoidQueue(int siteDbGroupId, int queueId);
+    Task<TicketVoidingQueueModel> ProcessVoidQueue(int siteDbGroupId, int queueId, bool? isCalledNetPosition);
 }
 
 public class TicketVoidingQueueServiceImp : TicketVoidingQueueService
@@ -31,7 +31,7 @@ public class TicketVoidingQueueServiceImp : TicketVoidingQueueService
         this.repository = repository;
     }
 
-    public async Task<IEnumerable<TicketVoidingQueueModel>> GetQueues(int siteDbGroupId, int? voidingHistoryId)
+    public async Task<IList<TicketVoidingQueueModel>> GetQueues(int siteDbGroupId, int? voidingHistoryId)
     {
         var criteria = new GetTicketVoidingQueueCriteria
         {
@@ -39,12 +39,13 @@ public class TicketVoidingQueueServiceImp : TicketVoidingQueueService
             VoidingHistoryId = voidingHistoryId
         };
 
-        var result = await repository.FetchAsync<TicketVoidingQueueModel>(criteria);
-        return result;
+        var voidingQueues = await repository.FetchAsync<TicketVoidingQueueModel>(criteria);
+
+        return voidingQueues.ToList();
     }
 
-    public async Task InsertQueue(int siteDbGroupId, int requestId, int voidingHistoryId,
-        IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets)
+    public async Task InsertQueue(int siteDbGroupId, int requestId, int voidingHistoryId, IEnumerable<RequestDetailTicketModel> singleTickets,
+        IEnumerable<RequestDetailTicketModel> parlayTickets, IEnumerable<RequestDetailTicketModel> cricketTickets)
     {
         var criteria = new InsertTicketVoidingQueueCriteria
         {
@@ -53,6 +54,7 @@ public class TicketVoidingQueueServiceImp : TicketVoidingQueueService
             VoidingHistoryId = voidingHistoryId,
             SingleTicketsJson = JsonSerializer.Serialize(singleTickets),
             ParlayTicketsJson = JsonSerializer.Serialize(parlayTickets),
+            CricketTicketsJson = JsonSerializer.Serialize(cricketTickets),
             UserId = AutoVoidConstant.ActorId,
             IP = AutoVoidConstant.IPAddress,
         };
@@ -60,23 +62,26 @@ public class TicketVoidingQueueServiceImp : TicketVoidingQueueService
     }
 
     public async Task InsertQueueForRequests(int siteDbGroupId, IEnumerable<VoidingHistoryModel> voidingHistoryList,
-        IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets)
+        IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets, IEnumerable<RequestDetailTicketModel> cricketTickets)
     {
         foreach (var voidingHistory in voidingHistoryList)
         {
             var singleTicketsInCurrentRequest = singleTickets.Where(x => x.RequestId == voidingHistory.RequestId);
             var parlayTicketsInCurrentRequest = parlayTickets.Where(x => x.RequestId == voidingHistory.RequestId);
+            var cricketTicketsInCurrentRequest = cricketTickets.Where(x => x.RequestId == voidingHistory.RequestId);
+
             await InsertQueue(siteDbGroupId, voidingHistory.RequestId, voidingHistory.VoidingHistoryId,
-                singleTicketsInCurrentRequest, parlayTicketsInCurrentRequest);
+                singleTicketsInCurrentRequest, parlayTicketsInCurrentRequest, cricketTicketsInCurrentRequest);
         }
     }
 
-    public async Task<TicketVoidingQueueModel> ProcessVoidQueue(int siteDbGroupId, int queueId)
+    public async Task<TicketVoidingQueueModel> ProcessVoidQueue(int siteDbGroupId, int queueId, bool? isCalledNetPosition)
     {
         var criteria = new ProcessVoidQueueCriteria
         {
             SiteDbGroupId = siteDbGroupId,
-            QueueId = queueId
+            QueueId = queueId,
+            IsCalledNetPosition = isCalledNetPosition
         };
 
         var result = await repository.GetAsync<TicketVoidingQueueModel>(criteria);

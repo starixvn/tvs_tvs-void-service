@@ -1,4 +1,5 @@
 ﻿using NSubstitute;
+using TicketVoidingSystem.Services;
 using TVS.Void.Service.Constants;
 using TVS.Void.Service.Models;
 using TVS.Void.Service.Services;
@@ -54,7 +55,7 @@ public class ScanAutoVoidRequestServiceImpTests
 
         autoVoidRequestQueueService.GetQueue(default).ReturnsForAnyArgs(queue);
         checkRequestQueueValidStage.Execute(default, default).ReturnsForAnyArgs(true);
-        checkTicketAllowToVoidStage.Execute(default, default, default, default)
+        checkTicketAllowToVoidStage.Execute(default, default, default, default, default)
             .ReturnsForAnyArgs(new CheckStatusTicketOutput());
         getTicketsStage.Execute(default, default, default).ReturnsForAnyArgs((true, new GetTicketsStageOutput()));
 
@@ -87,7 +88,7 @@ public class ScanAutoVoidRequestServiceImpTests
 
         autoVoidRequestQueueService.GetQueue(default).ReturnsForAnyArgs(queue);
         checkRequestQueueValidStage.Execute(default, default).ReturnsForAnyArgs(false);
-        checkTicketAllowToVoidStage.Execute(default, default, default, default)
+        checkTicketAllowToVoidStage.Execute(default, default, default, default, default)
             .ReturnsForAnyArgs(new CheckStatusTicketOutput());
         getTicketsStage.Execute(default, default, default).ReturnsForAnyArgs((true, new GetTicketsStageOutput()));
 
@@ -121,7 +122,7 @@ public class ScanAutoVoidRequestServiceImpTests
 
         autoVoidRequestQueueService.GetQueue(default).ReturnsForAnyArgs(queue);
         checkRequestQueueValidStage.Execute(default, default).ReturnsForAnyArgs(true);
-        checkTicketAllowToVoidStage.Execute(default, default, default, default)
+        checkTicketAllowToVoidStage.Execute(default, default, default, default, default)
             .ReturnsForAnyArgs(new CheckStatusTicketOutput());
         getTicketsStage.Execute(default, default, default).ReturnsForAnyArgs((false, new GetTicketsStageOutput()));
 
@@ -151,7 +152,7 @@ public class ScanAutoVoidRequestServiceImpTests
         var loggingService = Substitute.For<LoggingService>();
 
         autoVoidRequestQueueService.GetQueue(default).ReturnsForAnyArgs(queue);
-        checkTicketAllowToVoidStage.Execute(default, default, default, default)
+        checkTicketAllowToVoidStage.Execute(default, default, default, default, default)
             .ReturnsForAnyArgs(new CheckStatusTicketOutput());
         getTicketsStage.Execute(default, default, default).ReturnsForAnyArgs((true, new GetTicketsStageOutput()));
 
@@ -163,7 +164,7 @@ public class ScanAutoVoidRequestServiceImpTests
 
         await autoVoidRequestQueueService.Received(1).GetQueue(Arg.Any<int>());
         await checkTicketAllowToVoidStage.Received(1).Execute(Arg.Any<int>(), Arg.Any<IEnumerable<RequestDetailTicketModel>>(),
-            Arg.Any<IEnumerable<RequestDetailTicketModel>>(), Arg.Any<IList<string>>());
+            Arg.Any<IEnumerable<RequestDetailTicketModel>>(), Arg.Any<IEnumerable<RequestDetailTicketModel>>(), Arg.Any<IList<string>>());
         await loggingService.Received(1).InfoAppendNewLineAsync(Arg.Any<IList<string>>());
     }
 

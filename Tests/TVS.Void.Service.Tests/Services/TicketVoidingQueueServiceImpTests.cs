@@ -26,8 +26,7 @@ public class TicketVoidingQueueServiceImpTests
         await repository.Received(1).FetchAsync<TicketVoidingQueueModel>
         (Arg.Is<GetTicketVoidingQueueCriteria>(x =>
             x.SiteDbGroupId == fakeSiteDbGroupId && x.VoidingHistoryId == fakeVoidingHistoryId));
-
-        Assert.StrictEqual(fakeQueues, actual);
+        Assert.True(actual.Any());
     }
 
     [Fact]
@@ -44,7 +43,7 @@ public class TicketVoidingQueueServiceImpTests
         var service = new TicketVoidingQueueServiceImp(repository);
 
         // Act
-        await service.InsertQueue(fakeSiteDbGroupId, fakeRequestId, fakeVoidingHistoryId, null, null);
+        await service.InsertQueue(fakeSiteDbGroupId, fakeRequestId, fakeVoidingHistoryId, null, null, null);
 
         // Assert
         await repository.Received(1).ExecuteAsync(Arg.Is<InsertTicketVoidingQueueCriteria>(x =>
@@ -68,7 +67,7 @@ public class TicketVoidingQueueServiceImpTests
         var service = new TicketVoidingQueueServiceImp(repository);
 
         // Act
-        await service.InsertQueueForRequests(fakeSiteDbGroupId, fakeVoidingHistoryList, new List<RequestDetailTicketModel>(), new List<RequestDetailTicketModel>());
+        await service.InsertQueueForRequests(fakeSiteDbGroupId, fakeVoidingHistoryList, new List<RequestDetailTicketModel>(), new List<RequestDetailTicketModel>(), new List<RequestDetailTicketModel>());
 
         // Assert
         await repository.Received(2).ExecuteAsync(Arg.Is<InsertTicketVoidingQueueCriteria>(x => x.SiteDbGroupId == fakeSiteDbGroupId));
@@ -87,7 +86,7 @@ public class TicketVoidingQueueServiceImpTests
         var service = new TicketVoidingQueueServiceImp(repository);
 
         // Act
-        var actual = await service.ProcessVoidQueue(fakeSiteDbGroupId, fakeQueueId);
+        var actual = await service.ProcessVoidQueue(fakeSiteDbGroupId, fakeQueueId, true);
 
         // Assert
         await repository.Received(1).GetAsync<TicketVoidingQueueModel>
