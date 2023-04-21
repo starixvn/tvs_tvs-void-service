@@ -1,6 +1,6 @@
 ﻿namespace TicketVoidingSystem.Constants;
 
-public class ActionApiType
+public static class ActionApiType
 {
     public const string Void = "VOID";
 }
