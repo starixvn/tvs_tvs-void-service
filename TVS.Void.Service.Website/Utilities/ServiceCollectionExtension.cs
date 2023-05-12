@@ -25,6 +25,7 @@ using TVS.Void.Service.Services.ScanAutoVoidRequest;
 using TVS.Void.Service.Services.Void;
 using TVS.Void.Service.Website.Jobs;
 using TVS.Void.Service.Website.Jobs.Listener;
+using TVS.Void.Service.Website.Utilities.CustomServices;
 
 namespace TVS.Void.Service.Website.Utilities;
 
@@ -79,7 +80,7 @@ public static class ServiceCollectionExtension
     public static void RegisterONEbookUM(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddSingleton(new UMClientConfiguration().Initialize(configuration));
-        services.AddSingleton<IUMCacheService, UMCacheService>();
+        services.AddSingleton<IUMCacheService, MemoryUMCacheService>();
         services.AddSingleton<IUMRestClient, UMRestClient>();
         services.AddSingleton<IPHelper, IPHelperImpl>();
         services.AddSingleton<IHttpContextHelper, CustomHttpContextHelper>();

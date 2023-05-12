@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using ONEbook.UM.Helpers;
 
-namespace TVS.Void.Service.Website.Utilities;
+namespace TVS.Void.Service.Website.Utilities.CustomServices;
 
 [ExcludeFromCodeCoverage]
 public class CustomHttpContextHelper : IHttpContextHelper
