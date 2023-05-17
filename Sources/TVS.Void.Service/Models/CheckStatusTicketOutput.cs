@@ -12,4 +12,8 @@ public class CheckStatusTicketOutput
 
     public IEnumerable<RequestDetailTicketModel> ValidVoidCricketTickets { get; set; }
     public IEnumerable<RequestDetailTicketModel> CricketTicketsResettle { get; set; }
+
+    public IEnumerable<RequestDetailTicketModel> ValidCancelCOTickets { get; set; }
+
+    public IEnumerable<RequestDetailTicketModel> VoidSingleTickets14 { get; set; }
 }

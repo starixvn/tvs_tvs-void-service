@@ -8,7 +8,7 @@ namespace TVS.Void.Service.Services.ScanAutoVoidRequest;
 
 public interface CheckVoidInstantRequestQueueValidStage
 {
-    Task<bool> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue);
+    Task<(bool IsValid, int IssueTypeId)> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue);
 }
 
 public class CheckVoidInstantRequestQueueValidStageImp : CheckVoidInstantRequestQueueValidStage
@@ -22,28 +22,28 @@ public class CheckVoidInstantRequestQueueValidStageImp : CheckVoidInstantRequest
         this.requestDetailService = requestDetailService;
     }
 
-    public async Task<bool> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue)
+    public async Task<(bool IsValid, int IssueTypeId)> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue)
     {
         var requestIdList = queue.RequestIds.Split(",");
         if (requestIdList.Length > 1)
         {
             await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, ExecuteStatus.Done, "Too many RequestIds.");
-            return false;
+            return (false, 0);
         }
 
         var (request, _) = await requestDetailService.GetRequestById(int.Parse(requestIdList.First()));
         if (!request.Any())
         {
             await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, ExecuteStatus.Done, "RequestId invalid.");
-            return false;
+            return (false, 0);
         }
 
         if (!request.First().ActionName.Equals(queue.Action, StringComparison.OrdinalIgnoreCase))
         {
             await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, ExecuteStatus.Done, "Request Action was edited.");
-            return false;
+            return (false, 0);
         }
 
-        return true;
+        return (true, request.First().IssueTypeId);
     }
 }
