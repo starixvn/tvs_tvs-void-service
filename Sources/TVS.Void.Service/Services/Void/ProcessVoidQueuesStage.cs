@@ -8,21 +8,23 @@ namespace TVS.Void.Service.Services.Void;
 
 public interface ProcessVoidQueuesStage
 {
-    Task<IList<TicketVoidingQueueModel>> Execute(int siteDbGroupId, IEnumerable<TicketVoidingQueueModel> voidingQueues);
+    Task<IList<TicketVoidingQueueModel>> Execute(int siteDbGroupId, IEnumerable<TicketVoidingQueueModel> voidingQueues, IList<string> logData);
 }
 
 public class ProcessVoidQueuesStageImp : ProcessVoidQueuesStage
 {
+    private readonly TriggerBalanceTickets14Stage triggerBalanceTickets14Stage;
     private readonly TicketVoidingQueueService ticketVoidingQueueService;
     private readonly NetPositionService netPositionService;
 
-    public ProcessVoidQueuesStageImp(TicketVoidingQueueService ticketVoidingQueueService, NetPositionService netPositionService)
+    public ProcessVoidQueuesStageImp(TriggerBalanceTickets14Stage triggerBalanceTickets14Stage, TicketVoidingQueueService ticketVoidingQueueService, NetPositionService netPositionService)
     {
+        this.triggerBalanceTickets14Stage = triggerBalanceTickets14Stage;
         this.ticketVoidingQueueService = ticketVoidingQueueService;
         this.netPositionService = netPositionService;
     }
 
-    public async Task<IList<TicketVoidingQueueModel>> Execute(int siteDbGroupId, IEnumerable<TicketVoidingQueueModel> voidingQueues)
+    public async Task<IList<TicketVoidingQueueModel>> Execute(int siteDbGroupId, IEnumerable<TicketVoidingQueueModel> voidingQueues, IList<string> logData)
     {
         var processResult = new List<TicketVoidingQueueModel>();
         foreach (var queue in voidingQueues)
@@ -34,7 +36,7 @@ public class ProcessVoidQueuesStageImp : ProcessVoidQueuesStage
             }
 
             var voidResult = await ExecuteSingleQueue(siteDbGroupId, queue);
-
+            await triggerBalanceTickets14Stage.Execute(queue, logData);
             processResult.Add(voidResult);
         }
 

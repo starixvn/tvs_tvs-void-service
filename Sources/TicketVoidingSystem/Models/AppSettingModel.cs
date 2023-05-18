@@ -22,6 +22,8 @@ public class AppSettingModel
     public string NetPositionUrl { get; init; }
 
     public string IgnoreSiteDb { get; init; }
+
+    public bool IsPRODEnvironment { get; init; }
 }
 
 public class RedisConfig

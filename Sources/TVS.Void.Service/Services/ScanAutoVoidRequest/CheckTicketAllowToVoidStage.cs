@@ -57,13 +57,13 @@ public class CheckTicketAllowToVoidStageImp : CheckTicketAllowToVoidStage
             ValidVoidCricketTickets = objectsArray[4].Cast<RequestDetailTicketModel>(),
             CricketTicketsResettle = objectsArray[5].Cast<RequestDetailTicketModel>(),
             //ValidCancelCOTickets = objectsArray[6].Cast<RequestDetailTicketModel>()
-            VoidSingleTickets14 = objectsArray[7].Cast<RequestDetailTicketModel>()
+            ValidVoidSingleTickets14 = objectsArray[7].Cast<RequestDetailTicketModel>()
         };
 
         logData.Add($"{nameof(CheckTicketAllowToVoidStage)} - VVSingle: {outputData.ValidVoidSingleTickets.Count()} - VVParlay: {outputData.ValidVoidParlayTickets.Count()}"
                     + $" - SingleResettle: {outputData.SingleTicketsResettle.Count()} - ParlayResettle: {outputData.ParlayTicketsResettle.Count()}"
                     + $" - ValidVoidCricketTickets: {outputData.ValidVoidCricketTickets.Count()} - CricketTicketsResettle: {outputData.CricketTicketsResettle.Count()}"
-                    + $" - VoidSingleTickets14: {outputData.VoidSingleTickets14.Count()}");
+                    + $" - ValidVoidSingleTickets14: {outputData.ValidVoidSingleTickets14.Count()}");
 
         return outputData;
     }

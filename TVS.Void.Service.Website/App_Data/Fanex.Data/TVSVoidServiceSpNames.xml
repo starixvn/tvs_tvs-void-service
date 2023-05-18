@@ -44,6 +44,9 @@
         <Setting Key="TicketVoiding_VoidBetAutomation_Service_Insert" SpName="TicketVoiding_VoidBetAutomation_Service_Insert" DbName="DBCTG.bodb02.bodbAdminNet" TimeOut="600" />
         <Setting Key="TicketVoiding_Request_Select" SpName="TicketVoiding_Request_Select" DbName="DBCTG.bodb02.bodbAdminNet" TimeOut="600" />
         <Setting Key="TicketVoiding_TicketProcess_Update" SpName="TicketVoiding_TicketProcess_Update" DbName="DBCTG.bodb02.bodbAdminNet" TimeOut="600" />
+
+        <Setting Key="TicketVoiding_Admin_Bet14_BalanceTrigger_Insert" SpName="TicketVoiding_Admin_Bet14_BalanceTrigger_Insert" DbName="DBBAH.bodb02.bodbAdminNet" TimeOut="600" />
+        <Setting Key="TicketVoiding_Admin_Bet14_BalanceTrigger_Insert_Backup" SpName="TicketVoiding_Admin_Bet14_BalanceTrigger_Insert" DbName="DBBAH_BACKUP.bodb02.bodbAdminNet" TimeOut="600" />
     </Function>
     <Function Name="NetPosition">
         <Setting Key="Update_Net_Position_Log" SpName="NAP_Admin_SettlementService_Ins" DbName="DBCTG.bodb02.bodbAdminNet" TimeOut="600" />

@@ -15,5 +15,5 @@ public class CheckStatusTicketOutput
 
     public IEnumerable<RequestDetailTicketModel> ValidCancelCOTickets { get; set; }
 
-    public IEnumerable<RequestDetailTicketModel> VoidSingleTickets14 { get; set; }
+    public IEnumerable<RequestDetailTicketModel> ValidVoidSingleTickets14 { get; set; }
 }

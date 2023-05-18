@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using TicketVoidingSystem.Constants;
 using TicketVoidingSystem.Services;
@@ -48,13 +49,23 @@ public class AutoVoidInstantProcessStageImp : AutoVoidInstantProcessStage
             return;
         }
 
+        var validVoidSingleTickets = getTicketsResult.OutputData.SingleTickets;
+        var validVoidParlayTickets = getTicketsResult.OutputData.ParlayTickets;
+        var validVoidCricketTickets = getTicketsResult.OutputData.CricketTickets;
+        var validVoidSingleTickets14 = Enumerable.Empty<RequestDetailTicketModel>();
+
         if (checkQueueResult.IssueTypeId == IssueTypeConstant.AbnormalAccount)
         {
             var checkTicketResult = await checkTicketAllowToVoidStage.Execute(siteDbGroupId, getTicketsResult.OutputData.SingleTickets,
                 getTicketsResult.OutputData.ParlayTickets, getTicketsResult.OutputData.CricketTickets, logData);
+
+            validVoidSingleTickets = checkTicketResult.ValidVoidSingleTickets;
+            validVoidParlayTickets = checkTicketResult.ValidVoidParlayTickets;
+            validVoidCricketTickets = checkTicketResult.ValidVoidCricketTickets;
+            validVoidSingleTickets14 = checkTicketResult.ValidVoidSingleTickets14;
         }
-        var queueErrorMessage = await insertPreVoidingDataStage.Execute(siteDbGroupId, queue, getTicketsResult.OutputData.SingleTickets,
-            getTicketsResult.OutputData.ParlayTickets, getTicketsResult.OutputData.CricketTickets, logData);
+        var queueErrorMessage = await insertPreVoidingDataStage.Execute(siteDbGroupId, queue, validVoidSingleTickets,
+            validVoidParlayTickets, validVoidCricketTickets, validVoidSingleTickets14, logData);
         await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, ExecuteStatus.Done, queueErrorMessage);
         await WriteLog(logData);
     }
