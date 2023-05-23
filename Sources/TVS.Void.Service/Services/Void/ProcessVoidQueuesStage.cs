@@ -36,7 +36,7 @@ public class ProcessVoidQueuesStageImp : ProcessVoidQueuesStage
             }
 
             var voidResult = await ExecuteSingleQueue(siteDbGroupId, queue);
-            await triggerBalanceTickets14Stage.Execute(queue, logData);
+            await triggerBalanceTickets14Stage.Execute(voidResult, logData);
             processResult.Add(voidResult);
         }
 
@@ -60,7 +60,7 @@ public class ProcessVoidQueuesStageImp : ProcessVoidQueuesStage
 
         if (voidResult.StatusId == ExecuteStatus.Failed && isCalledNetPosition)
         {
-            await netPositionService.RollBackNetPosition(queue.TransIds, ActionApiType.Void, voidResult.ErrorMsg, AutoVoidConstant.ActorId);
+            await netPositionService.RollBackNetPosition(queue.TransIds, ActionApiType.Void, voidResult.ErrMsg, AutoVoidConstant.ActorId);
         }
 
         return voidResult;

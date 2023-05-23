@@ -13,7 +13,7 @@ public class TicketVoidingQueueModel
     public string UserName { get; set; }
     public string NegativeBalanceUsers { get; set; }
     public string TransIds { get; set; }
-    public string ErrorMsg { get; set; }
+    public string ErrMsg { get; set; }
     public string BeforeTransInfoJson { get; set; }
     public string AfterTransInfoJson { get; set; }
 }
