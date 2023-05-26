@@ -62,7 +62,7 @@ public class VoidServiceImp : VoidService
     private async Task ExecuteNormalFlow(int siteDbGroupId, IList<TicketVoidingQueueModel> voidingQueues, IList<string> logData)
     {
         logData.Add($"{nameof(VoidService)}[{siteDbGroupId}]: {JsonSerializer.Serialize(voidingQueues)}");
-        var processVoidQueuesResult = await processVoidQueuesStage.Execute(siteDbGroupId, voidingQueues, logData);
+        var processVoidQueuesResult = await processVoidQueuesStage.Execute(siteDbGroupId, voidingQueues);
         logData.Add($"{nameof(processVoidQueuesResult)}: {JsonSerializer.Serialize(processVoidQueuesResult)}");
 
         if (processVoidQueuesResult.Any(x => x.StatusId is ExecuteStatus.Failed or ExecuteStatus.New))

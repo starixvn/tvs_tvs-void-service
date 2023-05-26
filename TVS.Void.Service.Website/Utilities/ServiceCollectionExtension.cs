@@ -127,7 +127,6 @@ public static class ServiceCollectionExtension
         services.AddSingleton<ProcessVoidQueuesStage, ProcessVoidQueuesStageImp>();
         services.AddSingleton<InsertAfterVoidDataStage, InsertAfterVoidDataStageImp>();
         services.AddSingleton<InsertAfterVoidDataPrivateService, InsertAfterVoidDataPrivateServiceImp>();
-        services.AddSingleton<TriggerBalanceTickets14Stage, TriggerBalanceTickets14StageImp>();
     }
 
     public static void RegisterQuartzScheduler(this IServiceCollection services)
