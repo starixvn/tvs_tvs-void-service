@@ -14,10 +14,10 @@ public interface TicketVoidingQueueService
     Task<IList<TicketVoidingQueueModel>> GetQueues(int siteDbGroupId, int? voidingHistoryId);
 
     Task InsertQueue(int siteDbGroupId, int requestId, int voidingHistoryId, IEnumerable<RequestDetailTicketModel> singleTickets,
-        IEnumerable<RequestDetailTicketModel> parlayTickets, IEnumerable<RequestDetailTicketModel> cricketTickets);
+        IEnumerable<RequestDetailTicketModel> parlayTickets, IEnumerable<RequestDetailTicketModel> cricketTickets, IEnumerable<RequestDetailTicketModel> singleTickets14);
 
     Task InsertQueueForRequests(int siteDbGroupId, IEnumerable<VoidingHistoryModel> voidingHistoryList, IEnumerable<RequestDetailTicketModel> singleTickets,
-        IEnumerable<RequestDetailTicketModel> parlayTickets, IEnumerable<RequestDetailTicketModel> cricketTickets);
+        IEnumerable<RequestDetailTicketModel> parlayTickets, IEnumerable<RequestDetailTicketModel> cricketTickets, IEnumerable<RequestDetailTicketModel> singleTickets14);
 
     Task<TicketVoidingQueueModel> ProcessVoidQueue(int siteDbGroupId, int queueId, bool? isCalledNetPosition);
 }
@@ -45,7 +45,7 @@ public class TicketVoidingQueueServiceImp : TicketVoidingQueueService
     }
 
     public async Task InsertQueue(int siteDbGroupId, int requestId, int voidingHistoryId, IEnumerable<RequestDetailTicketModel> singleTickets,
-        IEnumerable<RequestDetailTicketModel> parlayTickets, IEnumerable<RequestDetailTicketModel> cricketTickets)
+        IEnumerable<RequestDetailTicketModel> parlayTickets, IEnumerable<RequestDetailTicketModel> cricketTickets, IEnumerable<RequestDetailTicketModel> singleTickets14)
     {
         var criteria = new InsertTicketVoidingQueueCriteria
         {
@@ -55,23 +55,24 @@ public class TicketVoidingQueueServiceImp : TicketVoidingQueueService
             SingleTicketsJson = JsonSerializer.Serialize(singleTickets),
             ParlayTicketsJson = JsonSerializer.Serialize(parlayTickets),
             CricketTicketsJson = JsonSerializer.Serialize(cricketTickets),
+            SingleTickets14Json = JsonSerializer.Serialize(singleTickets14),
             UserId = AutoVoidConstant.ActorId,
             IP = AutoVoidConstant.IPAddress,
         };
         await repository.ExecuteAsync(criteria);
     }
 
-    public async Task InsertQueueForRequests(int siteDbGroupId, IEnumerable<VoidingHistoryModel> voidingHistoryList,
-        IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets, IEnumerable<RequestDetailTicketModel> cricketTickets)
+    public async Task InsertQueueForRequests(int siteDbGroupId, IEnumerable<VoidingHistoryModel> voidingHistoryList, IEnumerable<RequestDetailTicketModel> singleTickets,
+        IEnumerable<RequestDetailTicketModel> parlayTickets, IEnumerable<RequestDetailTicketModel> cricketTickets, IEnumerable<RequestDetailTicketModel> singleTickets14)
     {
         foreach (var voidingHistory in voidingHistoryList)
         {
             var singleTicketsInCurrentRequest = singleTickets.Where(x => x.RequestId == voidingHistory.RequestId);
             var parlayTicketsInCurrentRequest = parlayTickets.Where(x => x.RequestId == voidingHistory.RequestId);
             var cricketTicketsInCurrentRequest = cricketTickets.Where(x => x.RequestId == voidingHistory.RequestId);
-
+            var singleTickets14InCurrentRequest = singleTickets14.Where(x => x.RequestId == voidingHistory.RequestId);
             await InsertQueue(siteDbGroupId, voidingHistory.RequestId, voidingHistory.VoidingHistoryId,
-                singleTicketsInCurrentRequest, parlayTicketsInCurrentRequest, cricketTicketsInCurrentRequest);
+                singleTicketsInCurrentRequest, parlayTicketsInCurrentRequest, cricketTicketsInCurrentRequest, singleTickets14InCurrentRequest);
         }
     }
 

@@ -120,6 +120,8 @@ public static class ServiceCollectionExtension
         services.AddSingleton<CheckTicketAllowToVoidStage, CheckTicketAllowToVoidStageImp>();
         services.AddSingleton<ReCalculateTicketsStage, ReCalculateTicketsStageImp>();
         services.AddSingleton<InsertPreVoidingDataStage, InsertPreVoidingDataStageImp>();
+        services.AddSingleton<AutoVoidInstantProcessStage, AutoVoidInstantProcessStageImp>();
+        services.AddSingleton<AutoVoidWinningProcessStage, AutoVoidWinningProcessStageImp>();
 
         services.AddSingleton<VoidService, VoidServiceImp>();
         services.AddSingleton<ProcessVoidQueuesStage, ProcessVoidQueuesStageImp>();
