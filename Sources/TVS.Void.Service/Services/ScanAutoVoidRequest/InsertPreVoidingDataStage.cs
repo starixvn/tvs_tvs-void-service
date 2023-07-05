@@ -39,7 +39,8 @@ public class InsertPreVoidingDataStageImp : InsertPreVoidingDataStage
         }
 
         var requestIds = string.Join(",", DistinctRequestIdList(validVoidSingleTickets, validVoidParlayTickets, validVoidCricketTickets, validVoidSingleTickets14));
-        var voidingHistoryList = await requestDetailService.InsertVoidingHistory(requestIds, siteDbGroupId, queue.BroadcastSessionId);
+        var voidingHistoryList = await requestDetailService.InsertVoidingHistory(requestIds, siteDbGroupId, queue.BroadcastSessionId,
+            validVoidSingleTickets, validVoidParlayTickets, validVoidCricketTickets, validVoidSingleTickets14);
         logData.Add($"{nameof(voidingHistoryList)}: {JsonSerializer.Serialize(voidingHistoryList)}");
 
         await notificationService.NotifyRequestRunningToAllUser(voidingHistoryList);
