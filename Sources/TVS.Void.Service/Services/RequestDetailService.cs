@@ -90,12 +90,18 @@ public class RequestDetailServiceImp : RequestDetailService
 
     public async Task<VoidDataXmlModel> GetVoidDataOfVoidingHistory(int voidingHistoryId)
     {
+        var allVoidDataInCurrentVoidTimes = await GetAllVoidDataInCurrentVoidTimes(voidingHistoryId);
+        return allVoidDataInCurrentVoidTimes.First(x => voidingHistoryId == x.VoidingHistoryId);
+    }
+
+    private async Task<IEnumerable<VoidDataXmlModel>> GetAllVoidDataInCurrentVoidTimes(int voidingHistoryId)
+    {
         var criteria = new GetVoidDataOfVoidingHistoryCriteria
         {
             VoidingHistoryIds = voidingHistoryId.ToString()
         };
 
-        return await repository.GetAsync<VoidDataXmlModel>(criteria);
+        return await repository.FetchAsync<VoidDataXmlModel>(criteria);
     }
 
     private static string CreateVoidDataXmlForAutoVoid(IEnumerable<RequestDetailTicketModel> validVoidSingleTickets, IEnumerable<RequestDetailTicketModel> validVoidParlayTickets,
