@@ -52,5 +52,5 @@ public class VoidDataXmlModel
 
     public int TotalTicket { get; set; }
 
-    public bool IsRunManualAfterVoid { get; set; }
+    public bool IsRunAutoAfterVoid { get; set; }
 }

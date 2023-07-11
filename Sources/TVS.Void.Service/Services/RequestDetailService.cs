@@ -16,7 +16,7 @@ public interface RequestDetailService
         IEnumerable<RequestDetailTicketModel> validVoidSingleTickets, IEnumerable<RequestDetailTicketModel> validVoidParlayTickets,
         IEnumerable<RequestDetailTicketModel> validVoidCricketTickets, IEnumerable<RequestDetailTicketModel> validVoidSingleTickets14);
 
-    Task<AfterVoidServiceModel> InsertAfterVoidServiceData(bool isRunManualAfterVoid, AfterVoidServiceModel afterVoidData);
+    Task<AfterVoidServiceModel> InsertAfterVoidServiceData(bool isRunAutoAfterVoid, AfterVoidServiceModel afterVoidData);
 
     Task UpdateTicketVoidingHistory(int voidingHistoryId, int statusId);
 
@@ -50,11 +50,11 @@ public class RequestDetailServiceImp : RequestDetailService
         return await repository.FetchAsync<VoidingHistoryModel>(criteria);
     }
 
-    public async Task<AfterVoidServiceModel> InsertAfterVoidServiceData(bool isRunManualAfterVoid, AfterVoidServiceModel afterVoidData)
+    public async Task<AfterVoidServiceModel> InsertAfterVoidServiceData(bool isRunAutoAfterVoid, AfterVoidServiceModel afterVoidData)
     {
         var criteria = new InsertAfterVoidServiceDataCriteria
         {
-            IsAutoVoid = !isRunManualAfterVoid,
+            IsAutoVoid = isRunAutoAfterVoid,
             RequestId = afterVoidData.RequestId,
             VoidingHistoryId = afterVoidData.VoidingHistoryId,
             MatchId = afterVoidData.MatchId,
@@ -122,7 +122,7 @@ public class RequestDetailServiceImp : RequestDetailService
                $"VoidToTime='{toTime.ToString(DateTimeFormatConstant.TimeWithAmPm)}' " +
                $"VoidFromDate='{fromDate.ToString(DateTimeFormatConstant.ShortDateFormatWithSlash)}' " +
                $"VoidToDate='{toDate.ToString(DateTimeFormatConstant.ShortDateFormatWithSlash)}' " +
-               $"IsRunManualAfterVoid='{false}' " +
+               $"IsRunAutoAfterVoid='{true}' " +
                $"IsHasSettledTicket='{isHasSettledTicket}' />";
     }
 }

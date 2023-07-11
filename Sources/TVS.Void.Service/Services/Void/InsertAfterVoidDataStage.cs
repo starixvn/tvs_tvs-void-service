@@ -36,7 +36,7 @@ public class InsertAfterVoidDataStageImp : InsertAfterVoidDataStage
         };
 
         var voidDataXmlModel = await requestDetailService.GetVoidDataOfVoidingHistory(firstVoidQueue.VoidingHistoryId);
-        var insertedAfterVoidData = await requestDetailService.InsertAfterVoidServiceData(voidDataXmlModel.IsRunManualAfterVoid, afterVoidData);
+        var insertedAfterVoidData = await requestDetailService.InsertAfterVoidServiceData(voidDataXmlModel.IsRunAutoAfterVoid, afterVoidData);
         logData.Add($"{nameof(RequestDetailService.InsertAfterVoidServiceData)}: {JsonSerializer.Serialize(insertedAfterVoidData)}");
     }
 }
