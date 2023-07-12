@@ -123,6 +123,7 @@ public class RequestDetailServiceImp : RequestDetailService
                $"VoidFromDate='{fromDate.ToString(DateTimeFormatConstant.ShortDateFormatWithSlash)}' " +
                $"VoidToDate='{toDate.ToString(DateTimeFormatConstant.ShortDateFormatWithSlash)}' " +
                $"IsRunAutoAfterVoid='{true}' " +
+               $"TotalTicket='{voidTickets.Count()}' " +
                $"IsHasSettledTicket='{isHasSettledTicket}' />";
     }
 }
