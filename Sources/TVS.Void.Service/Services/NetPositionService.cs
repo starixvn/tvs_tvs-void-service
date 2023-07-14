@@ -2,79 +2,65 @@
 using System.Threading.Tasks;
 using Fanex.Data.Repository;
 using TicketVoidingSystem.Constants;
-using TicketVoidingSystem.Services;
 using TVS.Void.Service.Criteria;
 
 namespace TVS.Void.Service.Services;
 
 public interface NetPositionService
 {
-    Task<bool> UpdateNetPosition(string transIds, string action, int userId);
+    Task<bool> UpdateNetPosition(string transIds, string action);
 
-    Task RollBackNetPosition(string transIds, string action, string message, int userId);
+    Task RollBackNetPosition(string transIds);
 }
 
 public class NetPositionServiceImp : NetPositionService
 {
-    private readonly NetPositionHttpClientService netPositionHttpClientService;
     private readonly IDynamicRepository repository;
 
-    public NetPositionServiceImp(NetPositionHttpClientService netPositionHttpClientService, IDynamicRepository repository)
+    public NetPositionServiceImp(IDynamicRepository repository)
     {
-        this.netPositionHttpClientService = netPositionHttpClientService;
         this.repository = repository;
     }
 
-    public async Task<bool> UpdateNetPosition(string transIds, string action, int userId)
+    public async Task<bool> UpdateNetPosition(string transIds, string action)
     {
-        if (!string.IsNullOrEmpty(transIds))
+        if (string.IsNullOrEmpty(transIds))
         {
-            var param = new UpdateNetPositionLogCommand
+            return true;
+        }
+
+        return await IsNetPosition(transIds, action);
+    }
+
+    private async Task<bool> IsNetPosition(string transIds, string action)
+    {
+        try
+        {
+            var command = new TicketVoidingNetPositionCriteria
             {
-                AdminId = userId,
-                ServiceType = ServiceApiType.Cricket,
-                TransIds = transIds,
+                StrTransIds = transIds,
                 Action = action
             };
 
-            return await ExecuteNetPosition(param);
+            await repository.ExecuteAsync(command);
+            return true;
         }
-
-        return true;
+        catch (Exception)
+        {
+            return false;
+        }
     }
 
-    private async Task<bool> ExecuteNetPosition(UpdateNetPositionLogCommand command)
-    {
-        command.StartTime = DateTime.Now;
-        var result = await netPositionHttpClientService.PostRequest(command.TransIds, command.Action);
-        command.EndTime = DateTime.Now;
-
-        if (result.IsSuccessful)
-        {
-            command.ServiceStatus = ServiceApiStatus.Finished;
-        }
-        else
-        {
-            command.ServiceStatus = ServiceApiStatus.Failed;
-            command.Reason = result.ErrorMsg;
-        }
-
-        await repository.ExecuteAsync(command);
-
-        return result.IsSuccessful;
-    }
-
-    public async Task RollBackNetPosition(string transIds, string action, string message, int userId)
+    public async Task RollBackNetPosition(string transIds)
     {
         if (!string.IsNullOrWhiteSpace(transIds))
         {
-            var command = new RollBackNetPositionCommand
+            var command = new TicketVoidingNetPositionCriteria
             {
-                CricketIds = transIds,
-                Action = action,
-                AdminId = userId,
-                Reason = message
+                StrTransIds = transIds,
+                Action = NetPositionConstant.ActionRecover
             };
+
             await repository.ExecuteAsync(command);
         }
     }
