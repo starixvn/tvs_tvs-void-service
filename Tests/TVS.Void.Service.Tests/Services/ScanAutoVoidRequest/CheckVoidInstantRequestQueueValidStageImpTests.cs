@@ -32,7 +32,7 @@ public class CheckVoidInstantRequestQueueValidStageImpTests
         var actual = await service.Execute(siteDbGroupId, queue);
 
         await requestDetailService.Received(1).GetRequestById(Arg.Any<int>());
-        Assert.True(actual);
+        Assert.True(actual.IsValid);
     }
 
     [Fact]
@@ -56,7 +56,7 @@ public class CheckVoidInstantRequestQueueValidStageImpTests
 
         await requestDetailService.DidNotReceiveWithAnyArgs().GetRequestById(default);
         Assert.Equal(1, countUpdateQueue);
-        Assert.False(actual);
+        Assert.False(actual.IsValid);
     }
 
     [Fact]
@@ -77,7 +77,7 @@ public class CheckVoidInstantRequestQueueValidStageImpTests
         var actual = await service.Execute(siteDbGroupId, queue);
 
         await requestDetailService.Received(1).GetRequestById(Arg.Any<int>());
-        Assert.False(actual);
+        Assert.False(actual.IsValid);
     }
 
     [Fact]
@@ -105,6 +105,6 @@ public class CheckVoidInstantRequestQueueValidStageImpTests
 
         await requestDetailService.Received(1).GetRequestById(Arg.Any<int>());
         await autoVoidRequestQueueService.Received(1).UpdateQueue(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<int?>(), Arg.Any<string>());
-        Assert.False(actual);
+        Assert.False(actual.IsValid);
     }
 }

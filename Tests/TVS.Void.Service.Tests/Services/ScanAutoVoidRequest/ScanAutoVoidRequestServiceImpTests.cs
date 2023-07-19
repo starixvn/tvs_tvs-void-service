@@ -1,4 +1,5 @@
 ﻿using NSubstitute;
+using TicketVoidingSystem.Constants;
 using TicketVoidingSystem.Services;
 using TVS.Void.Service.Constants;
 using TVS.Void.Service.Models;
@@ -9,27 +10,33 @@ namespace TVS.Void.Service.Tests.Services.ScanAutoVoidRequest;
 
 public class ScanAutoVoidRequestServiceImpTests
 {
+
+    private readonly AutoVoidWinningProcessStage autoVoidWinningProcessStage;
+    private readonly AutoVoidInstantProcessStage autoVoidInstantProcessStage;
+    private readonly AutoVoidRequestQueueService autoVoidRequestQueueService;
+    private readonly LoggingService loggingService;
+    private ScanAutoVoidRequestServiceImp service;
+
+    public ScanAutoVoidRequestServiceImpTests()
+    {
+        autoVoidWinningProcessStage = Substitute.For<AutoVoidWinningProcessStage>();
+        autoVoidInstantProcessStage = Substitute.For<AutoVoidInstantProcessStage>();
+        autoVoidRequestQueueService = Substitute.For<AutoVoidRequestQueueService>();
+        loggingService = Substitute.For<LoggingService>();
+        service = new ScanAutoVoidRequestServiceImp(autoVoidWinningProcessStage, autoVoidInstantProcessStage, autoVoidRequestQueueService, loggingService);
+    }
+
     [Fact]
     public async Task Execute_QueueIsNull_Return()
-    {
+    {   // Arrange
         AutoVoidRequestQueueModel? queue = null;
         const int siteDbGroupId = 0;
-        var checkRequestQueueValidStage = Substitute.For<CheckVoidInstantRequestQueueValidStage>();
-        var getTicketsStage = Substitute.For<GetTicketsStage>();
-        var checkTicketAllowToVoidStage = Substitute.For<CheckTicketAllowToVoidStage>();
-        var reCalculateTicketsStage = Substitute.For<ReCalculateTicketsStage>();
-        var insertPreVoidingDataStage = Substitute.For<InsertPreVoidingDataStage>();
-        var autoVoidRequestQueueService = Substitute.For<AutoVoidRequestQueueService>();
-        var loggingService = Substitute.For<LoggingService>();
-
         autoVoidRequestQueueService.GetQueue(default).ReturnsForAnyArgs(queue);
 
-        var service = new ScanAutoVoidRequestServiceImp(checkRequestQueueValidStage, getTicketsStage,
-            checkTicketAllowToVoidStage, reCalculateTicketsStage, insertPreVoidingDataStage,
-            autoVoidRequestQueueService, loggingService);
-
+        // Act
         await service.Execute(siteDbGroupId);
 
+        // Assert
         await autoVoidRequestQueueService.Received(1).GetQueue(Arg.Any<int>());
     }
 
@@ -45,153 +52,30 @@ public class ScanAutoVoidRequestServiceImpTests
             Action = action
         };
         const int siteDbGroupId = 0;
-        var checkRequestQueueValidStage = Substitute.For<CheckVoidInstantRequestQueueValidStage>();
-        var getTicketsStage = Substitute.For<GetTicketsStage>();
-        var checkTicketAllowToVoidStage = Substitute.For<CheckTicketAllowToVoidStage>();
-        var reCalculateTicketsStage = Substitute.For<ReCalculateTicketsStage>();
-        var insertPreVoidingDataStage = Substitute.For<InsertPreVoidingDataStage>();
-        var autoVoidRequestQueueService = Substitute.For<AutoVoidRequestQueueService>();
-        var loggingService = Substitute.For<LoggingService>();
-
         autoVoidRequestQueueService.GetQueue(default).ReturnsForAnyArgs(queue);
-        checkRequestQueueValidStage.Execute(default, default).ReturnsForAnyArgs(true);
-        checkTicketAllowToVoidStage.Execute(default, default, default, default, default)
-            .ReturnsForAnyArgs(new CheckStatusTicketOutput());
-        getTicketsStage.Execute(default, default, default).ReturnsForAnyArgs((true, new GetTicketsStageOutput()));
-
-        var service = new ScanAutoVoidRequestServiceImp(checkRequestQueueValidStage, getTicketsStage,
-            checkTicketAllowToVoidStage, reCalculateTicketsStage, insertPreVoidingDataStage,
-            autoVoidRequestQueueService, loggingService);
 
         await service.Execute(siteDbGroupId);
 
         await autoVoidRequestQueueService.Received(1).GetQueue(Arg.Any<int>());
-        await checkRequestQueueValidStage.Received(1).Execute(Arg.Any<int>(), Arg.Any<AutoVoidRequestQueueModel>());
-        await loggingService.Received(1).InfoAppendNewLineAsync(Arg.Any<IList<string>>());
+        await autoVoidInstantProcessStage.Received(1)
+            .Execute(default, Arg.Any<AutoVoidRequestQueueModel>(), Arg.Any<List<string>>());
     }
 
     [Fact]
-    public async Task Execute_IsQueueAutoVoidInstantAndRequestQueueInvalid_CalledExpected()
+    public async Task Execute_IsNotQueueAutoVoidInstant_CalledExpected()
     {
         var queue = new AutoVoidRequestQueueModel
         {
-            Action = AutoVoidConstant.QueueActionVoidInstant
+            Action = AutoVoidConstant.ActorName
         };
         const int siteDbGroupId = 0;
-        var checkRequestQueueValidStage = Substitute.For<CheckVoidInstantRequestQueueValidStage>();
-        var getTicketsStage = Substitute.For<GetTicketsStage>();
-        var checkTicketAllowToVoidStage = Substitute.For<CheckTicketAllowToVoidStage>();
-        var reCalculateTicketsStage = Substitute.For<ReCalculateTicketsStage>();
-        var insertPreVoidingDataStage = Substitute.For<InsertPreVoidingDataStage>();
-        var autoVoidRequestQueueService = Substitute.For<AutoVoidRequestQueueService>();
-        var loggingService = Substitute.For<LoggingService>();
-
         autoVoidRequestQueueService.GetQueue(default).ReturnsForAnyArgs(queue);
-        checkRequestQueueValidStage.Execute(default, default).ReturnsForAnyArgs(false);
-        checkTicketAllowToVoidStage.Execute(default, default, default, default, default)
-            .ReturnsForAnyArgs(new CheckStatusTicketOutput());
-        getTicketsStage.Execute(default, default, default).ReturnsForAnyArgs((true, new GetTicketsStageOutput()));
-
-        var service = new ScanAutoVoidRequestServiceImp(checkRequestQueueValidStage, getTicketsStage,
-            checkTicketAllowToVoidStage, reCalculateTicketsStage, insertPreVoidingDataStage,
-            autoVoidRequestQueueService, loggingService);
 
         await service.Execute(siteDbGroupId);
 
         await autoVoidRequestQueueService.Received(1).GetQueue(Arg.Any<int>());
-        await checkRequestQueueValidStage.Received(1).Execute(Arg.Any<int>(), Arg.Any<AutoVoidRequestQueueModel>());
-        await getTicketsStage.Received(0).Execute(Arg.Any<int>(), Arg.Any<AutoVoidRequestQueueModel>(), Arg.Any<IList<string>>());
-        await loggingService.Received(0).InfoAppendNewLineAsync(Arg.Any<IList<string>>());
-    }
-
-    [Fact]
-    public async Task Execute_IsQueueAutoVoidInstantAndIsContinueFlow_CalledExpected()
-    {
-        var queue = new AutoVoidRequestQueueModel
-        {
-            Action = AutoVoidConstant.QueueActionVoidInstant
-        };
-        const int siteDbGroupId = 0;
-        var checkRequestQueueValidStage = Substitute.For<CheckVoidInstantRequestQueueValidStage>();
-        var getTicketsStage = Substitute.For<GetTicketsStage>();
-        var checkTicketAllowToVoidStage = Substitute.For<CheckTicketAllowToVoidStage>();
-        var reCalculateTicketsStage = Substitute.For<ReCalculateTicketsStage>();
-        var insertPreVoidingDataStage = Substitute.For<InsertPreVoidingDataStage>();
-        var autoVoidRequestQueueService = Substitute.For<AutoVoidRequestQueueService>();
-        var loggingService = Substitute.For<LoggingService>();
-
-        autoVoidRequestQueueService.GetQueue(default).ReturnsForAnyArgs(queue);
-        checkRequestQueueValidStage.Execute(default, default).ReturnsForAnyArgs(true);
-        checkTicketAllowToVoidStage.Execute(default, default, default, default, default)
-            .ReturnsForAnyArgs(new CheckStatusTicketOutput());
-        getTicketsStage.Execute(default, default, default).ReturnsForAnyArgs((false, new GetTicketsStageOutput()));
-
-        var service = new ScanAutoVoidRequestServiceImp(checkRequestQueueValidStage, getTicketsStage,
-            checkTicketAllowToVoidStage, reCalculateTicketsStage, insertPreVoidingDataStage,
-            autoVoidRequestQueueService, loggingService);
-
-        await service.Execute(siteDbGroupId);
-
-        await autoVoidRequestQueueService.Received(1).GetQueue(Arg.Any<int>());
-        await checkRequestQueueValidStage.Received(1).Execute(Arg.Any<int>(), Arg.Any<AutoVoidRequestQueueModel>());
-        await getTicketsStage.Received(1).Execute(Arg.Any<int>(), Arg.Any<AutoVoidRequestQueueModel>(), Arg.Any<IList<string>>());
-        await loggingService.Received(0).InfoAppendNewLineAsync(Arg.Any<IList<string>>());
-    }
-
-    [Fact]
-    public async Task Execute_IsQueueAutoWinning_CalledExpected()
-    {
-        var queue = new AutoVoidRequestQueueModel { Action = "" };
-        const int siteDbGroupId = 0;
-        var checkRequestQueueValidStage = Substitute.For<CheckVoidInstantRequestQueueValidStage>();
-        var getTicketsStage = Substitute.For<GetTicketsStage>();
-        var checkTicketAllowToVoidStage = Substitute.For<CheckTicketAllowToVoidStage>();
-        var reCalculateTicketsStage = Substitute.For<ReCalculateTicketsStage>();
-        var insertPreVoidingDataStage = Substitute.For<InsertPreVoidingDataStage>();
-        var autoVoidRequestQueueService = Substitute.For<AutoVoidRequestQueueService>();
-        var loggingService = Substitute.For<LoggingService>();
-
-        autoVoidRequestQueueService.GetQueue(default).ReturnsForAnyArgs(queue);
-        checkTicketAllowToVoidStage.Execute(default, default, default, default, default)
-            .ReturnsForAnyArgs(new CheckStatusTicketOutput());
-        getTicketsStage.Execute(default, default, default).ReturnsForAnyArgs((true, new GetTicketsStageOutput()));
-
-        var service = new ScanAutoVoidRequestServiceImp(checkRequestQueueValidStage, getTicketsStage,
-            checkTicketAllowToVoidStage, reCalculateTicketsStage, insertPreVoidingDataStage,
-            autoVoidRequestQueueService, loggingService);
-
-        await service.Execute(siteDbGroupId);
-
-        await autoVoidRequestQueueService.Received(1).GetQueue(Arg.Any<int>());
-        await checkTicketAllowToVoidStage.Received(1).Execute(Arg.Any<int>(), Arg.Any<IEnumerable<RequestDetailTicketModel>>(),
-            Arg.Any<IEnumerable<RequestDetailTicketModel>>(), Arg.Any<IEnumerable<RequestDetailTicketModel>>(), Arg.Any<IList<string>>());
-        await loggingService.Received(1).InfoAppendNewLineAsync(Arg.Any<IList<string>>());
-    }
-
-    [Fact]
-    public async Task Execute_IsQueueAutoWinningAndIsContinueFlow_CalledExpected()
-    {
-        var queue = new AutoVoidRequestQueueModel { Action = "" };
-        const int siteDbGroupId = 0;
-        var checkRequestQueueValidStage = Substitute.For<CheckVoidInstantRequestQueueValidStage>();
-        var getTicketsStage = Substitute.For<GetTicketsStage>();
-        var checkTicketAllowToVoidStage = Substitute.For<CheckTicketAllowToVoidStage>();
-        var reCalculateTicketsStage = Substitute.For<ReCalculateTicketsStage>();
-        var insertPreVoidingDataStage = Substitute.For<InsertPreVoidingDataStage>();
-        var autoVoidRequestQueueService = Substitute.For<AutoVoidRequestQueueService>();
-        var loggingService = Substitute.For<LoggingService>();
-
-        autoVoidRequestQueueService.GetQueue(default).ReturnsForAnyArgs(queue);
-        getTicketsStage.Execute(default, default, default).ReturnsForAnyArgs((false, new GetTicketsStageOutput()));
-
-        var service = new ScanAutoVoidRequestServiceImp(checkRequestQueueValidStage, getTicketsStage,
-            checkTicketAllowToVoidStage, reCalculateTicketsStage, insertPreVoidingDataStage,
-            autoVoidRequestQueueService, loggingService);
-
-        await service.Execute(siteDbGroupId);
-
-        await autoVoidRequestQueueService.Received(1).GetQueue(Arg.Any<int>());
-        await loggingService.Received(0).InfoAppendNewLineAsync(Arg.Any<IList<string>>());
+        await autoVoidWinningProcessStage.Received(1)
+            .Execute(default, Arg.Any<AutoVoidRequestQueueModel>(), Arg.Any<List<string>>());
     }
 
     [Fact]
@@ -199,30 +83,17 @@ public class ScanAutoVoidRequestServiceImpTests
     {
         var queue = new AutoVoidRequestQueueModel
         {
-            Action = AutoVoidConstant.QueueActionVoidInstant
+            Action = AutoVoidConstant.ActorName
         };
         const int siteDbGroupId = 0;
-        var checkRequestQueueValidStage = Substitute.For<CheckVoidInstantRequestQueueValidStage>();
-        var getTicketsStage = Substitute.For<GetTicketsStage>();
-        var checkTicketAllowToVoidStage = Substitute.For<CheckTicketAllowToVoidStage>();
-        var reCalculateTicketsStage = Substitute.For<ReCalculateTicketsStage>();
-        var insertPreVoidingDataStage = Substitute.For<InsertPreVoidingDataStage>();
-        var autoVoidRequestQueueService = Substitute.For<AutoVoidRequestQueueService>();
-        var loggingService = Substitute.For<LoggingService>();
-
         autoVoidRequestQueueService.GetQueue(default).ReturnsForAnyArgs(queue);
-        checkRequestQueueValidStage.When(x => x.Execute(Arg.Any<int>(), Arg.Any<AutoVoidRequestQueueModel>()))
-            .Do(x => throw new Exception());
-
-        var service = new ScanAutoVoidRequestServiceImp(checkRequestQueueValidStage, getTicketsStage,
-            checkTicketAllowToVoidStage, reCalculateTicketsStage, insertPreVoidingDataStage,
-            autoVoidRequestQueueService, loggingService);
+        service = new ScanAutoVoidRequestServiceImp(null, autoVoidInstantProcessStage, autoVoidRequestQueueService, loggingService);
 
         await service.Execute(siteDbGroupId);
 
         await autoVoidRequestQueueService.Received(1).GetQueue(Arg.Any<int>());
-        await checkRequestQueueValidStage.Received(1).Execute(Arg.Any<int>(), Arg.Any<AutoVoidRequestQueueModel>());
-        await loggingService.Received(1).InfoAppendNewLineAsync(Arg.Any<IList<string>>());
-        await loggingService.Received(1).ErrorAsync(Arg.Any<string>(), Arg.Any<Exception>());
+        await loggingService.Received(1).InfoAppendNewLineAsync(Arg.Any<List<string>>());
+        await loggingService.ErrorAsync(Arg.Any<string>(), Arg.Any<Exception>());
+        await autoVoidRequestQueueService.UpdateQueue(Arg.Any<int>(), Arg.Any<int>(), ExecuteStatus.Failed, null);
     }
 }

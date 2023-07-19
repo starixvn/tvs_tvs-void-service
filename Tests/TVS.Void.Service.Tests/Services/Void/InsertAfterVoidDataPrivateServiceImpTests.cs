@@ -7,41 +7,6 @@ namespace TVS.Void.Service.Tests.Services.Void;
 public class InsertAfterVoidDataPrivateServiceImpTests
 {
     [Theory]
-    [InlineData(RequestActionConstant.AutoVoidWinning)]
-    [InlineData(RequestActionConstant.AutoVoidInstant)]
-    [InlineData(RequestActionConstant.AutoVoidInstant5m)]
-    [InlineData(RequestActionConstant.AutoVoidInstant10m)]
-    [InlineData(RequestActionConstant.AutoVoidInstantNoPolicy)]
-    public void IsAutoVoid_ShouldReturnTrue(int actionId)
-    {
-        // Arrange
-        var fakeRequest = new RequestModel { RequestId = 113, ActionId = actionId };
-        var service = new InsertAfterVoidDataPrivateServiceImp();
-
-        // Act
-        var actual = service.IsAutoVoid(fakeRequest, null);
-
-        // Assert
-        Assert.True(actual);
-    }
-
-    [Theory]
-    [InlineData(0)]
-    [InlineData(999)]
-    public void IsAutoVoid_ShouldReturnFalse(int actionId)
-    {
-        // Arrange
-        var fakeRequest = new RequestModel { RequestId = 113, ActionId = actionId };
-        var service = new InsertAfterVoidDataPrivateServiceImp();
-
-        // Act
-        var actual = service.IsAutoVoid(fakeRequest, new VoidingHistoryModel());
-
-        // Assert
-        Assert.False(actual);
-    }
-
-    [Theory]
     [MemberData(nameof(GetMatchIdForAfterVoidShouldReturnZeroTestData))]
     public void GetMatchIdForAfterVoid_ShouldReturnZero(int issueTypeId, IEnumerable<RequestDetail> requestDetails, IEnumerable<TicketVoidingQueueModel> voidQueueResults)
     {
