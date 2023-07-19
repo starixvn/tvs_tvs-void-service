@@ -9,6 +9,8 @@ public class AppSettingModel
 
     public bool IsCheckTicketStatusJobExecuting { get; set; }
 
+    public bool IsAddRequestDuplicatedJobExecuting { get; set; }
+
     public RedisConfig RedisConfig { get; init; }
 
     // Sentry
@@ -16,7 +18,7 @@ public class AppSettingModel
 
     public string SentryClientKey { get; init; }
 
-    //
+    ////
     public string TicketVoidingSystemUrl { get; init; }
 
     public string NetPositionUrl { get; init; }

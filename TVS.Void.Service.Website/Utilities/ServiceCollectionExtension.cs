@@ -20,6 +20,7 @@ using Quartz;
 using Sentry;
 using TicketVoidingSystem.Services;
 using TVS.Void.Service.Services;
+using TVS.Void.Service.Services.AddRequest;
 using TVS.Void.Service.Services.CheckTicketStatus;
 using TVS.Void.Service.Services.ScanAutoVoidRequest;
 using TVS.Void.Service.Services.Void;
@@ -126,6 +127,13 @@ public static class ServiceCollectionExtension
         services.AddSingleton<ProcessVoidQueuesStage, ProcessVoidQueuesStageImp>();
         services.AddSingleton<InsertAfterVoidDataStage, InsertAfterVoidDataStageImp>();
         services.AddSingleton<InsertAfterVoidDataPrivateService, InsertAfterVoidDataPrivateServiceImp>();
+
+        services.AddSingleton<AddRequestDuplicatedTicketsService, AddRequestDuplicatedTicketsServiceImp>();
+        services.AddSingleton<AddRequestStage, AddRequestStageImp>();
+        services.AddSingleton<CheckDuplicatedTicketsStage, CheckDuplicatedTicketsStageImp>();
+        services.AddSingleton<GetDuplicatedTicketsStage, GetDuplicatedTicketsStageImp>();
+        services.AddSingleton<InsertAutoVoidRequestQueueStage, InsertAutoVoidRequestQueueStageImp>();
+        services.AddSingleton<MarkTicketsStage, MarkTicketsStageImp>();
     }
 
     public static void RegisterQuartzScheduler(this IServiceCollection services)
@@ -134,6 +142,7 @@ public static class ServiceCollectionExtension
         services.AddTransient<CheckTicketStatusJob>();
         services.AddTransient<ScanAutoVoidRequestJob>();
         services.AddTransient<VoidJob>();
+        services.AddTransient<AddRequestDuplicatedTicketsJob>();
         services.AddQuartz(q =>
         {
             // handy when part of cluster or you want to otherwise identify multiple schedulers
@@ -165,6 +174,12 @@ public static class ServiceCollectionExtension
                 .WithIdentity($"{nameof(VoidJob)}Trigger")
                 .StartNow()
                 .WithSimpleSchedule(x => x.WithIntervalInSeconds(1).RepeatForever())
+            );
+
+            q.ScheduleJob<AddRequestDuplicatedTicketsJob>(trigger => trigger
+                .WithIdentity($"{nameof(AddRequestDuplicatedTicketsJob)} Trigger")
+                .StartNow()
+                .WithSimpleSchedule(x => x.WithIntervalInMinutes(1).RepeatForever())
             );
 
             q.AddSchedulerListener<CustomSchedulerListener>();
