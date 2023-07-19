@@ -25,6 +25,9 @@ public class RequestDetailTicketModel
     public long TransId { get; set; }
     public int MatchId { get; set; }
     public int MainTransId { get; set; }
+    public DateTime TransDate { get; set; }
+    public DateTime WinLostDate { get; set; }
+    public int StatusId { get; set; }
 }
 
 public class RequestDetailTicketModelEqualityComparer : IEqualityComparer<RequestDetailTicketModel>

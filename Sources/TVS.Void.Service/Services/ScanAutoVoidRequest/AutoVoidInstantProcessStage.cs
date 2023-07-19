@@ -54,7 +54,7 @@ public class AutoVoidInstantProcessStageImp : AutoVoidInstantProcessStage
         var validVoidCricketTickets = getTicketsResult.OutputData.CricketTickets;
         var validVoidSingleTickets14 = Enumerable.Empty<RequestDetailTicketModel>();
 
-        if (checkQueueResult.IssueTypeId == IssueTypeConstant.AbnormalAccount)
+        if (checkQueueResult.IssueTypeId is IssueTypeConstant.AbnormalAccount or IssueTypeConstant.ReducedOver)
         {
             var checkTicketResult = await checkTicketAllowToVoidStage.Execute(siteDbGroupId, getTicketsResult.OutputData.SingleTickets,
                 getTicketsResult.OutputData.ParlayTickets, getTicketsResult.OutputData.CricketTickets, logData);

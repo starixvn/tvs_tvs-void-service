@@ -35,8 +35,8 @@ public class InsertAfterVoidDataStageImp : InsertAfterVoidDataStage
             NegativeBalanceUsers = privateService.CombineNegativeBalanceUsers(voidQueueResults)
         };
 
-        var voidDataOfVoidingHistory = await requestDetailService.GetVoidDataOfVoidingHistory(firstVoidQueue.VoidingHistoryId);
-        var insertedAfterVoidData = await requestDetailService.InsertAfterVoidServiceData(privateService.IsAutoVoid(firstRequest, voidDataOfVoidingHistory), afterVoidData);
+        var voidDataXmlModel = await requestDetailService.GetVoidDataOfVoidingHistory(firstVoidQueue.VoidingHistoryId);
+        var insertedAfterVoidData = await requestDetailService.InsertAfterVoidServiceData(voidDataXmlModel.IsRunAutoAfterVoid, afterVoidData);
         logData.Add($"{nameof(RequestDetailService.InsertAfterVoidServiceData)}: {JsonSerializer.Serialize(insertedAfterVoidData)}");
     }
 }
