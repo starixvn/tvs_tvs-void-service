@@ -55,6 +55,7 @@
         <Setting Key="TicketVoiding_TicketProcess_Update" SpName="TicketVoiding_TicketProcess_Update" DbName="DBCTG.bodb02.bodbAdminNet" TimeOut="600" />
     </Function>
     <Function Name="NetPosition">
-        <Setting Key="NAP_TicketVoiding_NetPosition" SpName="NAP_TicketVoiding_NetPosition" DbName="DBCTG.bodb02.bodbAdminNet" TimeOut="600" />
+        <Setting Key="DBCTG.NAP_TicketVoiding_NetPosition" SpName="NAP_TicketVoiding_NetPosition" DbName="DBCTG.bodb02.bodbAdminNet" TimeOut="600" />
+        <Setting Key="DBSIG3.NAP_TicketVoiding_NetPosition" SpName="NAP_TicketVoiding_NetPosition" DbName="DBSIG3.bodb02.bodbAdminNet" TimeOut="600" />
     </Function>
 </Functions>

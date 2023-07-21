@@ -2,63 +2,69 @@
 using System.Threading.Tasks;
 using Fanex.Data.Repository;
 using TicketVoidingSystem.Constants;
+using TicketVoidingSystem.Services;
 using TVS.Void.Service.Criteria;
 
 namespace TVS.Void.Service.Services;
 
 public interface NetPositionService
 {
-    Task<bool> UpdateNetPosition(string transIds, string action);
+    Task<bool> UpdateNetPosition(int siteDbGroupId, string transIds, string action);
 
-    Task RollBackNetPosition(string transIds);
+    Task RollBackNetPosition(int siteDbGroupId, string transIds);
 }
 
 public class NetPositionServiceImp : NetPositionService
 {
+    private readonly LoggingService loggingService;
     private readonly IDynamicRepository repository;
 
-    public NetPositionServiceImp(IDynamicRepository repository)
+    public NetPositionServiceImp(LoggingService loggingService, IDynamicRepository repository)
     {
+        this.loggingService = loggingService;
         this.repository = repository;
     }
 
-    public async Task<bool> UpdateNetPosition(string transIds, string action)
+    public async Task<bool> UpdateNetPosition(int siteDbGroupId, string transIds, string action)
     {
-        if (string.IsNullOrEmpty(transIds))
+        if (string.IsNullOrWhiteSpace(transIds))
         {
             return true;
         }
 
-        return await IsNetPosition(transIds, action);
-    }
-
-    private async Task<bool> IsNetPosition(string transIds, string action)
-    {
         try
         {
-            var command = new TicketVoidingNetPositionCriteria
-            {
-                StrTransIds = transIds,
-                Action = action
-            };
-
-            await repository.ExecuteAsync(command);
+            await UpdateNetPositionTasks(siteDbGroupId, transIds, action);
             return true;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            await loggingService.ErrorAsync(ex);
             return false;
         }
     }
 
-    public async Task RollBackNetPosition(string transIds)
+    private async Task UpdateNetPositionTasks(int siteDbGroupId, string transIds, string action)
+    {
+        var command = new TicketVoidingNetPositionCriteria
+        {
+            StrTransIds = transIds,
+            Action = action,
+            SiteDbGroupId = siteDbGroupId
+        };
+
+        await repository.ExecuteAsync(command);
+    }
+
+    public async Task RollBackNetPosition(int siteDbGroupId, string transIds)
     {
         if (!string.IsNullOrWhiteSpace(transIds))
         {
             var command = new TicketVoidingNetPositionCriteria
             {
                 StrTransIds = transIds,
-                Action = NetPositionConstant.ActionRecover
+                Action = NetPositionConstant.ActionRecover,
+                SiteDbGroupId = siteDbGroupId
             };
 
             await repository.ExecuteAsync(command);
