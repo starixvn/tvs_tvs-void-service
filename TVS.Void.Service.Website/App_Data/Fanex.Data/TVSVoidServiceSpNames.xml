@@ -46,6 +46,11 @@
         <Setting Key="DBSIG2.TicketVoiding_AutoVoidRequest_CheckQueue" SpName="TicketVoiding_AutoVoidRequest_CheckQueue" DbName="DBSIG2.bodb02.bodbAdminNet" TimeOut="600" />
         <Setting Key="DBSIG3.TicketVoiding_AutoVoidRequest_CheckQueue" SpName="TicketVoiding_AutoVoidRequest_CheckQueue" DbName="DBSIG3.bodb02.bodbAdminNet" TimeOut="600" />
 
+        <Setting Key="DBCTG.Nap_SpecialDelete_MarkTickets_Update" SpName="Nap_SpecialDelete_MarkTickets_Update" DbName="DBCTG.bodb02.bodbAdminNet" TimeOut="600" />
+        <Setting Key="DBSIG.Nap_SpecialDelete_MarkTickets_Update" SpName="Nap_SpecialDelete_MarkTickets_Update" DbName="DBSIG.bodb02.bodbAdminNet" TimeOut="600" />
+        <Setting Key="DBSIG2.Nap_SpecialDelete_MarkTickets_Update" SpName="Nap_SpecialDelete_MarkTickets_Update" DbName="DBSIG2.bodb02.bodbAdminNet" TimeOut="600" />
+        <Setting Key="DBSIG3.Nap_SpecialDelete_MarkTickets_Update" SpName="Nap_SpecialDelete_MarkTickets_Update" DbName="DBSIG3.bodb02.bodbAdminNet" TimeOut="600" />
+
         <Setting Key="TicketVoiding_AutoVoidRequest_Ticket_Select" SpName="TicketVoiding_AutoVoidRequest_Ticket_Select" DbName="DBCTG.bodb02.bodbAdminNet" TimeOut="600" />
         <Setting Key="TicketVoiding_VoidingHistory_Insert" SpName="TicketVoiding_VoidingHistory_Insert" DbName="DBCTG.bodb02.bodbAdminNet" TimeOut="600" />
         <Setting Key="TicketVoiding_VoidingHistory_Update" SpName="TicketVoiding_VoidingHistory_Update" DbName="DBCTG.bodb02.bodbAdminNet" TimeOut="600" />
@@ -53,6 +58,10 @@
         <Setting Key="TicketVoiding_VoidBetAutomation_Service_Insert" SpName="TicketVoiding_VoidBetAutomation_Service_Insert" DbName="DBCTG.bodb02.bodbAdminNet" TimeOut="600" />
         <Setting Key="TicketVoiding_Request_Select" SpName="TicketVoiding_Request_Select" DbName="DBCTG.bodb02.bodbAdminNet" TimeOut="600" />
         <Setting Key="TicketVoiding_TicketProcess_Update" SpName="TicketVoiding_TicketProcess_Update" DbName="DBCTG.bodb02.bodbAdminNet" TimeOut="600" />
+
+        <Setting Key="TicketVoiding_Request_Insert" SpName="TicketVoiding_Request_Insert" DbName="DBCTG.bodb02.bodbAdminNet" TimeOut="600" />
+        <Setting Key="TicketVoiding_Request_CheckDuplicateTickets" SpName="TicketVoiding_Request_CheckDuplicateTickets" DbName="DBCTG.bodb02.bodbAdminNet" TimeOut="600" />
+        <Setting Key="TicketVoiding_DuplicateTickets_Select" SpName="TicketVoiding_DuplicateTickets_Select" DbName="DBRPT.bodb_Report.bodbAdminNet" TimeOut="600" />
     </Function>
     <Function Name="NetPosition">
         <Setting Key="DBCTG.NAP_TicketVoiding_NetPosition" SpName="NAP_TicketVoiding_NetPosition" DbName="DBCTG.bodb02.bodbAdminNet" TimeOut="600" />
