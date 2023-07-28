@@ -42,7 +42,7 @@ public class CheckTicketStatusServiceImp : CheckTicketStatusService
     private async Task ExecuteNormalFlow(IList<string> logData)
     {
         var (singleTickets, parlayTickets, cricketTickets) = await requestTicketService.GetTicketInAllRequests();
-        if (singleTickets.Any() || parlayTickets.Any())
+        if (singleTickets.Any() || parlayTickets.Any() || cricketTickets.Any())
         {
             logData.Add(
                 $"{nameof(CheckTicketStatusService)} - {nameof(singleTickets)}.Count: {singleTickets.Count()} - "
