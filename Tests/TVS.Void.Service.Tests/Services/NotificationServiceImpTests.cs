@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using NSubstitute;
+using TicketVoidingSystem.Constants;
 using TicketVoidingSystem.Models;
 using TicketVoidingSystem.Services;
 using TicketVoidingSystem.SignalR;
+using TVS.Void.Service.Constants;
 using TVS.Void.Service.Models;
 using TVS.Void.Service.Services;
 
@@ -57,12 +59,14 @@ public class NotificationServiceImpTests
     }
 
     [Theory]
-    [InlineData(123)]
-    [InlineData(0)]
-    public async Task NotifyVoidFailedToUser_ShouldExecuteSuccessful(int requestId)
+    [InlineData(123, VoidingTypeConstant.Cricket, ExecuteStatus.Failed)]
+    [InlineData(123, VoidingTypeConstant.CancelCashOut, ExecuteStatus.Failed)]
+    [InlineData(0, VoidingTypeConstant.Cricket, ExecuteStatus.Done)]
+    [InlineData(0, VoidingTypeConstant.CancelCashOut, ExecuteStatus.Done)]
+    public async Task NotifyVoidFailedToUser_ShouldExecuteSuccessful(int requestId, int voidingTypeId, int statusId)
     {
         // Arrange
-        var voidQueueResults = new List<TicketVoidingQueueModel> { new() { UserName = "abc" } };
+        var voidQueueResults = new List<TicketVoidingQueueModel> { new() { UserName = "abc", VoidingTypeId = voidingTypeId, StatusId = statusId } };
         var ticketVoidingSystemHttpClientService = Substitute.For<TicketVoidingSystemHttpClientService>();
         var hubContext = Substitute.For<IHubContext<NotificationHub, ClientEvent>>();
         var hubClient = Substitute.For<IHubClients<ClientEvent>>();

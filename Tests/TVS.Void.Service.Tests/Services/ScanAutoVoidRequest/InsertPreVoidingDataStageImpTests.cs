@@ -15,18 +15,26 @@ public class InsertPreVoidingDataStageImpTests
         var singleTickets = new List<RequestDetailTicketModel> { new() };
         var parlayTickets = new List<RequestDetailTicketModel>();
         var cricketTickets = new List<RequestDetailTicketModel>();
+        var singleTickets14 = new List<RequestDetailTicketModel>();
         var queue = new AutoVoidRequestQueueModel();
         var requestDetailService = Substitute.For<RequestDetailService>();
         var ticketVoidingQueueService = Substitute.For<TicketVoidingQueueService>();
         var requestTicketService = Substitute.For<RequestTicketService>();
         var notificationService = Substitute.For<NotificationService>();
-        requestDetailService.InsertVoidingHistory(default, default, default).ReturnsForAnyArgs(new List<VoidingHistoryModel>());
+        requestDetailService.InsertVoidingHistory(Arg.Any<string>(), default, Arg.Any<string>(),
+                Arg.Any<IEnumerable<RequestDetailTicketModel>>(), Arg.Any<IEnumerable<RequestDetailTicketModel>>(),
+                Arg.Any<IEnumerable<RequestDetailTicketModel>>(), Arg.Any<IEnumerable<RequestDetailTicketModel>>())
+            .ReturnsForAnyArgs(new List<VoidingHistoryModel>());
 
-        var service = new InsertPreVoidingDataStageImp(requestDetailService, ticketVoidingQueueService, requestTicketService, notificationService);
+        var service = new InsertPreVoidingDataStageImp(requestDetailService, ticketVoidingQueueService,
+            requestTicketService, notificationService);
 
-        var actual = await service.Execute(siteDbGroupId, queue, singleTickets, parlayTickets, cricketTickets, new List<string>());
+        var actual = await service.Execute(siteDbGroupId, queue, singleTickets, parlayTickets, cricketTickets,
+            singleTickets14, new List<string>());
 
-        await requestDetailService.Received(1).InsertVoidingHistory(Arg.Any<string>(), Arg.Any<int>(), Arg.Any<string>());
+        await requestDetailService.Received().InsertVoidingHistory(Arg.Any<string>(), default, Arg.Any<string>(),
+            Arg.Any<IEnumerable<RequestDetailTicketModel>>(), Arg.Any<IEnumerable<RequestDetailTicketModel>>(),
+            Arg.Any<IEnumerable<RequestDetailTicketModel>>(), Arg.Any<IEnumerable<RequestDetailTicketModel>>());
         Assert.Equal(expected, actual);
     }
 
@@ -37,10 +45,12 @@ public class InsertPreVoidingDataStageImpTests
         var singleTickets = new List<RequestDetailTicketModel>();
         var parlayTickets = new List<RequestDetailTicketModel>();
         var cricketTickets = new List<RequestDetailTicketModel>();
+        var singleTickets14 = new List<RequestDetailTicketModel>();
 
         var service = new InsertPreVoidingDataStageImp(default, default, default, default);
 
-        var actual = await service.Execute(default, default, singleTickets, parlayTickets, cricketTickets, default);
+        var actual = await service.Execute(default, default, singleTickets, parlayTickets, cricketTickets,
+            singleTickets14, default);
 
         Assert.Equal(expected, actual);
     }

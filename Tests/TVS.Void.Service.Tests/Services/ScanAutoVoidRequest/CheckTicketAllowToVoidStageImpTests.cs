@@ -13,7 +13,7 @@ public class CheckTicketAllowToVoidStageImpTests
     {
         const int siteDbGroupId = 0;
         var tickets = new List<RequestDetailTicketModel>();
-        IEnumerable<object>[] fakeData = { tickets, tickets, tickets, tickets, tickets, tickets };
+        IEnumerable<object>[] fakeData = { tickets, tickets, tickets, tickets, tickets, tickets, tickets, tickets };
         var expected = new CheckStatusTicketOutput
         {
             ValidVoidSingleTickets = tickets,
@@ -21,7 +21,8 @@ public class CheckTicketAllowToVoidStageImpTests
             ValidVoidParlayTickets = tickets,
             ParlayTicketsResettle = tickets,
             ValidVoidCricketTickets = tickets,
-            CricketTicketsResettle = tickets
+            CricketTicketsResettle = tickets,
+            ValidVoidSingleTickets14 = tickets,
         };
         var repository = Substitute.For<IDynamicRepository>();
         repository.FetchMultipleAsync(default, default)
@@ -30,8 +31,7 @@ public class CheckTicketAllowToVoidStageImpTests
 
         var actual = await service.Execute(siteDbGroupId, tickets, tickets, tickets, new List<string>());
 
-        await repository.Received(1)
-            .FetchMultipleAsync(Arg.Any<CheckTicketsAllowToVoidCriteria>(), Arg.Any<Type[]>());
+        await repository.Received(1).FetchMultipleAsync(Arg.Any<CheckTicketsAllowToVoidCriteria>(), Arg.Any<Type[]>());
         AssertExtension.Equal(expected, actual);
     }
 }

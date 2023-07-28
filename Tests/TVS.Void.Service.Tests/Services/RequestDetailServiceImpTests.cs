@@ -1,5 +1,6 @@
 ﻿using Fanex.Data.Repository;
 using NSubstitute;
+using TicketVoidingSystem.Constants;
 using TVS.Void.Service.Criteria;
 using TVS.Void.Service.Models;
 using TVS.Void.Service.Services;
@@ -9,18 +10,26 @@ namespace TVS.Void.Service.Tests.Services;
 public class RequestDetailServiceImpTests
 {
     [Theory]
-    [InlineData("2,3", 1, "123xyz")]
-    [InlineData("1", 0, "")]
-    public async Task InsertVoidingHistory_ShouldReturnExpectedData(string requestIds, int siteDbGroupId, string broadcastSessionId)
+    [InlineData("2,3", 1, "123xyz", TicketStatus.WonId)]
+    [InlineData("2,3", 1, "123xyz", TicketStatus.RunningId)]
+    [InlineData("1", 0, "", TicketStatus.DrawId)]
+    [InlineData("1", 0, "", TicketStatus.LoseId)]
+    public async Task InsertVoidingHistory_ShouldReturnExpectedData(string requestIds, int siteDbGroupId,
+        string broadcastSessionId, int statusId)
     {
         // Arrange
         var fakeVoidingHistory = new List<VoidingHistoryModel> { new() { VoidingHistoryId = 112 } };
         var repository = Substitute.For<IDynamicRepository>();
         repository.FetchAsync<VoidingHistoryModel>(default).ReturnsForAnyArgs(fakeVoidingHistory);
+        var singleTickets = new List<RequestDetailTicketModel> { new() { StatusId = statusId } };
+        var parlayTickets = new List<RequestDetailTicketModel>();
+        var cricketTickets = new List<RequestDetailTicketModel>();
+        var singleTickets14 = new List<RequestDetailTicketModel>();
         var service = new RequestDetailServiceImp(repository);
 
         // Act
-        var actual = await service.InsertVoidingHistory(requestIds, siteDbGroupId, broadcastSessionId);
+        var actual = await service.InsertVoidingHistory(requestIds, siteDbGroupId, broadcastSessionId, singleTickets,
+            parlayTickets, cricketTickets, singleTickets14);
 
         // Assert
         await repository.Received(1).FetchAsync<VoidingHistoryModel>
@@ -41,7 +50,8 @@ public class RequestDetailServiceImpTests
         var service = new RequestDetailServiceImp(repository);
 
         // Act
-        var actual = await service.InsertAfterVoidServiceData(isAutoVoid, new AfterVoidServiceModel() { RequestId = requestId });
+        var actual =
+            await service.InsertAfterVoidServiceData(isAutoVoid, new AfterVoidServiceModel { RequestId = requestId });
 
         // Assert
         await repository.Received(1).GetAsync<AfterVoidServiceModel>
@@ -81,7 +91,8 @@ public class RequestDetailServiceImpTests
         var fakeRequests = new List<RequestModel> { new() { RequestId = 113 } };
         var fakeRequestsDetail = new List<RequestDetail> { new() { RequestId = 222 } };
         var repository = Substitute.For<IDynamicRepository>();
-        repository.FetchMultipleAsync<RequestModel, RequestDetail>(default).ReturnsForAnyArgs((fakeRequests, fakeRequestsDetail));
+        repository.FetchMultipleAsync<RequestModel, RequestDetail>(default)
+            .ReturnsForAnyArgs((fakeRequests, fakeRequestsDetail));
         var service = new RequestDetailServiceImp(repository);
 
         // Act
@@ -94,20 +105,20 @@ public class RequestDetailServiceImpTests
     }
 
     [Fact]
-    public async Task GetVoidDataOfVoidingHistory_RepositoryHasCalled()
+    public async Task GetVoidDataOfVoidingHistory_ValidData_ReturnExpected()
     {
         // Arrange
-        var voidingHistory = new VoidingHistoryModel();
+        var voidingHistory = new List<VoidDataXmlModel> { new() { VoidingHistoryId = 1 } };
         var repository = Substitute.For<IDynamicRepository>();
-        repository.GetAsync<VoidingHistoryModel>(default).ReturnsForAnyArgs(voidingHistory);
+        repository.FetchAsync<VoidDataXmlModel>(Arg.Any<GetVoidDataOfVoidingHistoryCriteria>())
+            .ReturnsForAnyArgs(voidingHistory);
         var service = new RequestDetailServiceImp(repository);
 
         // Act
         var actual = await service.GetVoidDataOfVoidingHistory(1);
 
         // Assert
-        await repository.Received(1).GetAsync<VoidingHistoryModel>
-        (Arg.Is<GetVoidDataOfVoidingHistoryCriteria>(x => x.VoidingHistoryIds == "1"));
-        Assert.StrictEqual(voidingHistory, actual);
+        await repository.Received(1).FetchAsync<VoidDataXmlModel>(Arg.Any<GetVoidDataOfVoidingHistoryCriteria>());
+        AssertExtension.Equal(voidingHistory.First(), actual);
     }
 }

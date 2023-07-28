@@ -9,72 +9,64 @@ namespace TVS.Void.Service.Services;
 
 public interface NetPositionService
 {
-    Task<bool> UpdateNetPosition(string transIds, string action, int userId);
+    Task<bool> UpdateNetPosition(int siteDbGroupId, string transIds, string action);
 
-    Task RollBackNetPosition(string transIds, string action, string message, int userId);
+    Task RollBackNetPosition(int siteDbGroupId, string transIds);
 }
 
 public class NetPositionServiceImp : NetPositionService
 {
-    private readonly NetPositionHttpClientService netPositionHttpClientService;
+    private readonly LoggingService loggingService;
     private readonly IDynamicRepository repository;
 
-    public NetPositionServiceImp(NetPositionHttpClientService netPositionHttpClientService, IDynamicRepository repository)
+    public NetPositionServiceImp(LoggingService loggingService, IDynamicRepository repository)
     {
-        this.netPositionHttpClientService = netPositionHttpClientService;
+        this.loggingService = loggingService;
         this.repository = repository;
     }
 
-    public async Task<bool> UpdateNetPosition(string transIds, string action, int userId)
+    public async Task<bool> UpdateNetPosition(int siteDbGroupId, string transIds, string action)
     {
-        if (!string.IsNullOrEmpty(transIds))
+        if (string.IsNullOrWhiteSpace(transIds))
         {
-            var param = new UpdateNetPositionLogCommand
-            {
-                AdminId = userId,
-                ServiceType = ServiceApiType.Cricket,
-                TransIds = transIds,
-                Action = action
-            };
-
-            return await ExecuteNetPosition(param);
+            return true;
         }
 
-        return true;
+        try
+        {
+            await UpdateNetPositionTasks(siteDbGroupId, transIds, action);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            await loggingService.ErrorAsync(ex);
+            return false;
+        }
     }
 
-    private async Task<bool> ExecuteNetPosition(UpdateNetPositionLogCommand command)
+    private async Task UpdateNetPositionTasks(int siteDbGroupId, string transIds, string action)
     {
-        command.StartTime = DateTime.Now;
-        var result = await netPositionHttpClientService.PostRequest(command.TransIds, command.Action);
-        command.EndTime = DateTime.Now;
-
-        if (result.IsSuccessful)
+        var command = new TicketVoidingNetPositionCriteria
         {
-            command.ServiceStatus = ServiceApiStatus.Finished;
-        }
-        else
-        {
-            command.ServiceStatus = ServiceApiStatus.Failed;
-            command.Reason = result.ErrorMsg;
-        }
+            StrTransIds = transIds,
+            Action = action,
+            SiteDbGroupId = siteDbGroupId
+        };
 
         await repository.ExecuteAsync(command);
-
-        return result.IsSuccessful;
     }
 
-    public async Task RollBackNetPosition(string transIds, string action, string message, int userId)
+    public async Task RollBackNetPosition(int siteDbGroupId, string transIds)
     {
         if (!string.IsNullOrWhiteSpace(transIds))
         {
-            var command = new RollBackNetPositionCommand
+            var command = new TicketVoidingNetPositionCriteria
             {
-                CricketIds = transIds,
-                Action = action,
-                AdminId = userId,
-                Reason = message
+                StrTransIds = transIds,
+                Action = NetPositionConstant.ActionRecover,
+                SiteDbGroupId = siteDbGroupId
             };
+
             await repository.ExecuteAsync(command);
         }
     }

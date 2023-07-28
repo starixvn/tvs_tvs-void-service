@@ -52,12 +52,12 @@ public class ProcessVoidQueuesStageImp : ProcessVoidQueuesStage
 
     private async Task<TicketVoidingQueueModel> ExecuteQueueForCricketTickets(int siteDbGroupId, TicketVoidingQueueModel queue)
     {
-        var isCalledNetPosition = await netPositionService.UpdateNetPosition(queue.TransIds, ActionApiType.Void, AutoVoidConstant.ActorId);
+        var isCalledNetPosition = await netPositionService.UpdateNetPosition(siteDbGroupId, queue.TransIds, NetPositionConstant.ActionVoid);
         var voidResult = await ticketVoidingQueueService.ProcessVoidQueue(siteDbGroupId, queue.QueueId, isCalledNetPosition);
 
         if (voidResult.StatusId == ExecuteStatus.Failed && isCalledNetPosition)
         {
-            await netPositionService.RollBackNetPosition(queue.TransIds, ActionApiType.Void, voidResult.ErrMsg, AutoVoidConstant.ActorId);
+            await netPositionService.RollBackNetPosition(siteDbGroupId, queue.TransIds);
         }
 
         return voidResult;
