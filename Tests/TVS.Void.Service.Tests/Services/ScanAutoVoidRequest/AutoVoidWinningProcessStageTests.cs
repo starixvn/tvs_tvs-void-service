@@ -57,7 +57,7 @@ public class AutoVoidWinningProcessStageTests
         var queue = new AutoVoidRequestQueueModel { QueueId = 1 };
         var logData = new List<string>();
         var tickets = new List<RequestDetailTicketModel>();
-        var outputData = new GetTicketsStageOutput
+        var outputData = new GroupTicketsInRequest
         {
             SingleTickets = tickets,
             ParlayTickets = tickets,

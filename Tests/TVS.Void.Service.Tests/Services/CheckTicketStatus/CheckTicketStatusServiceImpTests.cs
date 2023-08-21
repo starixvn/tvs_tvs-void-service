@@ -1,7 +1,7 @@
 ﻿using NSubstitute;
-using TicketVoidingSystem.Constants;
-using TicketVoidingSystem.Models;
+using NSubstitute.ExceptionExtensions;
 using TicketVoidingSystem.Services;
+using TVS.Void.Service.Constants;
 using TVS.Void.Service.Models;
 using TVS.Void.Service.Services;
 using TVS.Void.Service.Services.CheckTicketStatus;
@@ -10,94 +10,60 @@ namespace TVS.Void.Service.Tests.Services.CheckTicketStatus;
 
 public class CheckTicketStatusServiceImpTests
 {
-    [Fact]
-    public async Task Execute_WhenTicketsEmpty_ShouldNotWriteLog()
+    private readonly CheckTicketsForAutoVoidAllResultKeyedStage checkTicketsForAutoVoidAllResultKeyedStage;
+    private readonly CheckTicketsForAutoVoidWinningStage checkTicketsForAutoVoidWinningStage;
+    private readonly LoggingService loggingService;
+    private readonly RequestTicketService requestTicketService;
+    private readonly CheckTicketStatusServiceImp service;
+
+    public CheckTicketStatusServiceImpTests()
     {
-        // Arrange
-        var fakeRequestsList = new List<RequestModel> { new() { RequestId = 112 } };
-        var requestTicketService = Substitute.For<RequestTicketService>();
-        var insertAutoVoidQueueStage = Substitute.For<InsertAutoVoidQueueStage>();
-        var loggingService = Substitute.For<LoggingService>();
-        var output = new CheckStatusTicketInsertAutoVoidQueueOutput
-        {
-            ValidRequests = fakeRequestsList,
-            InvalidCricketTickets = new List<RequestDetailTicketModel>(),
-            InvalidParlayTickets = new List<RequestDetailTicketModel>(),
-            InvalidSingleTickets = new List<RequestDetailTicketModel>(),
-        };
-        requestTicketService.GetTicketInAllRequests().ReturnsForAnyArgs((new List<RequestDetailTicketModel>(), new List<RequestDetailTicketModel>(), new List<RequestDetailTicketModel>()));
-        requestTicketService.CheckStatusTicketForInsertAutoVoidQueue(default, default, default, default).ReturnsForAnyArgs(output);
-        var service = new CheckTicketStatusServiceImp(requestTicketService, insertAutoVoidQueueStage, loggingService);
-
-        // Act
-        await service.Execute();
-
-        // Assert
-        await requestTicketService.Received(1).GetTicketInAllRequests();
-        await requestTicketService.DidNotReceiveWithAnyArgs()
-            .CheckStatusTicketForInsertAutoVoidQueue(default, default, default, default);
-        await insertAutoVoidQueueStage.DidNotReceiveWithAnyArgs()
-            .Execute(Arg.Any<int>(), Arg.Any<IEnumerable<RequestModel>>(),
-                Arg.Any<string>(), Arg.Any<List<string>>());
-        await loggingService.DidNotReceiveWithAnyArgs().InfoAppendNewLineAsync(default);
-    }
-
-    [Theory]
-    [MemberData(nameof(ExecuteWhenTicketsNotEmptyTestData))]
-    public async Task Execute_WhenTicketsNotEmpty_ShouldWriteLog(IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets, IEnumerable<RequestDetailTicketModel> cricketTickets)
-    {
-        // Arrange
-        AppSettingService.AppSetting = new AppSettingModel { IgnoreSiteDb = "2" };
-        var totalSiteDbCount = SiteDbGroupConstant.ServerList.Count;
-        var fakeRequestsList = new List<RequestModel> { new() { RequestId = 112 } };
-        var requestTicketService = Substitute.For<RequestTicketService>();
-        var insertAutoVoidQueueStage = Substitute.For<InsertAutoVoidQueueStage>();
-        var loggingService = Substitute.For<LoggingService>();
-        requestTicketService.GetTicketInAllRequests().ReturnsForAnyArgs((singleTickets, parlayTickets, cricketTickets));
-        requestTicketService.CheckStatusTicketForInsertAutoVoidQueue(1, default, default, default)
-            .ReturnsForAnyArgs(new CheckStatusTicketInsertAutoVoidQueueOutput { ValidRequests = fakeRequestsList });
-        var service = new CheckTicketStatusServiceImp(requestTicketService, insertAutoVoidQueueStage, loggingService);
-
-        // Act
-        await service.Execute();
-
-        // Assert
-        await requestTicketService.Received(1).GetTicketInAllRequests();
-        await requestTicketService.Received(totalSiteDbCount).CheckStatusTicketForInsertAutoVoidQueue(Arg.Any<int>(),
-            Arg.Any<IEnumerable<RequestDetailTicketModel>>(), Arg.Any<IEnumerable<RequestDetailTicketModel>>(),
-            Arg.Any<IEnumerable<RequestDetailTicketModel>>());
-        await insertAutoVoidQueueStage.Received(totalSiteDbCount)
-            .Execute(Arg.Any<int>(), Arg.Is<IEnumerable<RequestModel>>(x => x == fakeRequestsList),
-                Arg.Any<string>(), Arg.Any<List<string>>());
-        await loggingService.ReceivedWithAnyArgs(1).InfoAppendNewLineAsync(default);
+        requestTicketService = Substitute.For<RequestTicketService>();
+        checkTicketsForAutoVoidWinningStage = Substitute.For<CheckTicketsForAutoVoidWinningStage>();
+        checkTicketsForAutoVoidAllResultKeyedStage = Substitute.For<CheckTicketsForAutoVoidAllResultKeyedStage>();
+        loggingService = Substitute.For<LoggingService>();
+        service = new CheckTicketStatusServiceImp(requestTicketService, checkTicketsForAutoVoidWinningStage,
+            checkTicketsForAutoVoidAllResultKeyedStage, loggingService);
     }
 
     [Fact]
-    public async Task Execute_ShouldExecuteCatchException()
+    public async Task Execute_ExecuteNormalFlow_CallExpected()
     {
         // Arrange
-        var requestTicketService = Substitute.For<RequestTicketService>();
-        var insertAutoVoidQueueStage = Substitute.For<InsertAutoVoidQueueStage>();
-        var loggingService = Substitute.For<LoggingService>();
-        requestTicketService.WhenForAnyArgs(x => x.GetTicketInAllRequests())
-            .Do(x => throw new Exception());
-        var service = new CheckTicketStatusServiceImp(requestTicketService, insertAutoVoidQueueStage, loggingService);
+        var ticketAutoVoidWinning = new RequestDetailTicketModel
+            { VoidActionId = VoidActionTypeConstant.AutoVoidWinningId };
+        var ticketAutoVoidAllResultKeyed = new RequestDetailTicketModel
+            { VoidActionId = VoidActionTypeConstant.AutoVoidAllResultKeyedId };
+        var getTicketsResult = new GroupTicketsInRequest
+        {
+            SingleTickets = new List<RequestDetailTicketModel> { ticketAutoVoidWinning, ticketAutoVoidAllResultKeyed },
+            ParlayTickets = new List<RequestDetailTicketModel> { ticketAutoVoidWinning, ticketAutoVoidAllResultKeyed },
+            CricketTickets = new List<RequestDetailTicketModel> { ticketAutoVoidWinning, ticketAutoVoidAllResultKeyed }
+        };
+        requestTicketService.GetTicketInAllRequests().ReturnsForAnyArgs(getTicketsResult);
 
         // Act
         await service.Execute();
 
         // Assert
-        await requestTicketService.Received(1).GetTicketInAllRequests();
-        await insertAutoVoidQueueStage.DidNotReceiveWithAnyArgs().Execute(default, default, default, default);
-        await loggingService.ReceivedWithAnyArgs(1).InfoAppendNewLineAsync(default);
-        await loggingService.ReceivedWithAnyArgs(1).ErrorAsync(default, default);
+        await checkTicketsForAutoVoidWinningStage.Received(1)
+            .Execute(Arg.Any<List<string>>(), Arg.Any<GroupTicketsInRequest>());
+        await checkTicketsForAutoVoidAllResultKeyedStage.Received(1)
+            .Execute(Arg.Any<List<string>>(), Arg.Any<GroupTicketsInRequest>());
+        await loggingService.Received(1).InfoAppendNewLineAsync(Arg.Any<IList<string>>());
     }
 
-    public static IEnumerable<object[]> ExecuteWhenTicketsNotEmptyTestData =>
-        new List<object[]>
-        {
-            new object[] { new List<RequestDetailTicketModel> {new() { SiteDbGroupId = 0, TransId = 113 }}, new List<RequestDetailTicketModel>(), new List<RequestDetailTicketModel>() },
-            new object[] { new List<RequestDetailTicketModel>(), new List<RequestDetailTicketModel>{new() { SiteDbGroupId = 1, TransId = 222 } }, new List<RequestDetailTicketModel>()},
-            new object[] { new List<RequestDetailTicketModel> {new() { SiteDbGroupId = 0, TransId = 113 }}, new List<RequestDetailTicketModel>{new() { SiteDbGroupId = 1, TransId = 222 } }, new List<RequestDetailTicketModel>()},
-        };
+    [Fact]
+    public async Task Execute_HandleException_CallExpected()
+    {
+        // Arrange
+        requestTicketService.GetTicketInAllRequests().Throws(new Exception());
+
+        // Act
+        await service.Execute();
+
+        // Assert
+        await loggingService.Received(1).InfoAppendNewLineAsync(Arg.Any<List<string>>());
+        await loggingService.Received(1).ErrorAsync(Arg.Any<string>(), Arg.Any<Exception>());
+    }
 }
