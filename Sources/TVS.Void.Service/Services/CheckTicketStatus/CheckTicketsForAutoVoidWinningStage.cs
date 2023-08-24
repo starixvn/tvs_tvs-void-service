@@ -42,6 +42,9 @@ public class CheckTicketsForAutoVoidWinningStageImp : CheckTicketsForAutoVoidWin
                 await requestTicketService.UpdateIsProcessed(checkResult.InvalidSingleTickets, checkResult.InvalidParlayTickets, checkResult.InvalidCricketTickets);
                 logData.Add($"[{server.Id}]{nameof(requestTicketService.CheckStatusTicketForInsertAutoVoidQueue)} - {JsonSerializer.Serialize(checkResult)}");
             }
+
+            logData.Add($"ServerTime: {DateTime.Now:MM/dd/yyyy HH:mm:ss.fff}");
+            logData.Add("------------------");
         }
     }
 }

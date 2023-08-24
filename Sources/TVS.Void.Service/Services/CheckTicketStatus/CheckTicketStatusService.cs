@@ -49,12 +49,9 @@ public class CheckTicketStatusServiceImp : CheckTicketStatusService
         var autoVoidWinningGroup = GetGroupTicketsByVoidAction(VoidActionTypeConstant.AutoVoidWinningId, getTicketsResult);
         await checkTicketsForAutoVoidWinningStage.Execute(logData, autoVoidWinningGroup);
 
-        logData.Add("------------------");
-
         var autoVoidAllResultKeyedGroup = GetGroupTicketsByVoidAction(VoidActionTypeConstant.AutoVoidAllResultKeyedId, getTicketsResult);
         await checkTicketsForAutoVoidAllResultKeyedStage.Execute(logData, autoVoidAllResultKeyedGroup);
 
-        logData.Add($"ServerTime: {DateTime.Now:MM/dd/yyyy HH:mm:ss.fff}");
         await loggingService.InfoAppendNewLineAsync(logData);
     }
 

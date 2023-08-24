@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -44,6 +45,7 @@ public class CheckTicketsForAutoVoidAllResultKeyedStageImp : CheckTicketsForAuto
             }
 
             logData.Add($"{nameof(broadcastSessionIdCache)}: {JsonSerializer.Serialize(broadcastSessionIdCache)}");
+            logData.Add($"ServerTime: {DateTime.Now:MM/dd/yyyy HH:mm:ss.fff}");
         }
     }
 }
