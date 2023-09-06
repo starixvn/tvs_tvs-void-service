@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using ONEbook.UM.Services;
 using Quartz;
 using TicketVoidingSystem.Constants;
 using TicketVoidingSystem.Services;
-using TVS.Void.Service.Services;
 using TVS.Void.Service.Services.ScanAutoVoidRequest;
 
 namespace TVS.Void.Service.Website.Jobs;
@@ -48,13 +47,7 @@ public class ScanAutoVoidRequestJob : IJob
 
     private async Task ExecuteSiteDbParallel()
     {
-        var tasks = new List<Task>();
-        foreach (var server in SiteDbGroupConstant.ServerList)
-        {
-            var task = scanningService.Execute(server.Id);
-            tasks.Add(task);
-        }
-
-        await Task.WhenAll(tasks.ToArray());
+        var tasks = SiteDbGroupConstant.ServerList.Select(server => scanningService.Execute(server.Id));
+        await Task.WhenAll(tasks);
     }
 }

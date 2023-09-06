@@ -1,6 +1,6 @@
-﻿namespace TVS.Void.Service.Constants;
+﻿namespace TicketVoidingSystem.Constants;
 
-public static class RequestActionConstant
+public static class RequestFilterByConstant
 {
     public const int AutoVoidWinning = 1;
     public const int AutoVoidInstant = 4;
