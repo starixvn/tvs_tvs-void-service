@@ -33,6 +33,7 @@ public class AddRequestCommand : NonQueryCommand
     public string WrongOddsInfo { get; set; }
     public string ReducedOverInfo { get; set; }
     public string DuplicateTicketsInfo { get; set; }
+    public string NotParticipateInfo { get; set; }
     public string KickOffInfo { get; set; }
     public string TransInfoJson { get; set; }
 
