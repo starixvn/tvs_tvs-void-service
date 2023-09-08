@@ -29,7 +29,7 @@ public class AddRequestStageImp : AddRequestStage
             IssueTypeId = IssueTypeConstant.DuplicateTickets,
             MatchId = param.MatchId,
             SportType = param.SportType,
-            ActionId = RequestActionConstant.AutoVoidInstant,
+            ActionId = VoidActionTypeConstant.AutoVoidInstantId,
             DecidedBy = AutoVoidConstant.ActorName,
             UserId = AutoVoidConstant.ActorId,
             IP = AutoVoidConstant.IPAddress,

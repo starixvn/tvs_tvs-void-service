@@ -8,7 +8,7 @@ namespace TVS.Void.Service.Services.ScanAutoVoidRequest;
 
 public interface GetTicketsStage
 {
-    Task<(bool IsContinueFlow, GetTicketsStageOutput OutputData)> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue, IList<string> logData);
+    Task<(bool IsContinueFlow, GroupTicketsInRequest OutputData)> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue, IList<string> logData);
 }
 
 public class GetTicketsStageImp : GetTicketsStage
@@ -22,30 +22,23 @@ public class GetTicketsStageImp : GetTicketsStage
         this.requestTicketService = requestTicketService;
     }
 
-    public async Task<(bool, GetTicketsStageOutput)> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue, IList<string> logData)
+    public async Task<(bool, GroupTicketsInRequest)> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue, IList<string> logData)
     {
-        var (singleTickets, parlayTickets, cricketTickets)
-            = await requestTicketService.GetTicketsByRequestsAndSiteDbGroupId(siteDbGroupId, queue.RequestIds);
-        logData.Add($"{nameof(GetTicketsStage)} - SingleCount: {singleTickets.Count()} - ParlayCount: {parlayTickets.Count()}");
+        var getTicketsResult = await requestTicketService.GetTicketsByRequestsAndSiteDbGroupId(siteDbGroupId, queue.RequestIds);
+        logData.Add($"{nameof(GetTicketsStage)} - SingleCount: {getTicketsResult.SingleTickets.Count()} " +
+                    $"- ParlayCount: {getTicketsResult.ParlayTickets.Count()} - CricketCount: {getTicketsResult.CricketTickets.Count()}");
 
-        if (!singleTickets.Any() && !parlayTickets.Any() && !cricketTickets.Any())
+        if (!getTicketsResult.SingleTickets.Any() && !getTicketsResult.ParlayTickets.Any() && !getTicketsResult.CricketTickets.Any())
         {
             await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, ExecuteStatus.Done, "No ticket found.");
             return (false, null);
         }
 
-        return (true, new GetTicketsStageOutput
+        return (true, new GroupTicketsInRequest
         {
-            SingleTickets = singleTickets,
-            ParlayTickets = parlayTickets,
-            CricketTickets = cricketTickets
+            SingleTickets = getTicketsResult.SingleTickets,
+            ParlayTickets = getTicketsResult.ParlayTickets,
+            CricketTickets = getTicketsResult.CricketTickets
         });
     }
-}
-
-public class GetTicketsStageOutput
-{
-    public IEnumerable<RequestDetailTicketModel> SingleTickets { get; set; }
-    public IEnumerable<RequestDetailTicketModel> ParlayTickets { get; set; }
-    public IEnumerable<RequestDetailTicketModel> CricketTickets { get; set; }
 }

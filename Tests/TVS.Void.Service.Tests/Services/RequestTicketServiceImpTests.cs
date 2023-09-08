@@ -14,42 +14,53 @@ public class RequestTicketServiceImpTests
     public async Task GetTicketsByRequestsAndSiteDbGroupId_ShouldReturnExpectedData(int siteDbGroupId, string requestIds)
     {
         // Arrange
-        var fakeSingleTickets = new List<RequestDetailTicketModel> { new() { TransId = 113 } };
-        var fakeParlayTickets = new List<RequestDetailTicketModel> { new() { TransId = 222 } };
-        var fakeCricketTickets = new List<RequestDetailTicketModel> { new() { TransId = 222 } };
+        var singleTickets = new List<RequestDetailTicketModel> { new() { TransId = 113 } };
+        var parlayTickets = new List<RequestDetailTicketModel> { new() { TransId = 222 } };
+        var cricketTickets = new List<RequestDetailTicketModel> { new() { TransId = 222 } };
         var repository = Substitute.For<IDynamicRepository>();
         repository
             .FetchMultipleAsync<RequestDetailTicketModel, RequestDetailTicketModel, RequestDetailTicketModel>(default)
-            .ReturnsForAnyArgs((fakeSingleTickets, fakeParlayTickets, fakeCricketTickets));
+            .ReturnsForAnyArgs((singleTickets, parlayTickets, cricketTickets));
         var service = new RequestTicketServiceImp(repository);
-
+        var expected = new GroupTicketsInRequest
+        {
+            SingleTickets = singleTickets,
+            ParlayTickets = parlayTickets,
+            CricketTickets = cricketTickets
+        };
         // Act
         var actual = await service.GetTicketsByRequestsAndSiteDbGroupId(siteDbGroupId, requestIds);
 
         // Assert
         await repository.Received(1).FetchMultipleAsync<RequestDetailTicketModel, RequestDetailTicketModel, RequestDetailTicketModel>
             (Arg.Is<GetRequestTicketsCriteria>(x => x.SiteDbGroupId == siteDbGroupId && x.RequestIds == requestIds));
-        Assert.StrictEqual((fakeSingleTickets, fakeParlayTickets, fakeCricketTickets), actual);
+        AssertExtension.Equal(expected, actual);
     }
 
     [Fact]
     public async Task GetTicketInAllRequests_ShouldReturnExpectedData()
     {
         // Arrange
-        var fakeSingleTickets = new List<RequestDetailTicketModel> { new() { TransId = 113 } };
-        var fakeParlayTickets = new List<RequestDetailTicketModel> { new() { TransId = 222 } };
-        var fakeCricketTickets = new List<RequestDetailTicketModel> { new() { TransId = 222 } };
+        var singleTickets = new List<RequestDetailTicketModel> { new() { TransId = 113 } };
+        var parlayTickets = new List<RequestDetailTicketModel> { new() { TransId = 222 } };
+        var cricketTickets = new List<RequestDetailTicketModel> { new() { TransId = 222 } };
         var repository = Substitute.For<IDynamicRepository>();
+        var expected = new GroupTicketsInRequest
+        {
+            SingleTickets = singleTickets,
+            ParlayTickets = parlayTickets,
+            CricketTickets = cricketTickets
+        };
         repository
             .FetchMultipleAsync<RequestDetailTicketModel, RequestDetailTicketModel, RequestDetailTicketModel>(default)
-            .ReturnsForAnyArgs((fakeSingleTickets, fakeParlayTickets, fakeCricketTickets));
+            .ReturnsForAnyArgs((singleTickets, parlayTickets, cricketTickets));
         var service = new RequestTicketServiceImp(repository);
 
         // Act
         var actual = await service.GetTicketInAllRequests();
 
         // Assert
-        Assert.StrictEqual((fakeSingleTickets, fakeParlayTickets, fakeCricketTickets), actual);
+        AssertExtension.Equal(expected, actual);
     }
 
     [Theory]

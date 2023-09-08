@@ -7,6 +7,17 @@ namespace TVS.Void.Service.Tests.Services.ScanAutoVoidRequest;
 
 public class GetTicketsStageImpTests
 {
+    private readonly AutoVoidRequestQueueService autoVoidRequestQueueService;
+    private readonly RequestTicketService requestTicketService;
+    private readonly GetTicketsStageImp service;
+
+    public GetTicketsStageImpTests()
+    {
+        autoVoidRequestQueueService = Substitute.For<AutoVoidRequestQueueService>();
+        requestTicketService = Substitute.For<RequestTicketService>();
+        service = new GetTicketsStageImp(autoVoidRequestQueueService, requestTicketService);
+    }
+
     [Fact]
     public async Task Execute_HasSingleTickets_CalledExpected()
     {
@@ -17,12 +28,15 @@ public class GetTicketsStageImpTests
         };
         var parlayTickets = new List<RequestDetailTicketModel>();
         var cricketTickets = new List<RequestDetailTicketModel>();
+        var getTicketsResult = new GroupTicketsInRequest
+        {
+            SingleTickets = singleTickets,
+            ParlayTickets = parlayTickets,
+            CricketTickets = cricketTickets
+        };
         var queue = new AutoVoidRequestQueueModel();
-        var autoVoidRequestQueueService = Substitute.For<AutoVoidRequestQueueService>();
-        var requestTicketService = Substitute.For<RequestTicketService>();
         requestTicketService.GetTicketsByRequestsAndSiteDbGroupId(default, default)
-            .ReturnsForAnyArgs((singleTickets, parlayTickets, cricketTickets));
-        var service = new GetTicketsStageImp(autoVoidRequestQueueService, requestTicketService);
+            .ReturnsForAnyArgs(getTicketsResult);
 
         var actual = await service.Execute(siteDbGroupId, queue, new List<string>());
 
@@ -41,11 +55,14 @@ public class GetTicketsStageImpTests
         var parlayTickets = new List<RequestDetailTicketModel>();
         var cricketTickets = new List<RequestDetailTicketModel>();
         var queue = new AutoVoidRequestQueueModel();
-        var autoVoidRequestQueueService = Substitute.For<AutoVoidRequestQueueService>();
-        var requestTicketService = Substitute.For<RequestTicketService>();
+        var getTicketsResult = new GroupTicketsInRequest
+        {
+            SingleTickets = singleTickets,
+            ParlayTickets = parlayTickets,
+            CricketTickets = cricketTickets
+        };
         requestTicketService.GetTicketsByRequestsAndSiteDbGroupId(default, default)
-            .ReturnsForAnyArgs((singleTickets, parlayTickets, cricketTickets));
-        var service = new GetTicketsStageImp(autoVoidRequestQueueService, requestTicketService);
+            .ReturnsForAnyArgs(getTicketsResult);
 
         var actual = await service.Execute(siteDbGroupId, queue, new List<string>());
 

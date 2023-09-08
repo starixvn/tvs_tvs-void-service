@@ -7,7 +7,7 @@ public class RequestModel
 {
     public int RequestId { get; set; }
     public string ActionName { get; set; }
-    public int ActionId { get; set; }
+    public int VoidActionId { get; set; }
     public int IssueTypeId { get; set; }
 }
 
@@ -28,6 +28,7 @@ public class RequestDetailTicketModel
     public DateTime TransDate { get; set; }
     public DateTime WinLostDate { get; set; }
     public int StatusId { get; set; }
+    public int VoidActionId { get; set; }
 }
 
 public class RequestDetailTicketModelEqualityComparer : IEqualityComparer<RequestDetailTicketModel>

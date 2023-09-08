@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Fanex.Data.Repository;
 using TicketVoidingSystem.Constants;
 using TVS.Void.Service.Constants;
 using TVS.Void.Service.Models;
@@ -16,12 +15,10 @@ public interface InsertAutoVoidRequestQueueStage
 
 public class InsertAutoVoidRequestQueueStageImp : InsertAutoVoidRequestQueueStage
 {
-    private readonly IDynamicRepository repository;
     private readonly AutoVoidRequestQueueService autoVoidRequestQueueService;
 
-    public InsertAutoVoidRequestQueueStageImp(IDynamicRepository repository, AutoVoidRequestQueueService autoVoidRequestQueueService)
+    public InsertAutoVoidRequestQueueStageImp(AutoVoidRequestQueueService autoVoidRequestQueueService)
     {
-        this.repository = repository;
         this.autoVoidRequestQueueService = autoVoidRequestQueueService;
     }
 

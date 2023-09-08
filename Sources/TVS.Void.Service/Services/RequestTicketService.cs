@@ -11,12 +11,9 @@ namespace TVS.Void.Service.Services;
 
 public interface RequestTicketService
 {
-    Task<(IEnumerable<RequestDetailTicketModel>, IEnumerable<RequestDetailTicketModel>,
-        IEnumerable<RequestDetailTicketModel>)> GetTicketsByRequestsAndSiteDbGroupId(int siteDbGroupId,
-        string requestIds);
+    Task<GroupTicketsInRequest> GetTicketsByRequestsAndSiteDbGroupId(int siteDbGroupId, string requestIds);
 
-    Task<(IEnumerable<RequestDetailTicketModel>, IEnumerable<RequestDetailTicketModel>,
-        IEnumerable<RequestDetailTicketModel>)> GetTicketInAllRequests();
+    Task<GroupTicketsInRequest> GetTicketInAllRequests();
 
     Task<CheckStatusTicketInsertAutoVoidQueueOutput> CheckStatusTicketForInsertAutoVoidQueue(int siteDbGroupId,
         IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets,
@@ -35,19 +32,17 @@ public class RequestTicketServiceImp : RequestTicketService
         this.repository = repository;
     }
 
-    public async Task<(IEnumerable<RequestDetailTicketModel>, IEnumerable<RequestDetailTicketModel>,
-            IEnumerable<RequestDetailTicketModel>)> GetTicketsByRequestsAndSiteDbGroupId(int siteDbGroupId, string requestIds)
+    public async Task<GroupTicketsInRequest> GetTicketsByRequestsAndSiteDbGroupId(int siteDbGroupId, string requestIds)
     {
         return await GetTicketsInRequests(siteDbGroupId, requestIds);
     }
 
-    public async Task<(IEnumerable<RequestDetailTicketModel>, IEnumerable<RequestDetailTicketModel>, IEnumerable<RequestDetailTicketModel>)> GetTicketInAllRequests()
+    public async Task<GroupTicketsInRequest> GetTicketInAllRequests()
     {
         return await GetTicketsInRequests(null, null);
     }
 
-    private async Task<(IEnumerable<RequestDetailTicketModel>, IEnumerable<RequestDetailTicketModel>,
-            IEnumerable<RequestDetailTicketModel>)> GetTicketsInRequests(int? siteDbGroupId, string requestIds)
+    private async Task<GroupTicketsInRequest> GetTicketsInRequests(int? siteDbGroupId, string requestIds)
     {
         var criteria = new GetRequestTicketsCriteria
         {
@@ -58,7 +53,12 @@ public class RequestTicketServiceImp : RequestTicketService
         var (singleTickets, parlayTickets, cricketTickets) =
             await repository.FetchMultipleAsync<RequestDetailTicketModel, RequestDetailTicketModel, RequestDetailTicketModel>(criteria);
 
-        return (singleTickets, parlayTickets, cricketTickets);
+        return new GroupTicketsInRequest
+        {
+            SingleTickets = singleTickets,
+            ParlayTickets = parlayTickets,
+            CricketTickets = cricketTickets
+        };
     }
 
     public async Task<CheckStatusTicketInsertAutoVoidQueueOutput> CheckStatusTicketForInsertAutoVoidQueue(int siteDbGroupId,

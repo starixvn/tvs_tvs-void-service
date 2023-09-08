@@ -4,7 +4,7 @@ using TicketVoidingSystem.Utilities;
 
 namespace TVS.Void.Service.Criteria.MultiSiteDb;
 
-internal class MarkTicketsCriteria : CriteriaBase
+public class MarkTicketsCriteria : CriteriaBase
 {
     public int UserId { get; set; }
 

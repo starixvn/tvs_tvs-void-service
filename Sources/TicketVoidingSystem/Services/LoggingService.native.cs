@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Threading.Tasks;
 using Fanex.Logging;
 using Fanex.Logging.Extensions;
@@ -47,7 +48,10 @@ public class LoggingServiceImp : LoggingService
 
     public async Task InfoAppendNewLineAsync(IList<string> logData)
     {
-        await InfoAsync(string.Join($"{Environment.NewLine}*", logData));
+        if (logData.Any())
+        {
+            await InfoAsync(string.Join($"{Environment.NewLine}*", logData));
+        }
     }
 
     private static async Task HandleException(Exception exception)

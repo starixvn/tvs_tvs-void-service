@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
 using System.Threading.Tasks;
 using TicketVoidingSystem.Constants;
 using TVS.Void.Service.Constants;
@@ -10,7 +10,10 @@ namespace TVS.Void.Service.Services.CheckTicketStatus;
 
 public interface InsertAutoVoidQueueStage
 {
-    Task Execute(int siteDbGroupId, IEnumerable<RequestModel> requests, string broadcastSessionId, IList<string> logData);
+    Task ExecuteForAutoVoidWinning(int siteDbGroupId, IEnumerable<RequestModel> requests, string broadcastSessionId, IList<string> logData);
+
+    Task ExecuteForAutoVoidAllResultKeyed(int siteDbGroupId, IEnumerable<RequestModel> requests,
+        IDictionary<int, string> broadcastSessionIdCache, IList<string> logData);
 }
 
 public class InsertAutoVoidQueueStageImp : InsertAutoVoidQueueStage
@@ -22,7 +25,7 @@ public class InsertAutoVoidQueueStageImp : InsertAutoVoidQueueStage
         this.autoVoidRequestQueueService = autoVoidRequestQueueService;
     }
 
-    public async Task Execute(int siteDbGroupId, IEnumerable<RequestModel> requests, string broadcastSessionId, IList<string> logData)
+    public async Task ExecuteForAutoVoidWinning(int siteDbGroupId, IEnumerable<RequestModel> requests, string broadcastSessionId, IList<string> logData)
     {
         if (requests.Any())
         {
@@ -30,7 +33,25 @@ public class InsertAutoVoidQueueStageImp : InsertAutoVoidQueueStage
             // DB must check exist queue Status = New => not insert
             await autoVoidRequestQueueService.InsertQueue(siteDbGroupId, broadcastSessionId, requestIds, ExecuteStatus.New, AutoVoidConstant.QueueActionCal, null);
 
-            logData.Add($"{nameof(InsertAutoVoidQueueStage)}[{siteDbGroupId}]: {JsonSerializer.Serialize(requests)}");
+            logData.Add($"{nameof(InsertAutoVoidQueueStage)}-{AutoVoidConstant.QueueActionCal}-[{siteDbGroupId}]: {requestIds} - {broadcastSessionId}");
+        }
+    }
+
+    public async Task ExecuteForAutoVoidAllResultKeyed(int siteDbGroupId, IEnumerable<RequestModel> requests, IDictionary<int, string> broadcastSessionIdCache, IList<string> logData)
+    {
+        foreach (var request in requests)
+        {
+            if (!broadcastSessionIdCache.TryGetValue(request.RequestId, out var currentBroadcastSessionId))
+            {
+                currentBroadcastSessionId = Guid.NewGuid().ToString();
+                broadcastSessionIdCache.Add(request.RequestId, currentBroadcastSessionId);
+            }
+
+            // DB must check exist queue Status = New => not insert
+            await autoVoidRequestQueueService.InsertQueue(siteDbGroupId, currentBroadcastSessionId, request.RequestId.ToString(),
+                ExecuteStatus.New, AutoVoidConstant.QueueActionVoidResultKeyed, null);
+
+            logData.Add($"{nameof(InsertAutoVoidQueueStage)}-{AutoVoidConstant.QueueActionVoidResultKeyed}-[{siteDbGroupId}]: {request.RequestId} - {currentBroadcastSessionId}");
         }
     }
 }

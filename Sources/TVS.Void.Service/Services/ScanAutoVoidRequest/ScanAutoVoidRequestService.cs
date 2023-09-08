@@ -67,9 +67,12 @@ public class ScanAutoVoidRequestServiceImp : ScanAutoVoidRequestService
 
     private static bool IsVoidInstantQueue(string action)
     {
-        return action.Equals(AutoVoidConstant.QueueActionVoidInstant, StringComparison.OrdinalIgnoreCase)
-               || action.Equals(AutoVoidConstant.QueueActionVoidInstant5m, StringComparison.OrdinalIgnoreCase)
-               || action.Equals(AutoVoidConstant.QueueActionVoidInstant10m, StringComparison.OrdinalIgnoreCase)
-               || action.Equals(AutoVoidConstant.QueueActionVoidInstantNoPolicy, StringComparison.OrdinalIgnoreCase);
+        var isQueueVoidInstant = action.Equals(AutoVoidConstant.QueueActionVoidInstant, StringComparison.OrdinalIgnoreCase)
+                             || action.Equals(AutoVoidConstant.QueueActionVoidInstant5m, StringComparison.OrdinalIgnoreCase)
+                             || action.Equals(AutoVoidConstant.QueueActionVoidInstant10m, StringComparison.OrdinalIgnoreCase)
+                             || action.Equals(AutoVoidConstant.QueueActionVoidInstantNoPolicy, StringComparison.OrdinalIgnoreCase);
+        var isVoidLikeAutoWinningButNotRunResettled = action.Equals(AutoVoidConstant.QueueActionVoidResultKeyed, StringComparison.OrdinalIgnoreCase);
+
+        return isQueueVoidInstant || isVoidLikeAutoWinningButNotRunResettled;
     }
 }
