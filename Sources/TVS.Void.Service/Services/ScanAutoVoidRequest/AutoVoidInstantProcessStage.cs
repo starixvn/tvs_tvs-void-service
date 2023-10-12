@@ -54,6 +54,7 @@ public class AutoVoidInstantProcessStageImp : AutoVoidInstantProcessStage
         var validVoidCricketTickets = getTicketsResult.OutputData.CricketTickets;
         var validVoidSingleTickets14 = Enumerable.Empty<RequestDetailTicketModel>();
 
+        //// Recheck for issue type have Cricket, Archive, and need some ticket info in bettrans
         if (checkQueueResult.IssueTypeId is IssueTypeConstant.AbnormalAccount or IssueTypeConstant.ReducedOver
             or IssueTypeConstant.DuplicateTickets or IssueTypeConstant.NotParticipate)
         {
