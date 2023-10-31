@@ -55,6 +55,7 @@ public class AddRequestStageImp : AddRequestStage
     private static int GetRequestDuplicatedFilterBy(int matchId)
     {
         const int parlayMatchId = 29;
-        return matchId == parlayMatchId ? 1 : 0;
+        const int virtualSport = 2799;
+        return matchId is parlayMatchId or virtualSport ? 1 : 0;
     }
 }
