@@ -74,7 +74,7 @@ public class AutoVoidInstantProcessStageImp : AutoVoidInstantProcessStage
 
     private async Task WriteLog(IList<string> logData)
     {
-        logData.Add($"ServerTime: {DateTime.Now:MM/dd/yyyy HH:mm:ss.fff}");
+        logData.Add($"ServerTime: {DateTimeOffset.Now:MM/dd/yyyy HH:mm:ss.fff}");
         await loggingService.InfoAppendNewLineAsync(logData);
     }
 }

@@ -67,7 +67,7 @@ public class VoidServiceImp : VoidService
 
         if (processVoidQueuesResult.Any(x => x.StatusId is ExecuteStatus.Failed or ExecuteStatus.New))
         {
-            var firstVoidingQueue = voidingQueues.First();
+            var firstVoidingQueue = voidingQueues[0];
             await requestDetailService.UpdateTicketVoidingHistory(firstVoidingQueue.VoidingHistoryId, ExecuteStatus.Failed);
             await notificationService.NotifyVoidFailedToUser(firstVoidingQueue.RequestId, processVoidQueuesResult);
             await notificationService.NotifyRequestFailedToAllUser(firstVoidingQueue.RequestId);
@@ -83,7 +83,7 @@ public class VoidServiceImp : VoidService
 
         await insertAfterVoidDataStage.Execute(processVoidQueuesResult, logData);
 
-        logData.Add($"ServerTime: {DateTime.Now:MM/dd/yyyy HH:mm:ss.fff}");
+        logData.Add($"ServerTime: {DateTimeOffset.Now:MM/dd/yyyy HH:mm:ss.fff}");
         await loggingService.InfoAppendNewLineAsync(logData);
     }
 }

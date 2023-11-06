@@ -49,14 +49,17 @@ public class GetTicketsStageImpTests
         Assert.True(actual.Item1);
     }
 
-    [Fact]
-    public async Task Execute_HasNotSingleOrParlayTickets_CalledExpected()
+    [Theory]
+    [InlineData(AutoVoidConstant.QueueActionVoidInstant, 0)]
+    [InlineData(AutoVoidConstant.QueueActionVoidInstant, 1)]
+    [InlineData(AutoVoidConstant.QueueActionVoidResultKeyed, 0)]
+    public async Task Execute_HasNotSingleOrParlayTickets_CalledExpected(string action, int matchId)
     {
         const int siteDbGroupId = 0;
         var singleTickets = new List<RequestDetailTicketModel>();
         var parlayTickets = new List<RequestDetailTicketModel>();
         var cricketTickets = new List<RequestDetailTicketModel>();
-        var queue = new AutoVoidRequestQueueModel{Action = AutoVoidConstant.QueueActionVoidInstant, MatchId = 0, RequestIds = "1"};
+        var queue = new AutoVoidRequestQueueModel{Action = action, MatchId = matchId, RequestIds = "1"};
         var getTicketsResult = new GroupTicketsInRequest
         {
             SingleTickets = singleTickets,

@@ -8,7 +8,7 @@ using Quartz;
 
 namespace TVS.Void.Service.Website.Jobs.Listener;
 
-[ExcludeFromCodeCoverage]
+[ExcludeFromCodeCoverage(Justification = "non-logic")]
 public class CustomSchedulerListener : ISchedulerListener
 {
     private readonly ILogger<CustomSchedulerListener> logger;
@@ -101,7 +101,7 @@ public class CustomSchedulerListener : ISchedulerListener
 
     public async Task SchedulerStarted(CancellationToken cancellationToken = new CancellationToken())
     {
-        var message = $"TVS.Void.Service Scheduler - Started - {DateTime.Now}";
+        var message = $"TVS.Void.Service Scheduler - Started - {DateTimeOffset.Now}";
         logger.LogInformation(message);
         await LogService.InfoAsync(message);
     }
@@ -113,7 +113,7 @@ public class CustomSchedulerListener : ISchedulerListener
 
     public async Task SchedulerShutdown(CancellationToken cancellationToken = new CancellationToken())
     {
-        var message = $"TVS.Void.Service Scheduler - Shutdown!!! - {DateTime.Now}";
+        var message = $"TVS.Void.Service Scheduler - Shutdown!!! - {DateTimeOffset.Now}";
         logger.LogInformation(message);
         await LogService.InfoAsync(message);
     }

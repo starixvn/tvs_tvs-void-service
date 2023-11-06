@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using ONEbook.UM.Services;
 using Quartz;
 using TicketVoidingSystem.Services;
-using TVS.Void.Service.Services;
 using TVS.Void.Service.Services.CheckTicketStatus;
 
 namespace TVS.Void.Service.Website.Jobs;

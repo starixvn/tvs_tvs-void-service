@@ -3,7 +3,7 @@ using ONEbook.UM.Helpers;
 
 namespace TVS.Void.Service.Website.Utilities.CustomServices;
 
-[ExcludeFromCodeCoverage]
+[ExcludeFromCodeCoverage(Justification = "non-logic")]
 public class CustomHttpContextHelper : IHttpContextHelper
 {
     public string GetSession(string key)

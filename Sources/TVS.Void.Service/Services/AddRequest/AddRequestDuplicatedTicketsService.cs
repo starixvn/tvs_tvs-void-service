@@ -85,7 +85,7 @@ public class AddRequestDuplicatedTicketsServiceImp : AddRequestDuplicatedTickets
             await insertAutoVoidRequestQueueStage.Execute(requestId, item, logData);
         }
 
-        logData.Add($"ServerTime: {DateTime.Now:MM/dd/yyyy HH:mm:ss.fff}");
+        logData.Add($"ServerTime: {DateTimeOffset.Now:MM/dd/yyyy HH:mm:ss.fff}");
         await loggingService.InfoAppendNewLineAsync(logData);
     }
 }

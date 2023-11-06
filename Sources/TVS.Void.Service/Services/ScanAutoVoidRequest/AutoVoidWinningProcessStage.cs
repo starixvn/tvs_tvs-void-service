@@ -57,7 +57,7 @@ public class AutoVoidWinningProcessStageImp : AutoVoidWinningProcessStage
 
     private async Task WriteLog(IList<string> logData)
     {
-        logData.Add($"ServerTime: {DateTime.Now:MM/dd/yyyy HH:mm:ss.fff}");
+        logData.Add($"ServerTime: {DateTimeOffset.Now:MM/dd/yyyy HH:mm:ss.fff}");
         await loggingService.InfoAppendNewLineAsync(logData);
     }
 }

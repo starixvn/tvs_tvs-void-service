@@ -30,7 +30,7 @@ using TVS.Void.Service.Website.Utilities.CustomServices;
 
 namespace TVS.Void.Service.Website.Utilities;
 
-[ExcludeFromCodeCoverage]
+[ExcludeFromCodeCoverage(Justification = "non-logic")]
 public static class ServiceCollectionExtension
 {
     public static void LoadConfig(this IServiceCollection services, IConfiguration configuration)
