@@ -55,8 +55,7 @@ public class AutoVoidInstantProcessStageImp : AutoVoidInstantProcessStage
         var validVoidSingleTickets14 = Enumerable.Empty<RequestDetailTicketModel>();
 
         //// Recheck for issue type have Cricket, Archive, and need some ticket info in bettrans
-        if (checkQueueResult.IssueTypeId is IssueTypeConstant.AbnormalAccount or IssueTypeConstant.ReducedOver
-            or IssueTypeConstant.DuplicateTickets or IssueTypeConstant.NotParticipate)
+        if (IsNeedToReCheckValidation(checkQueueResult.IssueTypeId))
         {
             var checkTicketResult = await checkTicketAllowToVoidStage.Execute(siteDbGroupId, getTicketsResult.OutputData.SingleTickets,
                 getTicketsResult.OutputData.ParlayTickets, getTicketsResult.OutputData.CricketTickets, logData);
@@ -70,6 +69,20 @@ public class AutoVoidInstantProcessStageImp : AutoVoidInstantProcessStage
             validVoidParlayTickets, validVoidCricketTickets, validVoidSingleTickets14, logData);
         await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, ExecuteStatus.Done, queueErrorMessage);
         await WriteLog(logData);
+    }
+
+    private static bool IsNeedToReCheckValidation(int issueTypeId)
+    {
+        var issueTypesReCheckValidation = new List<int>
+        {
+            IssueTypeConstant.AbnormalAccount,
+            IssueTypeConstant.ReducedOver,
+            IssueTypeConstant.DuplicateTickets,
+            IssueTypeConstant.NotParticipate,
+            IssueTypeConstant.EarlyKickOffTime,
+            IssueTypeConstant.WrongKickOffTime,
+        };
+        return issueTypesReCheckValidation.Contains(issueTypeId);
     }
 
     private async Task WriteLog(IList<string> logData)
