@@ -39,19 +39,19 @@ public class InsertAutoVoidQueueStageImp : InsertAutoVoidQueueStage
 
     public async Task ExecuteForAutoVoidAllResultKeyed(int siteDbGroupId, IEnumerable<RequestModel> requests, IDictionary<int, string> broadcastSessionIdCache, IList<string> logData)
     {
-        foreach (var request in requests)
+        foreach (var requestId in requests.Select(x => x.RequestId))
         {
-            if (!broadcastSessionIdCache.TryGetValue(request.RequestId, out var currentBroadcastSessionId))
+            if (!broadcastSessionIdCache.TryGetValue(requestId, out var currentBroadcastSessionId))
             {
                 currentBroadcastSessionId = Guid.NewGuid().ToString();
-                broadcastSessionIdCache.Add(request.RequestId, currentBroadcastSessionId);
+                broadcastSessionIdCache.Add(requestId, currentBroadcastSessionId);
             }
 
             // DB must check exist queue Status = New => not insert
-            await autoVoidRequestQueueService.InsertQueue(siteDbGroupId, currentBroadcastSessionId, request.RequestId.ToString(),
+            await autoVoidRequestQueueService.InsertQueue(siteDbGroupId, currentBroadcastSessionId, requestId.ToString(),
                 ExecuteStatus.New, AutoVoidConstant.QueueActionVoidResultKeyed, null);
 
-            logData.Add($"{nameof(InsertAutoVoidQueueStage)}-{AutoVoidConstant.QueueActionVoidResultKeyed}-[{siteDbGroupId}]: {request.RequestId} - {currentBroadcastSessionId}");
+            logData.Add($"{nameof(InsertAutoVoidQueueStage)}-{AutoVoidConstant.QueueActionVoidResultKeyed}-[{siteDbGroupId}]: {requestId} - {currentBroadcastSessionId}");
         }
     }
 }

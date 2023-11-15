@@ -9,7 +9,7 @@ using TicketVoidingSystem.Constants;
 
 namespace TicketVoidingSystem.Utilities;
 
-[ExcludeFromCodeCoverage]
+[ExcludeFromCodeCoverage(Justification = "non-logic")]
 public static class Helper
 {
     public static string GetSettingKeyBySiteDbGroupId(int siteDbGroupId, string spName)

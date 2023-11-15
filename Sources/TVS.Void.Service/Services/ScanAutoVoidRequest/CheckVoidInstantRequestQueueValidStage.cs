@@ -31,7 +31,7 @@ public class CheckVoidInstantRequestQueueValidStageImp : CheckVoidInstantRequest
             return (false, 0);
         }
 
-        var (request, _) = await requestDetailService.GetRequestById(int.Parse(requestIdList.First()));
+        var (request, _) = await requestDetailService.GetRequestById(int.Parse(requestIdList[0]));
         if (!request.Any())
         {
             await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, ExecuteStatus.Done, "RequestId invalid.");

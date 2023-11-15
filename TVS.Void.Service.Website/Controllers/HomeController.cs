@@ -7,7 +7,7 @@ using TicketVoidingSystem.Services;
 
 namespace TVS.Void.Service.Website.Controllers;
 
-[ExcludeFromCodeCoverage]
+[ExcludeFromCodeCoverage(Justification = "non-logic")]
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> logger;
@@ -23,7 +23,7 @@ public class HomeController : Controller
         var jobStatus =
             $"{{{nameof(AppSettingModel.IsCheckTicketStatusJobExecuting)}: {AppSettingService.AppSetting.IsCheckTicketStatusJobExecuting}," +
             $" {nameof(AppSettingModel.IsScanAutoVoidRequestJobExecuting)}: {AppSettingService.AppSetting.IsScanAutoVoidRequestJobExecuting}," +
-            $" {nameof(AppSettingModel.IsVoidJobExecuting)}: {AppSettingService.AppSetting.IsVoidJobExecuting} - {DateTime.Now}}}";
+            $" {nameof(AppSettingModel.IsVoidJobExecuting)}: {AppSettingService.AppSetting.IsVoidJobExecuting} - {DateTimeOffset.Now}}}";
         logger.LogInformation(jobStatus);
         return Ok("Ok-200-TVS.Void.Service");
     }

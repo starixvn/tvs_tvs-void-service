@@ -54,7 +54,8 @@ public class AutoVoidInstantProcessStageImp : AutoVoidInstantProcessStage
         var validVoidCricketTickets = getTicketsResult.OutputData.CricketTickets;
         var validVoidSingleTickets14 = Enumerable.Empty<RequestDetailTicketModel>();
 
-        if (checkQueueResult.IssueTypeId is IssueTypeConstant.AbnormalAccount or IssueTypeConstant.ReducedOver or IssueTypeConstant.DuplicateTickets)
+        //// Recheck for issue type have Cricket, Archive, and need some ticket info in bettrans
+        if (IsNeedToReCheckValidation(checkQueueResult.IssueTypeId))
         {
             var checkTicketResult = await checkTicketAllowToVoidStage.Execute(siteDbGroupId, getTicketsResult.OutputData.SingleTickets,
                 getTicketsResult.OutputData.ParlayTickets, getTicketsResult.OutputData.CricketTickets, logData);
@@ -70,9 +71,23 @@ public class AutoVoidInstantProcessStageImp : AutoVoidInstantProcessStage
         await WriteLog(logData);
     }
 
+    private static bool IsNeedToReCheckValidation(int issueTypeId)
+    {
+        var issueTypesReCheckValidation = new List<int>
+        {
+            IssueTypeConstant.AbnormalAccount,
+            IssueTypeConstant.ReducedOver,
+            IssueTypeConstant.DuplicateTickets,
+            IssueTypeConstant.NotParticipate,
+            IssueTypeConstant.EarlyKickOffTime,
+            IssueTypeConstant.WrongKickOffTime,
+        };
+        return issueTypesReCheckValidation.Contains(issueTypeId);
+    }
+
     private async Task WriteLog(IList<string> logData)
     {
-        logData.Add($"ServerTime: {DateTime.Now:MM/dd/yyyy HH:mm:ss.fff}");
+        logData.Add($"ServerTime: {DateTimeOffset.Now:MM/dd/yyyy HH:mm:ss.fff}");
         await loggingService.InfoAppendNewLineAsync(logData);
     }
 }

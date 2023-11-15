@@ -8,7 +8,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace TVS.Void.Service.Website.Utilities;
 
-[ExcludeFromCodeCoverage]
+[ExcludeFromCodeCoverage(Justification = "non-logic")]
 public class ExceptionHandlerMiddleware
 {
     private readonly RequestDelegate next;

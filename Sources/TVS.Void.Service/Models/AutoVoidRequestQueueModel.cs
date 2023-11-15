@@ -8,4 +8,7 @@ public class AutoVoidRequestQueueModel
     public int QueueId { get; set; }
     public int SiteDbGroupId { get; set; }
     public string BroadcastSessionId { get; set; }
+
+    //// Use for request VoidInstant with multiple match
+    public int MatchId { get; set; }
 }

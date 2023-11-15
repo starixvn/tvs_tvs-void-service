@@ -4,7 +4,7 @@ using TicketVoidingSystem.Models;
 
 namespace TicketVoidingSystem.Services;
 
-[ExcludeFromCodeCoverage]
+[ExcludeFromCodeCoverage(Justification = "non-logic")]
 public static class AppSettingService
 {
     public static AppSettingModel AppSetting { get; set; }

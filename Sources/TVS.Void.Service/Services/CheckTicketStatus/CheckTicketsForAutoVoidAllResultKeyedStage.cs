@@ -32,20 +32,20 @@ public class CheckTicketsForAutoVoidAllResultKeyedStageImp : CheckTicketsForAuto
                         + $"{nameof(groupTickets.ParlayTickets)}.Count: {groupTickets.ParlayTickets.Count()} - {nameof(groupTickets.CricketTickets)}.Count: {groupTickets.CricketTickets.Count()}");
 
             IDictionary<int, string> broadcastSessionIdCache = new Dictionary<int, string>();
-            foreach (var server in SiteDbGroupConstant.ServerList)
+            foreach (var siteDbGroupId in SiteDbGroupConstant.ServerList.Select(x => x.Id))
             {
-                var singleTicketsInServer = groupTickets.SingleTickets.Where(x => x.SiteDbGroupId == server.Id);
-                var parlayTicketsInServer = groupTickets.ParlayTickets.Where(x => x.SiteDbGroupId == server.Id);
-                var cricketTicketsInServer = groupTickets.CricketTickets.Where(x => x.SiteDbGroupId == server.Id);
+                var singleTicketsInServer = groupTickets.SingleTickets.Where(x => x.SiteDbGroupId == siteDbGroupId);
+                var parlayTicketsInServer = groupTickets.ParlayTickets.Where(x => x.SiteDbGroupId == siteDbGroupId);
+                var cricketTicketsInServer = groupTickets.CricketTickets.Where(x => x.SiteDbGroupId == siteDbGroupId);
 
-                var checkResult = await requestTicketService.CheckStatusTicketForInsertAutoVoidQueue(server.Id, singleTicketsInServer, parlayTicketsInServer, cricketTicketsInServer);
-                await insertAutoVoidQueueStage.ExecuteForAutoVoidAllResultKeyed(server.Id, checkResult.ValidRequests, broadcastSessionIdCache, logData);
+                var checkResult = await requestTicketService.CheckStatusTicketForInsertAutoVoidQueue(siteDbGroupId, singleTicketsInServer, parlayTicketsInServer, cricketTicketsInServer);
+                await insertAutoVoidQueueStage.ExecuteForAutoVoidAllResultKeyed(siteDbGroupId, checkResult.ValidRequests, broadcastSessionIdCache, logData);
                 await requestTicketService.UpdateIsProcessed(checkResult.InvalidSingleTickets, checkResult.InvalidParlayTickets, checkResult.InvalidCricketTickets);
-                logData.Add($"[{server.Id}]{nameof(requestTicketService.CheckStatusTicketForInsertAutoVoidQueue)} - {JsonSerializer.Serialize(checkResult)}");
+                logData.Add($"[{siteDbGroupId}]{nameof(requestTicketService.CheckStatusTicketForInsertAutoVoidQueue)} - {JsonSerializer.Serialize(checkResult)}");
             }
 
             logData.Add($"{nameof(broadcastSessionIdCache)}: {JsonSerializer.Serialize(broadcastSessionIdCache)}");
-            logData.Add($"ServerTime: {DateTime.Now:MM/dd/yyyy HH:mm:ss.fff}");
+            logData.Add($"ServerTime: {DateTimeOffset.Now:MM/dd/yyyy HH:mm:ss.fff}");
         }
     }
 }
