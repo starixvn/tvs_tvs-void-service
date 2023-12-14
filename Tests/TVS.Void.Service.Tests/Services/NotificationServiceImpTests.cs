@@ -18,21 +18,18 @@ public class NotificationServiceImpTests
     public async Task NotifyRequestRunningToAllUser_ShouldExecuteSuccessful(int requestId)
     {
         // Arrange
-        var ticketVoidingSystemHttpClientService = Substitute.For<TicketVoidingSystemHttpClientService>();
         var hubContext = Substitute.For<IHubContext<NotificationHub, ClientEvent>>();
         var hubClient = Substitute.For<IHubClients<ClientEvent>>();
         var clientEvent = Substitute.For<ClientEvent>();
         hubClient.All.ReturnsForAnyArgs(clientEvent);
         hubContext.Clients.ReturnsForAnyArgs(hubClient);
 
-        var service = new NotificationServiceImp(ticketVoidingSystemHttpClientService, hubContext, default);
+        var service = new NotificationServiceImp(hubContext, default);
 
         // Act
         await service.NotifyRequestRunningToAllUser(new List<VoidingHistoryModel> { new VoidingHistoryModel { RequestId = requestId } });
 
         // Assert
-        await ticketVoidingSystemHttpClientService.Received(1)
-            .SignalRUpdateRequestStatusToAllUsers(Arg.Is<IEnumerable<RequestStatus>>(y => y.First().RequestId == requestId));
         await clientEvent.Received(1)
             .updateRequestStatus(Arg.Is<IEnumerable<RequestStatus>>(y => y.First().RequestId == requestId));
     }
@@ -44,17 +41,12 @@ public class NotificationServiceImpTests
     {
         // Arrange
         var loggingService = Substitute.For<LoggingService>();
-        var ticketVoidingSystemHttpClientService = Substitute.For<TicketVoidingSystemHttpClientService>();
-        ticketVoidingSystemHttpClientService.WhenForAnyArgs(x => x.SignalRUpdateRequestStatusToAllUsers(default))
-            .Do(x => throw new Exception());
-        var service = new NotificationServiceImp(ticketVoidingSystemHttpClientService, default, loggingService);
+        var service = new NotificationServiceImp(default, loggingService);
 
         // Act
         await service.NotifyRequestRunningToAllUser(new List<VoidingHistoryModel> { new VoidingHistoryModel { RequestId = requestId } });
 
         // Assert
-        await ticketVoidingSystemHttpClientService.Received(1)
-            .SignalRUpdateRequestStatusToAllUsers(Arg.Is<IEnumerable<RequestStatus>>(y => y.First().RequestId == requestId));
         await loggingService.Received(1).ErrorAsync(Arg.Any<string>());
     }
 
@@ -67,21 +59,18 @@ public class NotificationServiceImpTests
     {
         // Arrange
         var voidQueueResults = new List<TicketVoidingQueueModel> { new() { UserName = "abc", VoidingTypeId = voidingTypeId, StatusId = statusId } };
-        var ticketVoidingSystemHttpClientService = Substitute.For<TicketVoidingSystemHttpClientService>();
         var hubContext = Substitute.For<IHubContext<NotificationHub, ClientEvent>>();
         var hubClient = Substitute.For<IHubClients<ClientEvent>>();
         var clientEvent = Substitute.For<ClientEvent>();
         hubClient.User(Arg.Any<string>()).ReturnsForAnyArgs(clientEvent);
         hubContext.Clients.ReturnsForAnyArgs(hubClient);
 
-        var service = new NotificationServiceImp(ticketVoidingSystemHttpClientService, hubContext, default);
+        var service = new NotificationServiceImp(hubContext, default);
 
         // Act
         await service.NotifyVoidFailedToUser(requestId, voidQueueResults);
 
         // Assert
-        await ticketVoidingSystemHttpClientService.Received(1)
-            .SignalRNotifyErrorMessageToUser(Arg.Is<string>(x => x == "abc"), Arg.Any<string>());
         hubClient.Received(1).User(Arg.Is<string>(x => x == "abc"));
         await clientEvent.Received(1)
             .showErrorMessage(Arg.Any<string>());
@@ -93,7 +82,7 @@ public class NotificationServiceImpTests
     {
         // Arrange
         var loggingService = Substitute.For<LoggingService>();
-        var service = new NotificationServiceImp(default, default, loggingService);
+        var service = new NotificationServiceImp(default, loggingService);
 
         // Act
         await service.NotifyVoidFailedToUser(requestId, voidQueueResults);
@@ -108,21 +97,18 @@ public class NotificationServiceImpTests
     public async Task NotifyRequestFailedToAllUser_ShouldExecuteSuccessful(int requestId)
     {
         // Arrange
-        var ticketVoidingSystemHttpClientService = Substitute.For<TicketVoidingSystemHttpClientService>();
         var hubContext = Substitute.For<IHubContext<NotificationHub, ClientEvent>>();
         var hubClient = Substitute.For<IHubClients<ClientEvent>>();
         var clientEvent = Substitute.For<ClientEvent>();
         hubClient.All.ReturnsForAnyArgs(clientEvent);
         hubContext.Clients.ReturnsForAnyArgs(hubClient);
 
-        var service = new NotificationServiceImp(ticketVoidingSystemHttpClientService, hubContext, default);
+        var service = new NotificationServiceImp(hubContext, default);
 
         // Act
         await service.NotifyRequestFailedToAllUser(requestId);
 
         // Assert
-        await ticketVoidingSystemHttpClientService.Received(1)
-            .SignalRUpdateRequestStatusToAllUsers(Arg.Is<IEnumerable<RequestStatus>>(y => y.First().RequestId == requestId));
         await clientEvent.Received(1)
             .updateRequestStatus(Arg.Is<IEnumerable<RequestStatus>>(y => y.First().RequestId == requestId));
     }
@@ -134,17 +120,12 @@ public class NotificationServiceImpTests
     {
         // Arrange
         var loggingService = Substitute.For<LoggingService>();
-        var ticketVoidingSystemHttpClientService = Substitute.For<TicketVoidingSystemHttpClientService>();
-        ticketVoidingSystemHttpClientService.WhenForAnyArgs(x => x.SignalRUpdateRequestStatusToAllUsers(default))
-            .Do(x => throw new Exception());
-        var service = new NotificationServiceImp(ticketVoidingSystemHttpClientService, default, loggingService);
+        var service = new NotificationServiceImp(default, loggingService);
 
         // Act
         await service.NotifyRequestFailedToAllUser(requestId);
 
         // Assert
-        await ticketVoidingSystemHttpClientService.Received(1)
-            .SignalRUpdateRequestStatusToAllUsers(Arg.Is<IEnumerable<RequestStatus>>(y => y.First().RequestId == requestId));
         await loggingService.Received(1).ErrorAsync(Arg.Any<string>());
     }
 

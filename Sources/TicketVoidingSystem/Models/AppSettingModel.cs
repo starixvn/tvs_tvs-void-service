@@ -18,11 +18,6 @@ public class AppSettingModel
 
     public string SentryClientKey { get; init; }
 
-    ////
-    public string TicketVoidingSystemUrl { get; init; }
-
-    public string NetPositionUrl { get; init; }
-
     public string IgnoreSiteDb { get; init; }
 
     public bool IsPRODEnvironment { get; init; }

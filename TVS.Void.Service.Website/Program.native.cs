@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using TicketVoidingSystem.Services;
 using TicketVoidingSystem.SignalR;
 using TVS.Void.Service.Website.Utilities;
 
@@ -10,7 +9,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.LoadConfig(builder.Configuration);
 builder.Services.AddControllers();
 builder.Services.AddMemoryCache();
-builder.Services.AddHttpClient<TicketVoidingSystemHttpClientService, TicketVoidingSystemHttpClientServiceImp>();
 builder.Services.RegisterFanexData(builder.Configuration);
 builder.Services.RegisterFanexExceptionHandler();
 builder.Services.RegisterSentry();

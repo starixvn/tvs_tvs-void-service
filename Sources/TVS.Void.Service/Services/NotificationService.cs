@@ -24,13 +24,11 @@ public interface NotificationService
 
 public class NotificationServiceImp : NotificationService
 {
-    private readonly TicketVoidingSystemHttpClientService ticketVoidingSystemHttpClientService;
     private readonly IHubContext<NotificationHub, ClientEvent> hubContext;
     private readonly LoggingService loggingService;
 
-    public NotificationServiceImp(TicketVoidingSystemHttpClientService ticketVoidingSystemHttpClientService, IHubContext<NotificationHub, ClientEvent> hubContext, LoggingService loggingService)
+    public NotificationServiceImp(IHubContext<NotificationHub, ClientEvent> hubContext, LoggingService loggingService)
     {
-        this.ticketVoidingSystemHttpClientService = ticketVoidingSystemHttpClientService;
         this.hubContext = hubContext;
         this.loggingService = loggingService;
     }
@@ -41,7 +39,6 @@ public class NotificationServiceImp : NotificationService
         {
             var runningRequests = voidingHistoryList.Select(x
                 => new RequestStatus { RequestId = x.RequestId, Status = RequestStatusConstant.Running });
-            await ticketVoidingSystemHttpClientService.SignalRUpdateRequestStatusToAllUsers(runningRequests);
             await hubContext.Clients.All.updateRequestStatus(runningRequests);
         }
         catch (Exception e)
@@ -61,7 +58,6 @@ public class NotificationServiceImp : NotificationService
             {
                 notifyMessage.AppendLine($" {Messages.FailedApiVoidCricket}");
             }
-            await ticketVoidingSystemHttpClientService.SignalRNotifyErrorMessageToUser(voidResultHasUserInfo.UserName, notifyMessage.ToString());
             await hubContext.Clients.User(voidResultHasUserInfo.UserName).showErrorMessage(notifyMessage.ToString());
         }
         catch (Exception e)
@@ -75,7 +71,6 @@ public class NotificationServiceImp : NotificationService
         try
         {
             var failedRequests = new List<RequestStatus> { new() { RequestId = requestId, Status = RequestStatusConstant.Failed } };
-            await ticketVoidingSystemHttpClientService.SignalRUpdateRequestStatusToAllUsers(failedRequests);
             await hubContext.Clients.All.updateRequestStatus(failedRequests);
         }
         catch (Exception e)

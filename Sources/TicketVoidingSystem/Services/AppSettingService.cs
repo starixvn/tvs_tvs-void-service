@@ -20,10 +20,8 @@ public static class AppSettingService
                 DefaultDatabase = configuration.GetValue<int>($"{nameof(RedisConfig)}:{nameof(RedisConfig.DefaultDatabase)}"),
                 SignalRChannelPrefix = configuration.GetValue<string>($"{nameof(RedisConfig)}:{nameof(RedisConfig.SignalRChannelPrefix)}")
             },
-            TicketVoidingSystemUrl = configuration.GetValue<string>(nameof(AppSettingModel.TicketVoidingSystemUrl)),
             CategorySentryLog = configuration.GetValue<string>(nameof(AppSettingModel.CategorySentryLog)),
             SentryClientKey = configuration.GetValue<string>(nameof(AppSettingModel.SentryClientKey)),
-            NetPositionUrl = configuration.GetValue<string>(nameof(AppSettingModel.NetPositionUrl)),
             IgnoreSiteDb = configuration.GetValue<string>(nameof(AppSettingModel.IgnoreSiteDb)),
             IsPRODEnvironment = configuration.GetValue<bool>(nameof(AppSettingModel.IsPRODEnvironment))
         };
