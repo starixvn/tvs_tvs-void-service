@@ -39,7 +39,8 @@ public class CheckTicketsForAutoVoidWinningStageImp : CheckTicketsForAutoVoidWin
 
                 var checkResult = await requestTicketService.CheckStatusTicketForInsertAutoVoidQueue(siteDbGroupId, singleTicketsInServer, parlayTicketsInServer, cricketTicketsInServer);
                 await insertAutoVoidQueueStage.ExecuteForAutoVoidWinning(siteDbGroupId, checkResult.ValidRequests, broadcastSessionId, logData);
-                await requestTicketService.UpdateIsProcessed(checkResult.InvalidSingleTickets, checkResult.InvalidParlayTickets, checkResult.InvalidCricketTickets);
+                await requestTicketService.UpdateIsProcessed(checkResult.InvalidSingleTickets, checkResult.InvalidParlayTickets,
+                    checkResult.InvalidCricketTickets, new List<RequestDetailTicketModel>());
                 logData.Add($"[{siteDbGroupId}]{nameof(requestTicketService.CheckStatusTicketForInsertAutoVoidQueue)} - {JsonSerializer.Serialize(checkResult)}");
             }
 
