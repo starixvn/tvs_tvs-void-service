@@ -19,8 +19,8 @@ public interface RequestTicketService
         IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets,
         IEnumerable<RequestDetailTicketModel> cricketTickets);
 
-    Task UpdateIsProcessed(IEnumerable<RequestDetailTicketModel> singleTickets,
-        IEnumerable<RequestDetailTicketModel> parlayTickets, IEnumerable<RequestDetailTicketModel> cricketTickets);
+    Task UpdateIsProcessed(IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets,
+        IEnumerable<RequestDetailTicketModel> cricketTickets, IEnumerable<RequestDetailTicketModel> singleTickets14);
 }
 
 public class RequestTicketServiceImp : RequestTicketService
@@ -93,12 +93,12 @@ public class RequestTicketServiceImp : RequestTicketService
         return outputData;
     }
 
-    public async Task UpdateIsProcessed(IEnumerable<RequestDetailTicketModel> singleTickets,
-        IEnumerable<RequestDetailTicketModel> parlayTickets, IEnumerable<RequestDetailTicketModel> cricketTickets)
+    public async Task UpdateIsProcessed(IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets,
+        IEnumerable<RequestDetailTicketModel> cricketTickets, IEnumerable<RequestDetailTicketModel> singleTickets14)
     {
         var criteria = new UpdateIsProcessedForRequestTicketsCriteria
         {
-            SingleTicketsJson = JsonSerializer.Serialize(singleTickets),
+            SingleTicketsJson = JsonSerializer.Serialize(singleTickets.Union(singleTickets14)),
             ParlayTicketsJson = JsonSerializer.Serialize(parlayTickets),
             CricketTicketsJson = JsonSerializer.Serialize(cricketTickets)
         };

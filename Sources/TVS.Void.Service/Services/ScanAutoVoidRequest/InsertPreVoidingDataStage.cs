@@ -48,7 +48,7 @@ public class InsertPreVoidingDataStageImp : InsertPreVoidingDataStage
             validVoidSingleTickets, validVoidParlayTickets, validVoidCricketTickets, validVoidSingleTickets14);
         logData.Add("InsertQueues-OK");
 
-        await requestTicketService.UpdateIsProcessed(validVoidSingleTickets, validVoidParlayTickets, validVoidCricketTickets);
+        await requestTicketService.UpdateIsProcessed(validVoidSingleTickets, validVoidParlayTickets, validVoidCricketTickets, validVoidSingleTickets14);
         logData.Add($"{nameof(RequestTicketService.UpdateIsProcessed)}-AfterInsertVoidQueue-OK");
 
         return string.Empty;

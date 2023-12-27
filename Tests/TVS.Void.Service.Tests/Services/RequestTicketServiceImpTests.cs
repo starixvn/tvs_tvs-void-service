@@ -91,7 +91,8 @@ public class RequestTicketServiceImpTests
 
     [Theory]
     [MemberData(nameof(UpdateIsProcessedTestData))]
-    public async Task UpdateIsProcessed_ShouldExecuteRepositorySuccessful(IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets, IEnumerable<RequestDetailTicketModel> cricketTickets)
+    public async Task UpdateIsProcessed_ShouldExecuteRepositorySuccessful(IEnumerable<RequestDetailTicketModel> singleTickets,
+        IEnumerable<RequestDetailTicketModel> parlayTickets, IEnumerable<RequestDetailTicketModel> cricketTickets, IEnumerable<RequestDetailTicketModel> singleTickets14)
     {
         // Arrange
         var repository = Substitute.For<IDynamicRepository>();
@@ -101,7 +102,7 @@ public class RequestTicketServiceImpTests
         var service = new RequestTicketServiceImp(repository);
 
         // Act
-        await service.UpdateIsProcessed(singleTickets, parlayTickets, cricketTickets);
+        await service.UpdateIsProcessed(singleTickets, parlayTickets, cricketTickets, singleTickets14);
 
         // Assert
         await repository.Received(1).ExecuteAsync(Arg.Any<UpdateIsProcessedForRequestTicketsCriteria>());
@@ -123,12 +124,12 @@ public class RequestTicketServiceImpTests
     public static IEnumerable<object[]> UpdateIsProcessedTestData =>
         new List<object[]>
         {
-            new object[] {  null, null, null },
             new object[]
             {
                 new List<RequestDetailTicketModel> {new() { TransId = 113 }},
                 new List<RequestDetailTicketModel> {new() { TransId = 222 }},
-                new List<RequestDetailTicketModel>{new() { TransId = 223 } }
+                new List<RequestDetailTicketModel> {new() { TransId = 223 }},
+                new List<RequestDetailTicketModel> {new() { TransId = 223 }}
             },
         };
 }

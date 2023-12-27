@@ -34,7 +34,7 @@ public class InsertAfterVoidDataPrivateServiceImp : InsertAfterVoidDataPrivateSe
     public string CombineNegativeBalanceUsers(IEnumerable<TicketVoidingQueueModel> voidQueueResults)
     {
         var validNegativeBalance = voidQueueResults.Where(x => !string.IsNullOrWhiteSpace(x.NegativeBalanceUsers))
-            .Select(x => x.NegativeBalanceUsers);
+            .Select(x => x.NegativeBalanceUsers).Distinct();
 
         return string.Join(",", validNegativeBalance);
     }
