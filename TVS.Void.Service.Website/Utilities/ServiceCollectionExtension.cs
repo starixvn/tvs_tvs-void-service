@@ -1,9 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using Fanex.Data;
 using Fanex.Data.Repository;
-using Fanex.Data.SqlServer;
 using Fanex.Logging;
 using Fanex.Logging.Extensions;
 using Fanex.Logging.Extensions.AspNetCore;
@@ -36,24 +33,6 @@ public static class ServiceCollectionExtension
     public static void LoadConfig(this IServiceCollection services, IConfiguration configuration)
     {
         AppSettingService.InitSetting(configuration);
-    }
-
-    public static void RegisterFanexData(this IServiceCollection services, IConfiguration configuration)
-    {
-        var connections = configuration.GetSection("ConnectionStrings")
-            .GetChildren()
-            .AsEnumerable()
-            .ToDictionary(
-                x => x.Key,
-                y => new ConnectionConfiguration(y.Key, y.Value)
-            );
-
-        DbSettingProviderManager
-            .StartNewSession()
-            .Use(connections)
-            .WithSqlServer()
-            .UseDefaultDbSettingProvider(configuration.GetSection("StoredProcedurePath").Value)
-            .Run();
     }
 
     public static void RegisterSentry(this IServiceCollection services)
