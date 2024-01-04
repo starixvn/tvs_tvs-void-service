@@ -8,12 +8,12 @@ using TVS.Void.Service.Models;
 
 namespace TVS.Void.Service.Services.ScanAutoVoidRequest;
 
-public interface AutoVoidInstantProcessStage
+public interface AutoInstantProcessStage
 {
     Task Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue, IList<string> logData);
 }
 
-public class AutoVoidInstantProcessStageImp : AutoVoidInstantProcessStage
+public class AutoInstantProcessStageImp : AutoInstantProcessStage
 {
     private readonly CheckVoidInstantRequestQueueValidStage checkRequestQueueValidStage;
     private readonly GetTicketsStage getTicketsStage;
@@ -22,7 +22,7 @@ public class AutoVoidInstantProcessStageImp : AutoVoidInstantProcessStage
     private readonly AutoVoidRequestQueueService autoVoidRequestQueueService;
     private readonly LoggingService loggingService;
 
-    public AutoVoidInstantProcessStageImp(CheckVoidInstantRequestQueueValidStage checkRequestQueueValidStage, GetTicketsStage getTicketsStage,
+    public AutoInstantProcessStageImp(CheckVoidInstantRequestQueueValidStage checkRequestQueueValidStage, GetTicketsStage getTicketsStage,
         CheckTicketValidationStage checkTicketValidationStage, InsertPreVoidingDataStage insertPreVoidingDataStage,
         AutoVoidRequestQueueService autoVoidRequestQueueService, LoggingService loggingService)
     {

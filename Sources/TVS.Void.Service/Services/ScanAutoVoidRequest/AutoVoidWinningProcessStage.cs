@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using TicketVoidingSystem.Constants;
 using TicketVoidingSystem.Services;
@@ -41,15 +40,14 @@ public class AutoVoidWinningProcessStageImp : AutoVoidWinningProcessStage
             return;
         }
 
-        var checkTicketResult = await checkTicketAllowToVoidStage.Execute(siteDbGroupId, getTicketsResult.OutputData.SingleTickets,
+        var checkTicketResult = await checkTicketAllowToVoidStage.ExecuteForVoid(siteDbGroupId, getTicketsResult.OutputData.SingleTickets,
             getTicketsResult.OutputData.ParlayTickets, getTicketsResult.OutputData.CricketTickets, logData);
 
         await reCalculateTicketsStage.Execute(siteDbGroupId, checkTicketResult.SingleTicketsResettle,
             checkTicketResult.ParlayTicketsResettle, checkTicketResult.CricketTicketsResettle, logData);
 
-        var queueErrorMessage = await insertPreVoidingDataStage.Execute(siteDbGroupId, queue,
-            checkTicketResult.ValidVoidSingleTickets, checkTicketResult.ValidVoidParlayTickets, checkTicketResult.ValidVoidCricketTickets,
-            Enumerable.Empty<RequestDetailTicketModel>(), logData);
+        var groupTickets = insertPreVoidingDataStage.MapVoidingTypeToTickets(checkTicketResult);
+        var queueErrorMessage = await insertPreVoidingDataStage.Execute(siteDbGroupId, queue, groupTickets, logData);
 
         await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, ExecuteStatus.Done, queueErrorMessage);
         await WriteLog(logData);

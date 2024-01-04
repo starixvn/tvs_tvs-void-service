@@ -45,7 +45,7 @@ public class InsertPreVoidingDataStageImp : InsertPreVoidingDataStage
         await ticketVoidingQueueService.InsertQueueForRequests(siteDbGroupId, voidingHistoryList, groupTickets);
         logData.Add("InsertQueues-OK");
 
-        await requestTicketService.UpdateIsProcessed(validVoidSingleTickets, validVoidParlayTickets, validVoidCricketTickets, validVoidSingleTickets14);
+        await requestTicketService.UpdateIsProcessed(groupTickets);
         logData.Add($"{nameof(RequestTicketService.UpdateIsProcessed)}-AfterInsertVoidQueue-OK");
 
         return string.Empty;
