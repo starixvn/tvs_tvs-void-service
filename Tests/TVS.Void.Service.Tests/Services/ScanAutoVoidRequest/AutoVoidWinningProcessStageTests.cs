@@ -10,7 +10,7 @@ namespace TVS.Void.Service.Tests.Services.ScanAutoVoidRequest;
 public class AutoVoidWinningProcessStageTests
 {
     private readonly AutoVoidRequestQueueService autoVoidRequestQueueService;
-    private readonly CheckTicketAllowToVoidStage checkTicketAllowToVoidStage;
+    private readonly CheckTicketValidationStage checkTicketAllowToVoidStage;
     private readonly GetTicketsStage getTicketsStage;
     private readonly InsertPreVoidingDataStage insertPreVoidingDataStage;
     private readonly LoggingService loggingService;
@@ -21,7 +21,7 @@ public class AutoVoidWinningProcessStageTests
     {
         reCalculateTicketsStage = Substitute.For<ReCalculateTicketsStage>();
         getTicketsStage = Substitute.For<GetTicketsStage>();
-        checkTicketAllowToVoidStage = Substitute.For<CheckTicketAllowToVoidStage>();
+        checkTicketAllowToVoidStage = Substitute.For<CheckTicketValidationStage>();
         insertPreVoidingDataStage = Substitute.For<InsertPreVoidingDataStage>();
         autoVoidRequestQueueService = Substitute.For<AutoVoidRequestQueueService>();
         loggingService = Substitute.For<LoggingService>();
@@ -64,7 +64,7 @@ public class AutoVoidWinningProcessStageTests
             CricketTickets = tickets
         };
         var requestDetailTickets = new List<RequestDetailTicketModel>();
-        var checkTicketResult = new CheckStatusTicketOutput
+        var checkTicketResult = new CheckTicketValidationOutput
         {
             ValidVoidSingleTickets = requestDetailTickets,
             SingleTicketsResettle = requestDetailTickets,

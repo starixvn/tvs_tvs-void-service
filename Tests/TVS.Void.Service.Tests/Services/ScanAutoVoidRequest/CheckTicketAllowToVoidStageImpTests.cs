@@ -14,7 +14,7 @@ public class CheckTicketAllowToVoidStageImpTests
         const int siteDbGroupId = 0;
         var tickets = new List<RequestDetailTicketModel>();
         IEnumerable<object>[] fakeData = { tickets, tickets, tickets, tickets, tickets, tickets, tickets, tickets };
-        var expected = new CheckStatusTicketOutput
+        var expected = new CheckTicketValidationOutput
         {
             ValidVoidSingleTickets = tickets,
             SingleTicketsResettle = tickets,

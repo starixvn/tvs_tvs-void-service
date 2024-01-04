@@ -8,13 +8,7 @@ public class InsertTicketVoidingQueueCriteria : NonQueryCommand
 {
     public int RequestId { get; set; }
     public int VoidingHistoryId { get; set; }
-    public string SingleTicketsJson { get; set; }
-    public string ParlayTicketsJson { get; set; }
-
-    //// public string CancelCashOutTicketsJson { get; set; }
-
-    public string CricketTicketsJson { get; set; }
-    public string SingleTickets14Json { get; set; }
+    public string TicketsJson { get; set; }
     public int UserId { get; set; }
     public string IP { get; set; }
 

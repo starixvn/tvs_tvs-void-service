@@ -48,7 +48,7 @@ public class ScanAutoVoidRequestServiceImp : ScanAutoVoidRequestService
         try
         {
             logData.Add($"Scan[{siteDbGroupId}]: {JsonSerializer.Serialize(queue)}");
-            if (IsVoidInstantQueue(queue.Action))
+            if (IsInstantQueue(queue.Action))
             {
                 await autoVoidInstantProcessStage.Execute(siteDbGroupId, queue, logData);
             }
@@ -65,7 +65,7 @@ public class ScanAutoVoidRequestServiceImp : ScanAutoVoidRequestService
         }
     }
 
-    private static bool IsVoidInstantQueue(string action)
+    private static bool IsInstantQueue(string action)
     {
 #pragma warning disable S1067 // Expressions should not be too complex
         var isQueueVoidInstant =
@@ -76,7 +76,8 @@ public class ScanAutoVoidRequestServiceImp : ScanAutoVoidRequestService
                 || action.Equals(AutoVoidConstant.QueueActionVoidInstantWithPolicy, StringComparison.OrdinalIgnoreCase);
 #pragma warning restore S1067 // Expressions should not be too complex
         var isVoidLikeAutoWinningButNotRunResettled = action.Equals(AutoVoidConstant.QueueActionVoidResultKeyed, StringComparison.OrdinalIgnoreCase);
+        var isRecoverInstant = action.Equals(AutoVoidConstant.QueueRecoverInstant, StringComparison.OrdinalIgnoreCase);
 
-        return isQueueVoidInstant || isVoidLikeAutoWinningButNotRunResettled;
+        return isQueueVoidInstant || isVoidLikeAutoWinningButNotRunResettled || isRecoverInstant;
     }
 }

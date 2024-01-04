@@ -2,15 +2,16 @@
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using TVS.Void.Service.Constants;
 using TVS.Void.Service.Models;
 
 namespace TVS.Void.Service.Services.ScanAutoVoidRequest;
 
 public interface InsertPreVoidingDataStage
 {
-    Task<string> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue, IEnumerable<RequestDetailTicketModel> validVoidSingleTickets,
-        IEnumerable<RequestDetailTicketModel> validVoidParlayTickets, IEnumerable<RequestDetailTicketModel> validVoidCricketTickets,
-        IEnumerable<RequestDetailTicketModel> validVoidSingleTickets14, IList<string> logData);
+    Task<string> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue, IEnumerable<RequestDetailTicketModel> groupTickets, IList<string> logData);
+
+    IEnumerable<RequestDetailTicketModel> MapVoidingTypeToTickets(CheckTicketValidationOutput validation);
 }
 
 public class InsertPreVoidingDataStageImp : InsertPreVoidingDataStage
@@ -29,23 +30,19 @@ public class InsertPreVoidingDataStageImp : InsertPreVoidingDataStage
         this.notificationService = notificationService;
     }
 
-    public async Task<string> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue, IEnumerable<RequestDetailTicketModel> validVoidSingleTickets,
-        IEnumerable<RequestDetailTicketModel> validVoidParlayTickets, IEnumerable<RequestDetailTicketModel> validVoidCricketTickets,
-        IEnumerable<RequestDetailTicketModel> validVoidSingleTickets14, IList<string> logData)
+    public async Task<string> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue, IEnumerable<RequestDetailTicketModel> groupTickets, IList<string> logData)
     {
-        if (!validVoidSingleTickets.Any() && !validVoidParlayTickets.Any() && !validVoidCricketTickets.Any() && !validVoidSingleTickets14.Any())
+        if (!groupTickets.Any())
         {
             return "No ticket found.";
         }
 
-        var requestIds = string.Join(",", DistinctRequestIdList(validVoidSingleTickets, validVoidParlayTickets, validVoidCricketTickets, validVoidSingleTickets14));
-        var voidingHistoryList = await requestDetailService.InsertVoidingHistory(requestIds, siteDbGroupId, queue.BroadcastSessionId,
-            validVoidSingleTickets, validVoidParlayTickets, validVoidCricketTickets, validVoidSingleTickets14);
+        var requestIds = string.Join(",", DistinctRequestIdList(groupTickets));
+        var voidingHistoryList = await requestDetailService.InsertVoidingHistory(requestIds, siteDbGroupId, queue.BroadcastSessionId, groupTickets);
         logData.Add($"{nameof(voidingHistoryList)}: {JsonSerializer.Serialize(voidingHistoryList)}");
 
         await notificationService.NotifyRequestRunningToAllUser(voidingHistoryList);
-        await ticketVoidingQueueService.InsertQueueForRequests(siteDbGroupId, voidingHistoryList,
-            validVoidSingleTickets, validVoidParlayTickets, validVoidCricketTickets, validVoidSingleTickets14);
+        await ticketVoidingQueueService.InsertQueueForRequests(siteDbGroupId, voidingHistoryList, groupTickets);
         logData.Add("InsertQueues-OK");
 
         await requestTicketService.UpdateIsProcessed(validVoidSingleTickets, validVoidParlayTickets, validVoidCricketTickets, validVoidSingleTickets14);
@@ -54,15 +51,43 @@ public class InsertPreVoidingDataStageImp : InsertPreVoidingDataStage
         return string.Empty;
     }
 
-    private static IEnumerable<int> DistinctRequestIdList(IEnumerable<RequestDetailTicketModel> validVoidSingleTickets,
-        IEnumerable<RequestDetailTicketModel> validVoidParlayTickets, IEnumerable<RequestDetailTicketModel> validVoidCricketTickets,
-        IEnumerable<RequestDetailTicketModel> validVoidSingleTickets14)
+    private static IEnumerable<int> DistinctRequestIdList(IEnumerable<RequestDetailTicketModel> groupTickets)
     {
-        var requestIdInSingleTickets = validVoidSingleTickets.Select(x => x.RequestId).Distinct();
-        var requestIdInParlayTickets = validVoidParlayTickets.Select(x => x.RequestId).Distinct();
-        var requestIdInCricketTickets = validVoidCricketTickets.Select(x => x.RequestId).Distinct();
-        var requestIdInSingleTickets14 = validVoidSingleTickets14.Select(x => x.RequestId).Distinct();
+        var requestIdList = groupTickets.Select(x => x.RequestId).Distinct();
+        return requestIdList;
+    }
 
-        return requestIdInSingleTickets.Union(requestIdInParlayTickets).Union(requestIdInCricketTickets).Union(requestIdInSingleTickets14);
+    public IEnumerable<RequestDetailTicketModel> MapVoidingTypeToTickets(CheckTicketValidationOutput validation)
+    {
+        var groupTickets = new List<RequestDetailTicketModel>();
+
+        AddTicketsToGroup(groupTickets, validation.VoidSingleTickets, VoidingTypeConstant.Single);
+        AddTicketsToGroup(groupTickets, validation.VoidParlayTickets, VoidingTypeConstant.Parlay);
+        AddTicketsToGroup(groupTickets, validation.VoidCricketTickets, VoidingTypeConstant.Cricket);
+        AddTicketsToGroup(groupTickets, validation.VoidSingleTickets14, VoidingTypeConstant.Single14);
+        AddTicketsToGroup(groupTickets, validation.VoidParlayTickets14, VoidingTypeConstant.Parlay14);
+
+        AddTicketsToGroup(groupTickets, validation.RecoverSingleTickets, VoidingTypeConstant.RecoverSingle);
+        AddTicketsToGroup(groupTickets, validation.RecoverParlayTickets, VoidingTypeConstant.RecoverParlay);
+        AddTicketsToGroup(groupTickets, validation.RecoverCricketTickets, VoidingTypeConstant.RecoverCricket);
+        AddTicketsToGroup(groupTickets, validation.RecoverSingleTickets14, VoidingTypeConstant.RecoverSingle14);
+        AddTicketsToGroup(groupTickets, validation.RecoverParlayTickets14, VoidingTypeConstant.RecoverParlay14);
+
+        return groupTickets;
+    }
+
+    private static void AddTicketsToGroup(List<RequestDetailTicketModel> groups, IEnumerable<RequestDetailTicketModel> tickets, int voidingTypeId)
+    {
+        if (tickets == null || !tickets.Any())
+        {
+            return;
+        }
+
+        foreach (var ticket in tickets)
+        {
+            ticket.VoidingTypeId = voidingTypeId;
+        }
+
+        groups.AddRange(tickets);
     }
 }

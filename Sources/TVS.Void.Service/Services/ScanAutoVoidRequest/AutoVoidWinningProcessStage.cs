@@ -16,13 +16,13 @@ public interface AutoVoidWinningProcessStage
 public class AutoVoidWinningProcessStageImp : AutoVoidWinningProcessStage
 {
     private readonly GetTicketsStage getTicketsStage;
-    private readonly CheckTicketAllowToVoidStage checkTicketAllowToVoidStage;
+    private readonly CheckTicketValidationStage checkTicketAllowToVoidStage;
     private readonly ReCalculateTicketsStage reCalculateTicketsStage;
     private readonly InsertPreVoidingDataStage insertPreVoidingDataStage;
     private readonly AutoVoidRequestQueueService autoVoidRequestQueueService;
     private readonly LoggingService loggingService;
 
-    public AutoVoidWinningProcessStageImp(GetTicketsStage getTicketsStage, CheckTicketAllowToVoidStage checkTicketAllowToVoidStage, ReCalculateTicketsStage reCalculateTicketsStage,
+    public AutoVoidWinningProcessStageImp(GetTicketsStage getTicketsStage, CheckTicketValidationStage checkTicketAllowToVoidStage, ReCalculateTicketsStage reCalculateTicketsStage,
         InsertPreVoidingDataStage insertPreVoidingDataStage, AutoVoidRequestQueueService autoVoidRequestQueueService, LoggingService loggingService)
     {
         this.getTicketsStage = getTicketsStage;

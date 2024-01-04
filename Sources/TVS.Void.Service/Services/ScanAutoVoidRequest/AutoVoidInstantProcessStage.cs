@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using TicketVoidingSystem.Constants;
 using TicketVoidingSystem.Services;
+using TVS.Void.Service.Constants;
 using TVS.Void.Service.Models;
 
 namespace TVS.Void.Service.Services.ScanAutoVoidRequest;
@@ -17,18 +17,18 @@ public class AutoVoidInstantProcessStageImp : AutoVoidInstantProcessStage
 {
     private readonly CheckVoidInstantRequestQueueValidStage checkRequestQueueValidStage;
     private readonly GetTicketsStage getTicketsStage;
-    private readonly CheckTicketAllowToVoidStage checkTicketAllowToVoidStage;
+    private readonly CheckTicketValidationStage checkTicketValidationStage;
     private readonly InsertPreVoidingDataStage insertPreVoidingDataStage;
     private readonly AutoVoidRequestQueueService autoVoidRequestQueueService;
     private readonly LoggingService loggingService;
 
     public AutoVoidInstantProcessStageImp(CheckVoidInstantRequestQueueValidStage checkRequestQueueValidStage, GetTicketsStage getTicketsStage,
-        CheckTicketAllowToVoidStage checkTicketAllowToVoidStage, InsertPreVoidingDataStage insertPreVoidingDataStage,
+        CheckTicketValidationStage checkTicketValidationStage, InsertPreVoidingDataStage insertPreVoidingDataStage,
         AutoVoidRequestQueueService autoVoidRequestQueueService, LoggingService loggingService)
     {
         this.checkRequestQueueValidStage = checkRequestQueueValidStage;
         this.getTicketsStage = getTicketsStage;
-        this.checkTicketAllowToVoidStage = checkTicketAllowToVoidStage;
+        this.checkTicketValidationStage = checkTicketValidationStage;
         this.insertPreVoidingDataStage = insertPreVoidingDataStage;
 
         this.autoVoidRequestQueueService = autoVoidRequestQueueService;
@@ -49,29 +49,35 @@ public class AutoVoidInstantProcessStageImp : AutoVoidInstantProcessStage
             return;
         }
 
-        var validVoidSingleTickets = getTicketsResult.OutputData.SingleTickets;
-        var validVoidParlayTickets = getTicketsResult.OutputData.ParlayTickets;
-        var validVoidCricketTickets = getTicketsResult.OutputData.CricketTickets;
-        var validVoidSingleTickets14 = Enumerable.Empty<RequestDetailTicketModel>();
-
-        //// Recheck for issue type have Cricket, Archive, and need some ticket info in bettrans
-        if (IsNeedToReCheckValidation(checkQueueResult.IssueTypeId))
+        CheckTicketValidationOutput validationResult;
+        //// Recheck for issue type have Cricket, Archive (some case ticket moved...), and need some ticket info in bettrans
+        if (IsNeedToReCheckVoidValidation(checkQueueResult.IssueTypeId))
         {
-            var checkTicketResult = await checkTicketAllowToVoidStage.Execute(siteDbGroupId, getTicketsResult.OutputData.SingleTickets,
+            validationResult = await checkTicketValidationStage.ExecuteForVoid(siteDbGroupId, getTicketsResult.OutputData.SingleTickets,
                 getTicketsResult.OutputData.ParlayTickets, getTicketsResult.OutputData.CricketTickets, logData);
-
-            validVoidSingleTickets = checkTicketResult.ValidVoidSingleTickets;
-            validVoidParlayTickets = checkTicketResult.ValidVoidParlayTickets;
-            validVoidCricketTickets = checkTicketResult.ValidVoidCricketTickets;
-            validVoidSingleTickets14 = checkTicketResult.ValidVoidSingleTickets14;
         }
-        var queueErrorMessage = await insertPreVoidingDataStage.Execute(siteDbGroupId, queue, validVoidSingleTickets,
-            validVoidParlayTickets, validVoidCricketTickets, validVoidSingleTickets14, logData);
+        else if (IsRecoverAction(queue.Action))
+        {
+            validationResult = await checkTicketValidationStage.ExecuteForRecover(siteDbGroupId, getTicketsResult.OutputData.SingleTickets,
+                getTicketsResult.OutputData.ParlayTickets, getTicketsResult.OutputData.CricketTickets, logData);
+        }
+        else
+        {
+            validationResult = new CheckTicketValidationOutput
+            {
+                VoidSingleTickets = getTicketsResult.OutputData.SingleTickets,
+                VoidParlayTickets = getTicketsResult.OutputData.ParlayTickets,
+                VoidCricketTickets = getTicketsResult.OutputData.CricketTickets
+            };
+        }
+
+        var groupTickets = insertPreVoidingDataStage.MapVoidingTypeToTickets(validationResult);
+        var queueErrorMessage = await insertPreVoidingDataStage.Execute(siteDbGroupId, queue, groupTickets, logData);
         await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, ExecuteStatus.Done, queueErrorMessage);
         await WriteLog(logData);
     }
 
-    private static bool IsNeedToReCheckValidation(int issueTypeId)
+    private static bool IsNeedToReCheckVoidValidation(int issueTypeId)
     {
         var issueTypesReCheckValidation = new List<int>
         {
@@ -83,6 +89,11 @@ public class AutoVoidInstantProcessStageImp : AutoVoidInstantProcessStage
             IssueTypeConstant.WrongKickOffTime,
         };
         return issueTypesReCheckValidation.Contains(issueTypeId);
+    }
+
+    private static bool IsRecoverAction(string actionName)
+    {
+        return actionName.Equals(AutoVoidConstant.QueueRecoverInstant, StringComparison.OrdinalIgnoreCase);
     }
 
     private async Task WriteLog(IList<string> logData)
