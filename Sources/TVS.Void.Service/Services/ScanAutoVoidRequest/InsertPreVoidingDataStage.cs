@@ -83,11 +83,12 @@ public class InsertPreVoidingDataStageImp : InsertPreVoidingDataStage
             return;
         }
 
-        foreach (var ticket in tickets)
+        var ticketToList = tickets.ToList();
+        foreach (var ticket in ticketToList)
         {
             ticket.VoidingTypeId = voidingTypeId;
         }
 
-        groups.AddRange(tickets);
+        groups.AddRange(ticketToList);
     }
 }

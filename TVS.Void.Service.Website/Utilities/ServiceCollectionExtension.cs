@@ -101,7 +101,7 @@ public static class ServiceCollectionExtension
         services.AddSingleton<CheckTicketValidationStage, CheckTicketValidationStageImp>();
         services.AddSingleton<ReCalculateTicketsStage, ReCalculateTicketsStageImp>();
         services.AddSingleton<InsertPreVoidingDataStage, InsertPreVoidingDataStageImp>();
-        services.AddSingleton<AutoInstantProcessStage, AutoVoidInstantProcessStageImp>();
+        services.AddSingleton<AutoInstantProcessStage, AutoInstantProcessStageImp>();
         services.AddSingleton<AutoVoidWinningProcessStage, AutoVoidWinningProcessStageImp>();
 
         services.AddSingleton<VoidService, VoidServiceImp>();

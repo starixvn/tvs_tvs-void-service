@@ -42,17 +42,17 @@ public class ProcessVoidQueuesStageImp : ProcessVoidQueuesStage
 
     private async Task<TicketVoidingQueueModel> ExecuteSingleQueue(int siteDbGroupId, TicketVoidingQueueModel queue)
     {
-        if (queue.VoidingTypeId == VoidingTypeConstant.Cricket)
+        return queue.VoidingTypeId switch
         {
-            return await ExecuteQueueForCricketTickets(siteDbGroupId, queue);
-        }
-
-        return await ticketVoidingQueueService.ProcessVoidQueue(siteDbGroupId, queue.QueueId, null);
+            VoidingTypeConstant.Cricket => await ExecuteQueueForCricketTickets(siteDbGroupId, queue, NetPositionConstant.ActionVoid),
+            VoidingTypeConstant.RecoverCricket => await ExecuteQueueForCricketTickets(siteDbGroupId, queue, NetPositionConstant.ActionRecover),
+            _ => await ticketVoidingQueueService.ProcessVoidQueue(siteDbGroupId, queue.QueueId, null)
+        };
     }
 
-    private async Task<TicketVoidingQueueModel> ExecuteQueueForCricketTickets(int siteDbGroupId, TicketVoidingQueueModel queue)
+    private async Task<TicketVoidingQueueModel> ExecuteQueueForCricketTickets(int siteDbGroupId, TicketVoidingQueueModel queue, string actionName)
     {
-        var isCalledNetPosition = await netPositionService.UpdateNetPosition(siteDbGroupId, queue.TransIds, NetPositionConstant.ActionVoid);
+        var isCalledNetPosition = await netPositionService.UpdateNetPosition(siteDbGroupId, queue.TransIds, actionName);
         var voidResult = await ticketVoidingQueueService.ProcessVoidQueue(siteDbGroupId, queue.QueueId, isCalledNetPosition);
 
         if (voidResult.StatusId == ExecuteStatus.Failed && isCalledNetPosition)
