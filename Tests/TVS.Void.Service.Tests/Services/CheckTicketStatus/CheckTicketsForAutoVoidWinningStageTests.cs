@@ -70,6 +70,6 @@ public class CheckTicketsForAutoVoidWinningStageTests : IClassFixture<AppSetting
             checkResult.ValidRequests,
             Arg.Any<string>(), Arg.Any<List<string>>());
         await requestTicketService.Received(4).UpdateIsProcessed(Arg.Any<IEnumerable<RequestDetailTicketModel>>(), Arg.Any<IEnumerable<RequestDetailTicketModel>>(),
-            Arg.Any<IEnumerable<RequestDetailTicketModel>>(), Arg.Any<IEnumerable<RequestDetailTicketModel>>());
+            Arg.Any<IEnumerable<RequestDetailTicketModel>>());
     }
 }

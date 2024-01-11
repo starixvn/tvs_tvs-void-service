@@ -58,11 +58,14 @@ public class CheckTicketStatusServiceImp : CheckTicketStatusService
     private static GroupTicketsInRequest GetGroupTicketsByVoidAction(int voidActionId, GroupTicketsInRequest getTicketsResult)
 
     {
+        var singleTickets = getTicketsResult.SingleTickets.Where(x => x.VoidActionId == voidActionId);
+        var parlayTickets = getTicketsResult.ParlayTickets.Where(x => x.VoidActionId == voidActionId);
+        var cricketTickets = getTicketsResult.CricketTickets.Where(x => x.VoidActionId == voidActionId);
         return new GroupTicketsInRequest
         {
-            SingleTickets = getTicketsResult.SingleTickets.Where(x => x.VoidActionId == voidActionId),
-            ParlayTickets = getTicketsResult.ParlayTickets.Where(x => x.VoidActionId == voidActionId),
-            CricketTickets = getTicketsResult.CricketTickets.Where(x => x.VoidActionId == voidActionId)
+            SingleTickets = singleTickets,
+            ParlayTickets = parlayTickets,
+            CricketTickets = cricketTickets
         };
     }
 
