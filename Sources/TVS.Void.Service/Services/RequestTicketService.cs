@@ -24,6 +24,8 @@ public interface RequestTicketService
         IEnumerable<RequestDetailTicketModel> cricketTickets);
 
     Task UpdateIsProcessed(IEnumerable<RequestDetailTicketModel> groupTickets);
+
+    Task UpdateIsProcessed(string resettledTransId);
 }
 
 public class RequestTicketServiceImp : RequestTicketService
@@ -117,6 +119,16 @@ public class RequestTicketServiceImp : RequestTicketService
         {
             SingleTicketsJson = JsonSerializer.Serialize(input.SingleTickets),
             ParlayTicketsJson = JsonSerializer.Serialize(input.ParlayTickets)
+        };
+
+        await repository.ExecuteAsync(criteria);
+    }
+
+    public async Task UpdateIsProcessed(string resettledTransId)
+    {
+        var criteria = new UpdateIsProcessedForRequestTicketsCriteria
+        {
+            ResettledTransIds = resettledTransId
         };
 
         await repository.ExecuteAsync(criteria);

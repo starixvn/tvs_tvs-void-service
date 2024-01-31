@@ -14,11 +14,13 @@ public interface ProcessVoidQueuesStage
 public class ProcessVoidQueuesStageImp : ProcessVoidQueuesStage
 {
     private readonly TicketVoidingQueueService ticketVoidingQueueService;
+    private readonly RequestTicketService requestTicketService;
     private readonly NetPositionService netPositionService;
 
-    public ProcessVoidQueuesStageImp(TicketVoidingQueueService ticketVoidingQueueService, NetPositionService netPositionService)
+    public ProcessVoidQueuesStageImp(TicketVoidingQueueService ticketVoidingQueueService, RequestTicketService requestTicketService, NetPositionService netPositionService)
     {
         this.ticketVoidingQueueService = ticketVoidingQueueService;
+        this.requestTicketService = requestTicketService;
         this.netPositionService = netPositionService;
     }
 
@@ -34,6 +36,7 @@ public class ProcessVoidQueuesStageImp : ProcessVoidQueuesStage
             }
 
             var voidResult = await ExecuteSingleQueue(siteDbGroupId, queue);
+            await UpdateIsProcessedForResettled(voidResult);
             processResult.Add(voidResult);
         }
 
@@ -61,5 +64,13 @@ public class ProcessVoidQueuesStageImp : ProcessVoidQueuesStage
         }
 
         return voidResult;
+    }
+
+    private async Task UpdateIsProcessedForResettled(TicketVoidingQueueModel voidResult)
+    {
+        if (!string.IsNullOrWhiteSpace(voidResult.ResettledTransIds))
+        {
+            await requestTicketService.UpdateIsProcessed(voidResult.ResettledTransIds);
+        }
     }
 }
