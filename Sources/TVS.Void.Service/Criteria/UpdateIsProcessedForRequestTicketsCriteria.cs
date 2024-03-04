@@ -7,6 +7,8 @@ public class UpdateIsProcessedForRequestTicketsCriteria : NonQueryCommand
     public string SingleTicketsJson { get; set; }
     public string ParlayTicketsJson { get; set; }
     public string CricketTicketsJson { get; set; }
+    public string CancelCashOutTicketsJson { get; set; }  //Just use in manual void
+    public string ResettledTransIds { get; set; }
 
     public override string GetSettingKey() => "TicketVoiding_TicketProcess_Update";
 

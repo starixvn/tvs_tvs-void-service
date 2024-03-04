@@ -1,5 +1,6 @@
 ﻿using Fanex.Data.Repository;
 using NSubstitute;
+using TVS.Void.Service.Constants;
 using TVS.Void.Service.Criteria;
 using TVS.Void.Service.Models;
 using TVS.Void.Service.Services;
@@ -89,47 +90,56 @@ public class RequestTicketServiceImpTests
         Assert.StrictEqual(fakeRequests, actual.ValidRequests);
     }
 
-    [Theory]
-    [MemberData(nameof(UpdateIsProcessedTestData))]
-    public async Task UpdateIsProcessed_ShouldExecuteRepositorySuccessful(IEnumerable<RequestDetailTicketModel> singleTickets,
-        IEnumerable<RequestDetailTicketModel> parlayTickets, IEnumerable<RequestDetailTicketModel> cricketTickets, IEnumerable<RequestDetailTicketModel> singleTickets14)
+    [Fact]
+    public async Task UpdateIsProcessed_HasManyGroupTickets_CalledExpected()
     {
         // Arrange
         var repository = Substitute.For<IDynamicRepository>();
-        var counter = 0;
-        repository.When(x => x.ExecuteAsync(Arg.Any<UpdateIsProcessedForRequestTicketsCriteria>()))
-            .Do(x => counter++);
         var service = new RequestTicketServiceImp(repository);
 
         // Act
-        await service.UpdateIsProcessed(singleTickets, parlayTickets, cricketTickets, singleTickets14);
+        await service.UpdateIsProcessed(default, default, default);
 
         // Assert
         await repository.Received(1).ExecuteAsync(Arg.Any<UpdateIsProcessedForRequestTicketsCriteria>());
-        Assert.Equal(1, counter);
     }
 
-    public static IEnumerable<object[]> CheckStatusTicketForInsertAutoVoidQueueTestData =>
-        new List<object[]>
+    [Fact]
+    public async Task UpdateIsProcessed_HasOneGroupTickets_CalledExpected()
+    {
+        // Arrange
+        var groupTickets = new List<RequestDetailTicketModel>
         {
-            new object[] { 1, null, null, null },
+            new(){ VoidingTypeId = VoidingTypeConstant.Single , TransId = 1},
+            new(){ VoidingTypeId = VoidingTypeConstant.Parlay , TransId = 2},
+            new(){ VoidingTypeId = VoidingTypeConstant.Cricket , TransId = 3},
+            new(){ VoidingTypeId = VoidingTypeConstant.Single14 , TransId = 4},
+            new(){ VoidingTypeId = VoidingTypeConstant.Parlay14 , TransId = 4},
+            new(){ VoidingTypeId = VoidingTypeConstant.RecoverSingle , TransId = 5},
+            new(){ VoidingTypeId = VoidingTypeConstant.RecoverParlay , TransId = 6},
+            new(){ VoidingTypeId = VoidingTypeConstant.RecoverCricket , TransId = 7},
+            new(){ VoidingTypeId = VoidingTypeConstant.RecoverSingle14 , TransId = 8},
+            new(){ VoidingTypeId = VoidingTypeConstant.RecoverParlay14 , TransId = 8}
+        };
+        var repository = Substitute.For<IDynamicRepository>();
+        var service = new RequestTicketServiceImp(repository);
+
+        // Act
+        await service.UpdateIsProcessed(groupTickets);
+
+        // Assert
+        await repository.Received(1).ExecuteAsync(Arg.Any<UpdateIsProcessedForRequestTicketsCriteria>());
+    }
+
+    public static IEnumerable<object?[]> CheckStatusTicketForInsertAutoVoidQueueTestData =>
+        new List<object?[]>
+        {
+            new object?[] { 1, null, null, null },
             new object[]
             {
                 2, new List<RequestDetailTicketModel> {new() { TransId = 113 }},
                 new List<RequestDetailTicketModel>{new() { TransId = 222 } },
                 new List<RequestDetailTicketModel> {new() { TransId = 113 }}
-            },
-        };
-
-    public static IEnumerable<object[]> UpdateIsProcessedTestData =>
-        new List<object[]>
-        {
-            new object[]
-            {
-                new List<RequestDetailTicketModel> {new() { TransId = 113 }},
-                new List<RequestDetailTicketModel> {new() { TransId = 222 }},
-                new List<RequestDetailTicketModel> {new() { TransId = 223 }},
-                new List<RequestDetailTicketModel> {new() { TransId = 223 }}
             },
         };
 }

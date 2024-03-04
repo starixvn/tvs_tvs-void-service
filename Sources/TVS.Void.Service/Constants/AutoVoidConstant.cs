@@ -13,6 +13,7 @@ public static class AutoVoidConstant
     public const string QueueActionVoidResultKeyed = "VoidResultKeyed";
     public const string QueueActionMixParlay = "MixParlay";
     public const string QueueActionCal = "CAL";
+    public const string QueueRecoverInstant = "RecoverInstant";
 }
 
 public static class VoidActionTypeConstant
@@ -24,4 +25,5 @@ public static class VoidActionTypeConstant
     public const int AutoVoidInstantNoPolicyId = 8;
     public const int AutoVoidAllResultKeyedId = 9;
     public const int AutoVoidAllInstantWithPolicyId = 10;
+    public const int AutoRecoverInstant = 11;
 }

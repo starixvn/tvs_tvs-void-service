@@ -14,11 +14,13 @@ public interface ProcessVoidQueuesStage
 public class ProcessVoidQueuesStageImp : ProcessVoidQueuesStage
 {
     private readonly TicketVoidingQueueService ticketVoidingQueueService;
+    private readonly RequestTicketService requestTicketService;
     private readonly NetPositionService netPositionService;
 
-    public ProcessVoidQueuesStageImp(TicketVoidingQueueService ticketVoidingQueueService, NetPositionService netPositionService)
+    public ProcessVoidQueuesStageImp(TicketVoidingQueueService ticketVoidingQueueService, RequestTicketService requestTicketService, NetPositionService netPositionService)
     {
         this.ticketVoidingQueueService = ticketVoidingQueueService;
+        this.requestTicketService = requestTicketService;
         this.netPositionService = netPositionService;
     }
 
@@ -34,6 +36,7 @@ public class ProcessVoidQueuesStageImp : ProcessVoidQueuesStage
             }
 
             var voidResult = await ExecuteSingleQueue(siteDbGroupId, queue);
+            await UpdateIsProcessedForResettled(voidResult);
             processResult.Add(voidResult);
         }
 
@@ -42,17 +45,17 @@ public class ProcessVoidQueuesStageImp : ProcessVoidQueuesStage
 
     private async Task<TicketVoidingQueueModel> ExecuteSingleQueue(int siteDbGroupId, TicketVoidingQueueModel queue)
     {
-        if (queue.VoidingTypeId == VoidingTypeConstant.Cricket)
+        return queue.VoidingTypeId switch
         {
-            return await ExecuteQueueForCricketTickets(siteDbGroupId, queue);
-        }
-
-        return await ticketVoidingQueueService.ProcessVoidQueue(siteDbGroupId, queue.QueueId, null);
+            VoidingTypeConstant.Cricket => await ExecuteQueueForCricketTickets(siteDbGroupId, queue, NetPositionConstant.ActionVoid),
+            VoidingTypeConstant.RecoverCricket => await ExecuteQueueForCricketTickets(siteDbGroupId, queue, NetPositionConstant.ActionRecover),
+            _ => await ticketVoidingQueueService.ProcessVoidQueue(siteDbGroupId, queue.QueueId, null)
+        };
     }
 
-    private async Task<TicketVoidingQueueModel> ExecuteQueueForCricketTickets(int siteDbGroupId, TicketVoidingQueueModel queue)
+    private async Task<TicketVoidingQueueModel> ExecuteQueueForCricketTickets(int siteDbGroupId, TicketVoidingQueueModel queue, string actionName)
     {
-        var isCalledNetPosition = await netPositionService.UpdateNetPosition(siteDbGroupId, queue.TransIds, NetPositionConstant.ActionVoid);
+        var isCalledNetPosition = await netPositionService.UpdateNetPosition(siteDbGroupId, queue.TransIds, actionName);
         var voidResult = await ticketVoidingQueueService.ProcessVoidQueue(siteDbGroupId, queue.QueueId, isCalledNetPosition);
 
         if (voidResult.StatusId == ExecuteStatus.Failed && isCalledNetPosition)
@@ -61,5 +64,13 @@ public class ProcessVoidQueuesStageImp : ProcessVoidQueuesStage
         }
 
         return voidResult;
+    }
+
+    private async Task UpdateIsProcessedForResettled(TicketVoidingQueueModel voidResult)
+    {
+        if (!string.IsNullOrWhiteSpace(voidResult.ResettledTransIds))
+        {
+            await requestTicketService.UpdateIsProcessed(voidResult.ResettledTransIds);
+        }
     }
 }

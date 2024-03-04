@@ -29,6 +29,7 @@ public class RequestDetailTicketModel
     public DateTime WinLostDate { get; set; }
     public int StatusId { get; set; }
     public int VoidActionId { get; set; }
+    public int VoidingTypeId { get; set; }
 }
 
 public class RequestDetailTicketModelEqualityComparer : IEqualityComparer<RequestDetailTicketModel>

@@ -47,7 +47,7 @@ public class NotificationServiceImpTests
         await service.NotifyRequestRunningToAllUser(new List<VoidingHistoryModel> { new VoidingHistoryModel { RequestId = requestId } });
 
         // Assert
-        await loggingService.Received(1).ErrorAsync(Arg.Any<string>());
+        await loggingService.Received(1).ErrorAsync(Arg.Any<Exception>());
     }
 
     [Theory]
@@ -88,7 +88,7 @@ public class NotificationServiceImpTests
         await service.NotifyVoidFailedToUser(requestId, voidQueueResults);
 
         // Assert
-        await loggingService.Received(1).ErrorAsync(Arg.Any<string>());
+        await loggingService.Received(1).ErrorAsync(Arg.Any<Exception>());
     }
 
     [Theory]
@@ -126,7 +126,7 @@ public class NotificationServiceImpTests
         await service.NotifyRequestFailedToAllUser(requestId);
 
         // Assert
-        await loggingService.Received(1).ErrorAsync(Arg.Any<string>());
+        await loggingService.Received(1).ErrorAsync(Arg.Any<Exception>());
     }
 
     public static IEnumerable<object[]> NotifyVoidFailedToUserThrowExceptionTestData =>

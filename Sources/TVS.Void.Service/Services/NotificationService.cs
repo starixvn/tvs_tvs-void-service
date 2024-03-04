@@ -43,7 +43,7 @@ public class NotificationServiceImp : NotificationService
         }
         catch (Exception e)
         {
-            await loggingService.ErrorAsync(e.Message);
+            await loggingService.ErrorAsync(e);
         }
     }
 
@@ -62,7 +62,7 @@ public class NotificationServiceImp : NotificationService
         }
         catch (Exception e)
         {
-            await loggingService.ErrorAsync(e.Message);
+            await loggingService.ErrorAsync(e);
         }
     }
 
@@ -75,7 +75,7 @@ public class NotificationServiceImp : NotificationService
         }
         catch (Exception e)
         {
-            await loggingService.ErrorAsync(e.Message);
+            await loggingService.ErrorAsync(e);
         }
     }
 }

@@ -98,10 +98,10 @@ public static class ServiceCollectionExtension
         services.AddSingleton<ScanAutoVoidRequestService, ScanAutoVoidRequestServiceImp>();
         services.AddSingleton<CheckVoidInstantRequestQueueValidStage, CheckVoidInstantRequestQueueValidStageImp>();
         services.AddSingleton<GetTicketsStage, GetTicketsStageImp>();
-        services.AddSingleton<CheckTicketAllowToVoidStage, CheckTicketAllowToVoidStageImp>();
+        services.AddSingleton<CheckTicketValidationStage, CheckTicketValidationStageImp>();
         services.AddSingleton<ReCalculateTicketsStage, ReCalculateTicketsStageImp>();
         services.AddSingleton<InsertPreVoidingDataStage, InsertPreVoidingDataStageImp>();
-        services.AddSingleton<AutoVoidInstantProcessStage, AutoVoidInstantProcessStageImp>();
+        services.AddSingleton<AutoInstantProcessStage, AutoInstantProcessStageImp>();
         services.AddSingleton<AutoVoidWinningProcessStage, AutoVoidWinningProcessStageImp>();
 
         services.AddSingleton<VoidService, VoidServiceImp>();

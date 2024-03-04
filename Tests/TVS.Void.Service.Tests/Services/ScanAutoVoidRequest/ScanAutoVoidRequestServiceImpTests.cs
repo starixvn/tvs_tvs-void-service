@@ -12,7 +12,7 @@ public class ScanAutoVoidRequestServiceImpTests
 {
 
     private readonly AutoVoidWinningProcessStage autoVoidWinningProcessStage;
-    private readonly AutoVoidInstantProcessStage autoVoidInstantProcessStage;
+    private readonly AutoInstantProcessStage autoVoidInstantProcessStage;
     private readonly AutoVoidRequestQueueService autoVoidRequestQueueService;
     private readonly LoggingService loggingService;
     private ScanAutoVoidRequestServiceImp service;
@@ -20,7 +20,7 @@ public class ScanAutoVoidRequestServiceImpTests
     public ScanAutoVoidRequestServiceImpTests()
     {
         autoVoidWinningProcessStage = Substitute.For<AutoVoidWinningProcessStage>();
-        autoVoidInstantProcessStage = Substitute.For<AutoVoidInstantProcessStage>();
+        autoVoidInstantProcessStage = Substitute.For<AutoInstantProcessStage>();
         autoVoidRequestQueueService = Substitute.For<AutoVoidRequestQueueService>();
         loggingService = Substitute.For<LoggingService>();
         service = new ScanAutoVoidRequestServiceImp(autoVoidWinningProcessStage, autoVoidInstantProcessStage, autoVoidRequestQueueService, loggingService);

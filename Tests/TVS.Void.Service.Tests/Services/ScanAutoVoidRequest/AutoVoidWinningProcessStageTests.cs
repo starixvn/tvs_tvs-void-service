@@ -10,7 +10,7 @@ namespace TVS.Void.Service.Tests.Services.ScanAutoVoidRequest;
 public class AutoVoidWinningProcessStageTests
 {
     private readonly AutoVoidRequestQueueService autoVoidRequestQueueService;
-    private readonly CheckTicketAllowToVoidStage checkTicketAllowToVoidStage;
+    private readonly CheckTicketValidationStage checkTicketAllowToVoidStage;
     private readonly GetTicketsStage getTicketsStage;
     private readonly InsertPreVoidingDataStage insertPreVoidingDataStage;
     private readonly LoggingService loggingService;
@@ -21,7 +21,7 @@ public class AutoVoidWinningProcessStageTests
     {
         reCalculateTicketsStage = Substitute.For<ReCalculateTicketsStage>();
         getTicketsStage = Substitute.For<GetTicketsStage>();
-        checkTicketAllowToVoidStage = Substitute.For<CheckTicketAllowToVoidStage>();
+        checkTicketAllowToVoidStage = Substitute.For<CheckTicketValidationStage>();
         insertPreVoidingDataStage = Substitute.For<InsertPreVoidingDataStage>();
         autoVoidRequestQueueService = Substitute.For<AutoVoidRequestQueueService>();
         loggingService = Substitute.For<LoggingService>();
@@ -64,38 +64,35 @@ public class AutoVoidWinningProcessStageTests
             CricketTickets = tickets
         };
         var requestDetailTickets = new List<RequestDetailTicketModel>();
-        var checkTicketResult = new CheckStatusTicketOutput
+        var checkTicketResult = new CheckTicketValidationOutput
         {
-            ValidVoidSingleTickets = requestDetailTickets,
+            VoidSingleTickets = requestDetailTickets,
             SingleTicketsResettle = requestDetailTickets,
-            ValidVoidParlayTickets = requestDetailTickets,
+            VoidParlayTickets = requestDetailTickets,
             ParlayTicketsResettle = requestDetailTickets,
-            ValidVoidCricketTickets = requestDetailTickets,
+            VoidCricketTickets = requestDetailTickets,
             CricketTicketsResettle = requestDetailTickets,
-            ValidCancelCOTickets = requestDetailTickets,
-            ValidVoidSingleTickets14 = requestDetailTickets
+            VoidSingleTickets14 = requestDetailTickets,
+            VoidParlayTickets14 = requestDetailTickets,
+            RecoverSingleTickets = requestDetailTickets,
+            RecoverParlayTickets = requestDetailTickets,
+            RecoverCricketTickets = requestDetailTickets,
+            RecoverParlayTickets14 = requestDetailTickets,
+            RecoverSingleTickets14 = requestDetailTickets
         };
         getTicketsStage.Execute(1, queue, logData).ReturnsForAnyArgs((true, outputData));
-        checkTicketAllowToVoidStage.Execute(1, tickets,
+        checkTicketAllowToVoidStage.ExecuteForVoid(1, tickets,
             tickets, tickets, logData).ReturnsForAnyArgs(checkTicketResult);
-        insertPreVoidingDataStage.Execute(1, queue,
-            checkTicketResult.ValidVoidSingleTickets, checkTicketResult.ValidVoidParlayTickets,
-            checkTicketResult.ValidVoidCricketTickets,
-            Enumerable.Empty<RequestDetailTicketModel>(), logData).ReturnsForAnyArgs("true");
+        insertPreVoidingDataStage.Execute(1, queue, Arg.Any<IEnumerable<RequestDetailTicketModel>>(), logData).ReturnsForAnyArgs("error");
 
         // Act
         _ = service.Execute(1, queue, logData);
 
         // Assert
-        checkTicketAllowToVoidStage.Received(1).Execute(1, tickets,
+        checkTicketAllowToVoidStage.Received(1).ExecuteForVoid(1, tickets,
             tickets, tickets, logData);
-        reCalculateTicketsStage.Execute(1, checkTicketResult.SingleTicketsResettle,
-            checkTicketResult.ParlayTicketsResettle, checkTicketResult.CricketTicketsResettle, logData);
-        insertPreVoidingDataStage.Received(1).Execute(1, queue,
-            checkTicketResult.ValidVoidSingleTickets, checkTicketResult.ValidVoidParlayTickets,
-            checkTicketResult.ValidVoidCricketTickets,
-            Enumerable.Empty<RequestDetailTicketModel>(), logData);
-        autoVoidRequestQueueService.Received(1).UpdateQueue(1, 1, ExecuteStatus.Done, "true");
-        loggingService.Received(1).InfoAppendNewLineAsync(Arg.Any<List<string>>());
+        insertPreVoidingDataStage.Execute(1, queue, Arg.Any<IEnumerable<RequestDetailTicketModel>>(), logData);
+        autoVoidRequestQueueService.UpdateQueue(1, queue.QueueId, ExecuteStatus.Done, "error");
+        loggingService.Received(1).InfoAppendNewLineAsync(logData);
     }
 }

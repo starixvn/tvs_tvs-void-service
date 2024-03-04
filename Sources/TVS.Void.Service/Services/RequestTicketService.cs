@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Fanex.Data.Repository;
+using TVS.Void.Service.Constants;
 using TVS.Void.Service.Criteria;
 using TVS.Void.Service.Criteria.MultiSiteDb;
 using TVS.Void.Service.Models;
@@ -20,7 +21,11 @@ public interface RequestTicketService
         IEnumerable<RequestDetailTicketModel> cricketTickets);
 
     Task UpdateIsProcessed(IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets,
-        IEnumerable<RequestDetailTicketModel> cricketTickets, IEnumerable<RequestDetailTicketModel> singleTickets14);
+        IEnumerable<RequestDetailTicketModel> cricketTickets);
+
+    Task UpdateIsProcessed(IEnumerable<RequestDetailTicketModel> groupTickets);
+
+    Task UpdateIsProcessed(string resettledTransId);
 }
 
 public class RequestTicketServiceImp : RequestTicketService
@@ -94,15 +99,52 @@ public class RequestTicketServiceImp : RequestTicketService
     }
 
     public async Task UpdateIsProcessed(IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets,
-        IEnumerable<RequestDetailTicketModel> cricketTickets, IEnumerable<RequestDetailTicketModel> singleTickets14)
+        IEnumerable<RequestDetailTicketModel> cricketTickets)
     {
         var criteria = new UpdateIsProcessedForRequestTicketsCriteria
         {
-            SingleTicketsJson = JsonSerializer.Serialize(singleTickets.Union(singleTickets14)),
+            //CancelCashOutTicketsJson = Just use in manual void
+            SingleTicketsJson = JsonSerializer.Serialize(singleTickets),
             ParlayTicketsJson = JsonSerializer.Serialize(parlayTickets),
             CricketTicketsJson = JsonSerializer.Serialize(cricketTickets)
         };
 
         await repository.ExecuteAsync(criteria);
+    }
+
+    public async Task UpdateIsProcessed(IEnumerable<RequestDetailTicketModel> groupTickets)
+    {
+        var input = SplitTicketsForUpdateIsProcessed(groupTickets);
+        var criteria = new UpdateIsProcessedForRequestTicketsCriteria
+        {
+            SingleTicketsJson = JsonSerializer.Serialize(input.SingleTickets),
+            ParlayTicketsJson = JsonSerializer.Serialize(input.ParlayTickets)
+        };
+
+        await repository.ExecuteAsync(criteria);
+    }
+
+    public async Task UpdateIsProcessed(string resettledTransId)
+    {
+        var criteria = new UpdateIsProcessedForRequestTicketsCriteria
+        {
+            ResettledTransIds = resettledTransId
+        };
+
+        await repository.ExecuteAsync(criteria);
+    }
+
+    private static (IEnumerable<RequestDetailTicketModel> SingleTickets, IEnumerable<RequestDetailTicketModel> ParlayTickets)
+        SplitTicketsForUpdateIsProcessed(IEnumerable<RequestDetailTicketModel> groupTickets)
+    {
+#pragma warning disable S1067 // Expressions should not be too complex
+        var singleTickets = groupTickets.Where(x => x.VoidingTypeId
+            is VoidingTypeConstant.Single or VoidingTypeConstant.Cricket or VoidingTypeConstant.Single14
+            or VoidingTypeConstant.RecoverSingle or VoidingTypeConstant.RecoverCricket or VoidingTypeConstant.RecoverSingle14);
+#pragma warning restore S1067 // Expressions should not be too complex
+
+        var parlayTickets = groupTickets.Where(x => x.VoidingTypeId
+            is VoidingTypeConstant.Parlay or VoidingTypeConstant.Parlay14 or VoidingTypeConstant.RecoverParlay or VoidingTypeConstant.RecoverParlay14);
+        return (singleTickets, parlayTickets);
     }
 }

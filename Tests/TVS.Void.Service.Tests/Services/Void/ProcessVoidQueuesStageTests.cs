@@ -62,7 +62,7 @@ public class ProcessVoidQueuesStageTests
     }
 
     [Fact]
-    public async Task Execute_HasVoidingTypeIdIsNotCricket_CalledExpected()
+    public async Task Execute_HasVoidingTypeIdIsSingle_CalledExpected()
     {
         // Arrange
         var fakeQueues = new List<TicketVoidingQueueModel>
@@ -74,7 +74,7 @@ public class ProcessVoidQueuesStageTests
             }
         };
         var fakeProcessQueuesResult = new TicketVoidingQueueModel
-            { VoidingHistoryId = 113, StatusId = ExecuteStatus.Running };
+        { VoidingHistoryId = 113, StatusId = ExecuteStatus.Running };
         var ticketVoidingQueueService = Substitute.For<TicketVoidingQueueService>();
         var netPositionService = Substitute.For<NetPositionService>();
         ticketVoidingQueueService.ProcessVoidQueue(default, default, default)
@@ -87,5 +87,33 @@ public class ProcessVoidQueuesStageTests
 
         // Assert
         await ticketVoidingQueueService.Received(1).ProcessVoidQueue(Arg.Any<int>(), Arg.Any<int>(), null);
+    }
+
+    [Fact]
+    public async Task Execute_HasVoidingTypeIdIsRecoverCricket_CalledExpected()
+    {
+        // Arrange
+        var fakeQueues = new List<TicketVoidingQueueModel>
+        {
+            new()
+            {
+                TransIds = "1", StatusId = ExecuteStatus.Running, QueueId = 223,
+                VoidingTypeId = VoidingTypeConstant.RecoverCricket
+            }
+        };
+        var fakeProcessQueuesResult = new TicketVoidingQueueModel
+        { VoidingHistoryId = 113, StatusId = ExecuteStatus.Running };
+        var ticketVoidingQueueService = Substitute.For<TicketVoidingQueueService>();
+        var netPositionService = Substitute.For<NetPositionService>();
+        ticketVoidingQueueService.ProcessVoidQueue(default, default, default)
+            .ReturnsForAnyArgs(fakeProcessQueuesResult);
+        var service = new ProcessVoidQueuesStageImp(ticketVoidingQueueService, netPositionService);
+        netPositionService.UpdateNetPosition(default, Arg.Any<string>(), "").ReturnsForAnyArgs(true);
+
+        // Act
+        _ = await service.Execute(1, fakeQueues);
+
+        // Assert
+        await netPositionService.Received(1).UpdateNetPosition(1, "1", NetPositionConstant.ActionRecover);
     }
 }

@@ -72,7 +72,7 @@ public class InsertAfterVoidDataPrivateServiceImpTests
             new object[] {  new List<TicketVoidingQueueModel>
             {
                 new() {NegativeBalanceUsers = "abc" }, new() {NegativeBalanceUsers = "xyz" }, new() { NegativeBalanceUsers = "xyz" }
-            }, "abc,xyz,xyz"},
+            }, "abc,xyz"},
             new object[] {  new List<TicketVoidingQueueModel>
             {
                 new() {NegativeBalanceUsers = "" }, new() {NegativeBalanceUsers = "xyz" }, new() { NegativeBalanceUsers = "" }, new() {NegativeBalanceUsers = "abc" }

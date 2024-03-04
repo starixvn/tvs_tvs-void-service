@@ -13,11 +13,9 @@ public interface TicketVoidingQueueService
 {
     Task<IList<TicketVoidingQueueModel>> GetQueues(int siteDbGroupId, int? voidingHistoryId);
 
-    Task InsertQueue(int siteDbGroupId, int requestId, int voidingHistoryId, IEnumerable<RequestDetailTicketModel> singleTickets,
-        IEnumerable<RequestDetailTicketModel> parlayTickets, IEnumerable<RequestDetailTicketModel> cricketTickets, IEnumerable<RequestDetailTicketModel> singleTickets14);
+    Task InsertQueue(int siteDbGroupId, int requestId, int voidingHistoryId, IEnumerable<RequestDetailTicketModel> groupTickets);
 
-    Task InsertQueueForRequests(int siteDbGroupId, IEnumerable<VoidingHistoryModel> voidingHistoryList, IEnumerable<RequestDetailTicketModel> singleTickets,
-        IEnumerable<RequestDetailTicketModel> parlayTickets, IEnumerable<RequestDetailTicketModel> cricketTickets, IEnumerable<RequestDetailTicketModel> singleTickets14);
+    Task InsertQueueForRequests(int siteDbGroupId, IEnumerable<VoidingHistoryModel> voidingHistoryList, IEnumerable<RequestDetailTicketModel> groupTickets);
 
     Task<TicketVoidingQueueModel> ProcessVoidQueue(int siteDbGroupId, int queueId, bool? isCalledNetPosition);
 }
@@ -44,35 +42,26 @@ public class TicketVoidingQueueServiceImp : TicketVoidingQueueService
         return voidingQueues.ToList();
     }
 
-    public async Task InsertQueue(int siteDbGroupId, int requestId, int voidingHistoryId, IEnumerable<RequestDetailTicketModel> singleTickets,
-        IEnumerable<RequestDetailTicketModel> parlayTickets, IEnumerable<RequestDetailTicketModel> cricketTickets, IEnumerable<RequestDetailTicketModel> singleTickets14)
+    public async Task InsertQueue(int siteDbGroupId, int requestId, int voidingHistoryId, IEnumerable<RequestDetailTicketModel> groupTickets)
     {
         var criteria = new InsertTicketVoidingQueueCriteria
         {
             SiteDbGroupId = siteDbGroupId,
             RequestId = requestId,
             VoidingHistoryId = voidingHistoryId,
-            SingleTicketsJson = JsonSerializer.Serialize(singleTickets),
-            ParlayTicketsJson = JsonSerializer.Serialize(parlayTickets),
-            CricketTicketsJson = JsonSerializer.Serialize(cricketTickets),
-            SingleTickets14Json = JsonSerializer.Serialize(singleTickets14),
+            TicketsJson = JsonSerializer.Serialize(groupTickets),
             UserId = AutoVoidConstant.ActorId,
             IP = AutoVoidConstant.IPAddress,
         };
         await repository.ExecuteAsync(criteria);
     }
 
-    public async Task InsertQueueForRequests(int siteDbGroupId, IEnumerable<VoidingHistoryModel> voidingHistoryList, IEnumerable<RequestDetailTicketModel> singleTickets,
-        IEnumerable<RequestDetailTicketModel> parlayTickets, IEnumerable<RequestDetailTicketModel> cricketTickets, IEnumerable<RequestDetailTicketModel> singleTickets14)
+    public async Task InsertQueueForRequests(int siteDbGroupId, IEnumerable<VoidingHistoryModel> voidingHistoryList, IEnumerable<RequestDetailTicketModel> groupTickets)
     {
         foreach (var voidingHistory in voidingHistoryList)
         {
-            var singleTicketsInCurrentRequest = singleTickets.Where(x => x.RequestId == voidingHistory.RequestId);
-            var parlayTicketsInCurrentRequest = parlayTickets.Where(x => x.RequestId == voidingHistory.RequestId);
-            var cricketTicketsInCurrentRequest = cricketTickets.Where(x => x.RequestId == voidingHistory.RequestId);
-            var singleTickets14InCurrentRequest = singleTickets14.Where(x => x.RequestId == voidingHistory.RequestId);
-            await InsertQueue(siteDbGroupId, voidingHistory.RequestId, voidingHistory.VoidingHistoryId,
-                singleTicketsInCurrentRequest, parlayTicketsInCurrentRequest, cricketTicketsInCurrentRequest, singleTickets14InCurrentRequest);
+            var ticketsInCurrentRequest = groupTickets.Where(x => x.RequestId == voidingHistory.RequestId);
+            await InsertQueue(siteDbGroupId, voidingHistory.RequestId, voidingHistory.VoidingHistoryId, ticketsInCurrentRequest);
         }
     }
 

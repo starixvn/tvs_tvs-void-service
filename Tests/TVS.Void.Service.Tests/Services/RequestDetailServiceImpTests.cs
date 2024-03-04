@@ -22,14 +22,10 @@ public class RequestDetailServiceImpTests
         var repository = Substitute.For<IDynamicRepository>();
         repository.FetchAsync<VoidingHistoryModel>(default).ReturnsForAnyArgs(fakeVoidingHistory);
         var singleTickets = new List<RequestDetailTicketModel> { new() { StatusId = statusId } };
-        var parlayTickets = new List<RequestDetailTicketModel>();
-        var cricketTickets = new List<RequestDetailTicketModel>();
-        var singleTickets14 = new List<RequestDetailTicketModel>();
         var service = new RequestDetailServiceImp(repository);
 
         // Act
-        var actual = await service.InsertVoidingHistory(requestIds, siteDbGroupId, broadcastSessionId, singleTickets,
-            parlayTickets, cricketTickets, singleTickets14);
+        var actual = await service.InsertVoidingHistory(requestIds, siteDbGroupId, broadcastSessionId, singleTickets);
 
         // Assert
         await repository.Received(1).FetchAsync<VoidingHistoryModel>
@@ -108,10 +104,11 @@ public class RequestDetailServiceImpTests
     public async Task GetVoidDataOfVoidingHistory_ValidData_ReturnExpected()
     {
         // Arrange
-        var voidingHistory = new List<VoidDataXmlModel> { new() { VoidingHistoryId = 1 } };
+        var voidingHistory = new VoidDataXmlModel { VoidingHistoryId = 1 };
+        var voidingHistorys = new List<VoidDataXmlModel> { voidingHistory };
         var repository = Substitute.For<IDynamicRepository>();
         repository.FetchAsync<VoidDataXmlModel>(Arg.Any<GetVoidDataOfVoidingHistoryCriteria>())
-            .ReturnsForAnyArgs(voidingHistory);
+            .ReturnsForAnyArgs(voidingHistorys);
         var service = new RequestDetailServiceImp(repository);
 
         // Act
@@ -119,6 +116,6 @@ public class RequestDetailServiceImpTests
 
         // Assert
         await repository.Received(1).FetchAsync<VoidDataXmlModel>(Arg.Any<GetVoidDataOfVoidingHistoryCriteria>());
-        AssertExtension.Equal(voidingHistory.First(), actual);
+        AssertExtension.Equal(voidingHistory, actual);
     }
 }

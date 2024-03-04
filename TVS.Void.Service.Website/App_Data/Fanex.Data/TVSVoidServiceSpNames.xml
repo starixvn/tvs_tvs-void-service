@@ -11,6 +11,11 @@
         <Setting Key="DBSIG2.TicketVoiding_AutoVoidRequest_Validation" SpName="TicketVoiding_AutoVoidRequest_Validation" DbName="DBSIG2.bodb02.bodbAdminNet" TimeOut="600" />
         <Setting Key="DBSIG3.TicketVoiding_AutoVoidRequest_Validation" SpName="TicketVoiding_AutoVoidRequest_Validation" DbName="DBSIG3.bodb02.bodbAdminNet" TimeOut="600" />
 
+        <Setting Key="DBCTG.TicketVoiding_AutoRecover_Validation" SpName="TicketVoiding_AutoRecover_Validation" DbName="DBCTG.bodb02.bodbAdminNet" TimeOut="600" />
+        <Setting Key="DBSIG.TicketVoiding_AutoRecover_Validation" SpName="TicketVoiding_AutoRecover_Validation" DbName="DBSIG.bodb02.bodbAdminNet" TimeOut="600" />
+        <Setting Key="DBSIG2.TicketVoiding_AutoRecover_Validation" SpName="TicketVoiding_AutoRecover_Validation" DbName="DBSIG2.bodb02.bodbAdminNet" TimeOut="600" />
+        <Setting Key="DBSIG3.TicketVoiding_AutoRecover_Validation" SpName="TicketVoiding_AutoRecover_Validation" DbName="DBSIG3.bodb02.bodbAdminNet" TimeOut="600" />
+
         <Setting Key="DBCTG.TicketVoiding_AutoVoidRequest_Queue_Update" SpName="TicketVoiding_AutoVoidRequest_Queue_Update" DbName="DBCTG.bodb02.bodbAdminNet" TimeOut="600" />
         <Setting Key="DBSIG.TicketVoiding_AutoVoidRequest_Queue_Update" SpName="TicketVoiding_AutoVoidRequest_Queue_Update" DbName="DBSIG.bodb02.bodbAdminNet" TimeOut="600" />
         <Setting Key="DBSIG2.TicketVoiding_AutoVoidRequest_Queue_Update" SpName="TicketVoiding_AutoVoidRequest_Queue_Update" DbName="DBSIG2.bodb02.bodbAdminNet" TimeOut="600" />

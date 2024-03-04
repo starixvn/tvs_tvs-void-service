@@ -43,7 +43,7 @@ public class TicketVoidingQueueServiceImpTests
         var service = new TicketVoidingQueueServiceImp(repository);
 
         // Act
-        await service.InsertQueue(fakeSiteDbGroupId, fakeRequestId, fakeVoidingHistoryId, null, null, null, null);
+        await service.InsertQueue(fakeSiteDbGroupId, fakeRequestId, fakeVoidingHistoryId, null);
 
         // Assert
         await repository.Received(1).ExecuteAsync(Arg.Is<InsertTicketVoidingQueueCriteria>(x =>
@@ -67,7 +67,7 @@ public class TicketVoidingQueueServiceImpTests
         var service = new TicketVoidingQueueServiceImp(repository);
 
         // Act
-        await service.InsertQueueForRequests(fakeSiteDbGroupId, fakeVoidingHistoryList, new List<RequestDetailTicketModel>(), new List<RequestDetailTicketModel>(), new List<RequestDetailTicketModel>(), new List<RequestDetailTicketModel>());
+        await service.InsertQueueForRequests(fakeSiteDbGroupId, fakeVoidingHistoryList, new List<RequestDetailTicketModel>());
 
         // Assert
         await repository.Received(2).ExecuteAsync(Arg.Is<InsertTicketVoidingQueueCriteria>(x => x.SiteDbGroupId == fakeSiteDbGroupId));
