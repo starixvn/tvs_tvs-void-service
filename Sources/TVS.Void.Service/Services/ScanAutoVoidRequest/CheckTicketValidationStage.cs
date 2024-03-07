@@ -47,6 +47,7 @@ public class CheckTicketValidationStageImp : CheckTicketValidationStage
             typeof (RequestDetailTicketModel),
             typeof (RequestDetailTicketModel),
             typeof (RequestDetailTicketModel),
+            typeof (RequestDetailTicketModel),
             typeof (RequestDetailTicketModel)
         };
 
@@ -61,13 +62,15 @@ public class CheckTicketValidationStageImp : CheckTicketValidationStage
             CricketTicketsResettle = objectsArray[5].Cast<RequestDetailTicketModel>(),
             //ValidCancelCOTickets = objectsArray[6].Cast<RequestDetailTicketModel>() (Only use for manual void issue type)
             VoidSingleTickets14 = objectsArray[7].Cast<RequestDetailTicketModel>(),
-            VoidParlayTickets14 = objectsArray[8].Cast<RequestDetailTicketModel>()
+            VoidParlayTickets14 = objectsArray[8].Cast<RequestDetailTicketModel>(),
+            UpdateProcessedTickets = objectsArray[9].Cast<RequestDetailTicketModel>()
         };
 
         logData.Add($"{nameof(CheckTicketValidationStage)}.{nameof(ExecuteForVoid)} - vSingle: {output.VoidSingleTickets.Count()} - vParlay: {output.VoidParlayTickets.Count()}"
                         + $" - SingleResettle: {output.SingleTicketsResettle.Count()} - ParlayResettle: {output.ParlayTicketsResettle.Count()}"
                         + $" - vCricketTickets: {output.VoidCricketTickets.Count()} - CricketTicketsResettle: {output.CricketTicketsResettle.Count()}"
-                        + $" - vSingle14: {output.VoidSingleTickets14.Count()} - vParlay14: {output.VoidParlayTickets14.Count()}");
+                        + $" - vSingle14: {output.VoidSingleTickets14.Count()} - vParlay14: {output.VoidParlayTickets14.Count()}"
+                        + $" - UpdateProcessed: {output.UpdateProcessedTickets.Count()}");
 
         return output;
     }
