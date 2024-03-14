@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Fanex.Data.Repository;
 using TicketVoidingSystem.Constants;
+using TicketVoidingSystem.Extension;
 using TVS.Void.Service.Constants;
 using TVS.Void.Service.Criteria;
 using TVS.Void.Service.Models;
@@ -54,8 +55,6 @@ public class AddRequestStageImp : AddRequestStage
 
     private static int GetRequestDuplicatedFilterBy(int matchId)
     {
-        const int parlayMatchId = 29;
-        const int virtualSport = 2799;
-        return matchId is parlayMatchId or virtualSport ? 1 : 0;
+        return matchId.IsParlay() ? 1 : 0;
     }
 }
