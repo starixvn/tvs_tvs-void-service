@@ -15,6 +15,7 @@ using ONEbook.UM.Services;
 using ONEbook.UM.Transport;
 using Quartz;
 using Sentry;
+using TicketVoidingSystem.Constants;
 using TicketVoidingSystem.Services;
 using TVS.Void.Service.Services;
 using TVS.Void.Service.Services.AddRequest;
@@ -128,8 +129,8 @@ public static class ServiceCollectionExtension
         services.AddQuartz(q =>
         {
             // handy when part of cluster or you want to otherwise identify multiple schedulers
-            q.SchedulerId = "Scheduler-TVS-Void-Service";
-            q.UseMicrosoftDependencyInjectionJobFactory();
+            q.SchedulerId = "Scheduler-TVS-Void-Service-Id";
+            q.SchedulerName = "Scheduler-TVS-Void-Service";
 
             // these are the defaults
             q.UseSimpleTypeLoader();
@@ -146,17 +147,21 @@ public static class ServiceCollectionExtension
                 .WithSimpleSchedule(x => x.WithIntervalInMinutes(schedulerInterval).RepeatForever())
             );
 
-            q.ScheduleJob<ScanAutoVoidRequestJob>(trigger => trigger
-                .WithIdentity($"{nameof(ScanAutoVoidRequestJob)} Trigger")
-                .StartNow()
-                .WithSimpleSchedule(x => x.WithIntervalInSeconds(1).RepeatForever())
-            );
+            foreach (var server in SiteDbGroupConstant.ServerList)
+            {
+                q.ScheduleJob<VoidJob>(trigger => trigger
+                    .UsingJobData("siteDbGroupId", server.Id)
+                    .WithIdentity($"{nameof(VoidJob)}{server.Id}Trigger")
+                    .StartNow()
+                    .WithSimpleSchedule(x => x.WithIntervalInSeconds(1).RepeatForever()));
 
-            q.ScheduleJob<VoidJob>(trigger => trigger
-                .WithIdentity($"{nameof(VoidJob)}Trigger")
-                .StartNow()
-                .WithSimpleSchedule(x => x.WithIntervalInSeconds(1).RepeatForever())
-            );
+                q.ScheduleJob<ScanAutoVoidRequestJob>(trigger => trigger
+                    .UsingJobData("siteDbGroupId", server.Id)
+                    .WithIdentity($"{nameof(ScanAutoVoidRequestJob)}{server.Id}Trigger")
+                    .StartNow()
+                    .WithSimpleSchedule(x => x.WithIntervalInSeconds(1).RepeatForever())
+                );
+            }
 
             q.ScheduleJob<AddRequestDuplicatedTicketsJob>(trigger => trigger
                 .WithIdentity($"{nameof(AddRequestDuplicatedTicketsJob)} Trigger")
