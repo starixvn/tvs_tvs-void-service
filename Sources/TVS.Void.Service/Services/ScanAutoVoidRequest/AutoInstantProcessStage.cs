@@ -81,6 +81,7 @@ public class AutoInstantProcessStageImp : AutoInstantProcessStage
     {
         var issueTypesReCheckValidation = new List<int>
         {
+            IssueTypeConstant.AbnormalBet, // AB need recheck, because it support void 14
             IssueTypeConstant.AbnormalAccount,
             IssueTypeConstant.ReducedOver,
             IssueTypeConstant.DuplicateTickets,
