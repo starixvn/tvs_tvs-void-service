@@ -9,6 +9,16 @@ namespace TVS.Void.Service.Tests.Services.Void;
 
 public class ProcessVoidQueuesStageTests
 {
+    private TicketVoidingQueueService ticketVoidingQueueService = null!;
+    private NetPositionService netPositionService = null!;
+    private ProcessVoidQueuesStageImp service = null!;
+
+    internal void InItService()
+    {
+        ticketVoidingQueueService = Substitute.For<TicketVoidingQueueService>();
+        netPositionService = Substitute.For<NetPositionService>();
+    }
+
     [Theory]
     [InlineData(ExecuteStatus.Failed)]
     [InlineData(ExecuteStatus.Done)]
@@ -16,9 +26,8 @@ public class ProcessVoidQueuesStageTests
     {
         // Arrange
         var fakeQueues = new List<TicketVoidingQueueModel> { new() { StatusId = executeStatus } };
-        var ticketVoidingQueueService = Substitute.For<TicketVoidingQueueService>();
-        var netPositionService = Substitute.For<NetPositionService>();
-        var service = new ProcessVoidQueuesStageImp(ticketVoidingQueueService, netPositionService);
+        InItService();
+        service = new ProcessVoidQueuesStageImp(ticketVoidingQueueService, null, netPositionService);
 
         // Act
         var actual = await service.Execute(1, fakeQueues);
@@ -44,13 +53,12 @@ public class ProcessVoidQueuesStageTests
             }
         };
         var fakeProcessQueuesResult = new TicketVoidingQueueModel { VoidingHistoryId = 113, StatusId = executeStatus };
-        var ticketVoidingQueueService = Substitute.For<TicketVoidingQueueService>();
-        var netPositionService = Substitute.For<NetPositionService>();
+        InItService();
         ticketVoidingQueueService.ProcessVoidQueue(default, default, default)
             .ReturnsForAnyArgs(fakeProcessQueuesResult);
-        var service = new ProcessVoidQueuesStageImp(ticketVoidingQueueService, netPositionService);
         netPositionService.UpdateNetPosition(default, Arg.Any<string>(), "")
             .ReturnsForAnyArgs(isCalledNetPosition);
+        service = new ProcessVoidQueuesStageImp(ticketVoidingQueueService, null, netPositionService);
 
         // Act
         var actual = await service.Execute(1, fakeQueues);
@@ -75,11 +83,10 @@ public class ProcessVoidQueuesStageTests
         };
         var fakeProcessQueuesResult = new TicketVoidingQueueModel
         { VoidingHistoryId = 113, StatusId = ExecuteStatus.Running };
-        var ticketVoidingQueueService = Substitute.For<TicketVoidingQueueService>();
-        var netPositionService = Substitute.For<NetPositionService>();
+        InItService();
         ticketVoidingQueueService.ProcessVoidQueue(default, default, default)
             .ReturnsForAnyArgs(fakeProcessQueuesResult);
-        var service = new ProcessVoidQueuesStageImp(ticketVoidingQueueService, netPositionService);
+        service = new ProcessVoidQueuesStageImp(ticketVoidingQueueService, null, netPositionService);
         netPositionService.UpdateNetPosition(default, Arg.Any<string>(), "").ReturnsForAnyArgs(true);
 
         // Act
@@ -101,13 +108,11 @@ public class ProcessVoidQueuesStageTests
                 VoidingTypeId = VoidingTypeConstant.RecoverCricket
             }
         };
-        var fakeProcessQueuesResult = new TicketVoidingQueueModel
-        { VoidingHistoryId = 113, StatusId = ExecuteStatus.Running };
-        var ticketVoidingQueueService = Substitute.For<TicketVoidingQueueService>();
-        var netPositionService = Substitute.For<NetPositionService>();
+        var fakeProcessQueuesResult = new TicketVoidingQueueModel { VoidingHistoryId = 113, StatusId = ExecuteStatus.Running };
+        InItService();
         ticketVoidingQueueService.ProcessVoidQueue(default, default, default)
             .ReturnsForAnyArgs(fakeProcessQueuesResult);
-        var service = new ProcessVoidQueuesStageImp(ticketVoidingQueueService, netPositionService);
+        service = new ProcessVoidQueuesStageImp(ticketVoidingQueueService, null, netPositionService);
         netPositionService.UpdateNetPosition(default, Arg.Any<string>(), "").ReturnsForAnyArgs(true);
 
         // Act
