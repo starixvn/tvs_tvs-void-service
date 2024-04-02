@@ -7,6 +7,7 @@ using TVS.Void.Service.Services.AddRequest;
 
 namespace TVS.Void.Service.Website.Jobs;
 
+[DisallowConcurrentExecution]
 public class AddRequestDuplicatedTicketsJob : IJob
 {
     private readonly LoggingService loggingService;
@@ -24,21 +25,13 @@ public class AddRequestDuplicatedTicketsJob : IJob
     {
         try
         {
-            if (!AppSettingService.AppSetting.IsAddRequestDuplicatedJobExecuting)
+            if (!await maintenanceService.IsUnderMaintenanceAsync())
             {
-                AppSettingService.AppSetting.IsAddRequestDuplicatedJobExecuting = true;
-
-                if (!await maintenanceService.IsUnderMaintenanceAsync())
-                {
-                    await addRequestDuplicatedTicketsService.Execute();
-                }
-
-                AppSettingService.AppSetting.IsAddRequestDuplicatedJobExecuting = false;
+                await addRequestDuplicatedTicketsService.Execute();
             }
         }
         catch (Exception ex)
         {
-            AppSettingService.AppSetting.IsAddRequestDuplicatedJobExecuting = false;
             await loggingService.ErrorAsync($"{nameof(AddRequestDuplicatedTicketsJob)} execute failed!", ex);
         }
     }

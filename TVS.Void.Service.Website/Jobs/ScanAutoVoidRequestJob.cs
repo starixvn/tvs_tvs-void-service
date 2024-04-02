@@ -1,14 +1,13 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
 using ONEbook.UM.Services;
 using Quartz;
-using TicketVoidingSystem.Constants;
 using TicketVoidingSystem.Services;
 using TVS.Void.Service.Services.ScanAutoVoidRequest;
 
 namespace TVS.Void.Service.Website.Jobs;
 
+[DisallowConcurrentExecution]
 public class ScanAutoVoidRequestJob : IJob
 {
     private readonly LoggingService loggingService;
@@ -24,30 +23,17 @@ public class ScanAutoVoidRequestJob : IJob
 
     public async Task Execute(IJobExecutionContext context)
     {
+        var currentSiteDbGroupId = context.MergedJobDataMap.GetIntValue("siteDbGroupId");
         try
         {
-            if (!AppSettingService.AppSetting.IsScanAutoVoidRequestJobExecuting)
+            if (!await maintenanceService.IsUnderMaintenanceAsync())
             {
-                AppSettingService.AppSetting.IsScanAutoVoidRequestJobExecuting = true;
-
-                if (!await maintenanceService.IsUnderMaintenanceAsync())
-                {
-                    await ExecuteSiteDbParallel();
-                }
-
-                AppSettingService.AppSetting.IsScanAutoVoidRequestJobExecuting = false;
+                await scanningService.Execute(currentSiteDbGroupId);
             }
         }
         catch (Exception ex)
         {
-            AppSettingService.AppSetting.IsScanAutoVoidRequestJobExecuting = false;
             await loggingService.ErrorAsync($"{nameof(ScanAutoVoidRequestJob)} execute failed!", ex);
         }
-    }
-
-    private async Task ExecuteSiteDbParallel()
-    {
-        var tasks = SiteDbGroupConstant.ServerList.Select(server => scanningService.Execute(server.Id));
-        await Task.WhenAll(tasks);
     }
 }
