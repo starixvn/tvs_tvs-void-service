@@ -19,18 +19,16 @@ public class AutoVoidWinningProcessStageImp : AutoVoidWinningProcessStage
     private readonly ReCalculateTicketsStage reCalculateTicketsStage;
     private readonly InsertPreVoidingDataStage insertPreVoidingDataStage;
     private readonly AutoVoidRequestQueueService autoVoidRequestQueueService;
-    private readonly UpdateIsProcessedStage updateIsProcessedStage;
     private readonly LoggingService loggingService;
 
     public AutoVoidWinningProcessStageImp(GetTicketsStage getTicketsStage, CheckTicketValidationStage checkTicketAllowToVoidStage, ReCalculateTicketsStage reCalculateTicketsStage,
-        InsertPreVoidingDataStage insertPreVoidingDataStage, AutoVoidRequestQueueService autoVoidRequestQueueService, UpdateIsProcessedStage updateIsProcessedStage, LoggingService loggingService)
+        InsertPreVoidingDataStage insertPreVoidingDataStage, AutoVoidRequestQueueService autoVoidRequestQueueService, LoggingService loggingService)
     {
         this.getTicketsStage = getTicketsStage;
         this.checkTicketAllowToVoidStage = checkTicketAllowToVoidStage;
         this.reCalculateTicketsStage = reCalculateTicketsStage;
         this.insertPreVoidingDataStage = insertPreVoidingDataStage;
         this.autoVoidRequestQueueService = autoVoidRequestQueueService;
-        this.updateIsProcessedStage = updateIsProcessedStage;
         this.loggingService = loggingService;
     }
 
@@ -47,8 +45,6 @@ public class AutoVoidWinningProcessStageImp : AutoVoidWinningProcessStage
 
         await reCalculateTicketsStage.Execute(siteDbGroupId, checkTicketResult.SingleTicketsResettle,
             checkTicketResult.ParlayTicketsResettle, checkTicketResult.CricketTicketsResettle, logData);
-
-        await updateIsProcessedStage.Execute(checkTicketResult.UpdateProcessedTickets, logData);
 
         var groupTickets = insertPreVoidingDataStage.MapVoidingTypeToTickets(checkTicketResult);
         var queueErrorMessage = await insertPreVoidingDataStage.Execute(siteDbGroupId, queue, groupTickets, logData);

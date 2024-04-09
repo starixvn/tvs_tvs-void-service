@@ -104,7 +104,6 @@ public static class ServiceCollectionExtension
         services.AddSingleton<InsertPreVoidingDataStage, InsertPreVoidingDataStageImp>();
         services.AddSingleton<AutoInstantProcessStage, AutoInstantProcessStageImp>();
         services.AddSingleton<AutoVoidWinningProcessStage, AutoVoidWinningProcessStageImp>();
-        services.AddSingleton<UpdateIsProcessedStage, UpdateIsProcessedStageImp>();
 
         services.AddSingleton<VoidService, VoidServiceImp>();
         services.AddSingleton<ProcessVoidQueuesStage, ProcessVoidQueuesStageImp>();

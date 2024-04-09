@@ -17,9 +17,6 @@ public class CheckTicketValidationOutput
 
     public IEnumerable<RequestDetailTicketModel> VoidParlayTickets14 { get; set; }
 
-    //// Tickets Update IsProcessed (Lose tickets(Single+MainParlay) in Auto void winning)
-    public IEnumerable<RequestDetailTicketModel> UpdateProcessedTickets { get; set; }
-
     //// re settle
     public IEnumerable<RequestDetailTicketModel> SingleTicketsResettle { get; set; }
 
