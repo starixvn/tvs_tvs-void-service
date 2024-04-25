@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using Fanex.Data.Repository;
 using Fanex.Logging;
 using Fanex.Logging.Extensions;
@@ -146,17 +147,17 @@ public static class ServiceCollectionExtension
                 .WithSimpleSchedule(x => x.WithIntervalInMinutes(schedulerInterval).RepeatForever())
             );
 
-            foreach (var server in SiteDbGroupConstant.ServerList)
+            foreach (var siteDbGroupId in SiteDbGroupConstant.ServerList.Select(x => x.Id))
             {
                 q.ScheduleJob<VoidJob>(trigger => trigger
-                    .UsingJobData("siteDbGroupId", server.Id)
-                    .WithIdentity($"{nameof(VoidJob)}{server.Id}Trigger")
+                    .UsingJobData("siteDbGroupId", siteDbGroupId)
+                    .WithIdentity($"{nameof(VoidJob)}{siteDbGroupId}Trigger")
                     .StartNow()
                     .WithSimpleSchedule(x => x.WithIntervalInSeconds(1).RepeatForever()));
 
                 q.ScheduleJob<ScanAutoVoidRequestJob>(trigger => trigger
-                    .UsingJobData("siteDbGroupId", server.Id)
-                    .WithIdentity($"{nameof(ScanAutoVoidRequestJob)}{server.Id}Trigger")
+                    .UsingJobData("siteDbGroupId", siteDbGroupId)
+                    .WithIdentity($"{nameof(ScanAutoVoidRequestJob)}{siteDbGroupId}Trigger")
                     .StartNow()
                     .WithSimpleSchedule(x => x.WithIntervalInSeconds(1).RepeatForever())
                 );
