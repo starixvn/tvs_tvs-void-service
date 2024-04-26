@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using TicketVoidingSystem.Constants;
 using TVS.Void.Service.Constants;
 using TVS.Void.Service.Models;
 
@@ -37,8 +38,9 @@ public class InsertPreVoidingDataStageImp : InsertPreVoidingDataStage
             return "No ticket found.";
         }
 
-        var requestIds = string.Join(",", DistinctRequestIdList(groupTickets));
-        var voidingHistoryList = await requestDetailService.InsertVoidingHistory(requestIds, siteDbGroupId, queue.BroadcastSessionId, groupTickets);
+        var requestsDistinctJson = JsonSerializer.Serialize(DistinctRequestsList(groupTickets));
+        logData.Add($"{nameof(DistinctRequestsList)}: {requestsDistinctJson}");
+        var voidingHistoryList = await requestDetailService.InsertVoidingHistory(requestsDistinctJson, siteDbGroupId, queue.BroadcastSessionId, groupTickets);
         logData.Add($"{nameof(voidingHistoryList)}: {JsonSerializer.Serialize(voidingHistoryList)}");
 
         await notificationService.NotifyRequestRunningToAllUser(voidingHistoryList);
@@ -51,10 +53,15 @@ public class InsertPreVoidingDataStageImp : InsertPreVoidingDataStage
         return string.Empty;
     }
 
-    private static IEnumerable<int> DistinctRequestIdList(IEnumerable<RequestDetailTicketModel> groupTickets)
+    private static IEnumerable<RequestDetail> DistinctRequestsList(IEnumerable<RequestDetailTicketModel> groupTickets)
     {
-        var requestIdList = groupTickets.Select(x => x.RequestId).Distinct();
-        return requestIdList;
+        var abnormalBetRequests = groupTickets.Where(x => x.IssueTypeId == IssueTypeConstant.AbnormalBet)
+            .Select(x => new RequestDetail { RequestId = x.RequestId, MatchId = x.MatchId }).DistinctBy(x => new { x.RequestId, x.MatchId });
+
+        var otherRequests = groupTickets.Where(x => x.IssueTypeId != IssueTypeConstant.AbnormalBet)
+            .Select(x => new RequestDetail { RequestId = x.RequestId }).DistinctBy(x => x.RequestId);
+
+        return abnormalBetRequests.Union(otherRequests);
     }
 
     public IEnumerable<RequestDetailTicketModel> MapVoidingTypeToTickets(CheckTicketValidationOutput validation)

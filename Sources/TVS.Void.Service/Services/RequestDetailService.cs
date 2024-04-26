@@ -12,7 +12,7 @@ namespace TVS.Void.Service.Services;
 
 public interface RequestDetailService
 {
-    Task<IEnumerable<VoidingHistoryModel>> InsertVoidingHistory(string requestIds, int siteDbGroupId, string broadcastSessionId, IEnumerable<RequestDetailTicketModel> groupTickets);
+    Task<IEnumerable<VoidingHistoryModel>> InsertVoidingHistory(string requestsJson, int siteDbGroupId, string broadcastSessionId, IEnumerable<RequestDetailTicketModel> groupTickets);
 
     Task<AfterVoidServiceModel> InsertAfterVoidServiceData(bool isRunAutoAfterVoid, AfterVoidServiceModel afterVoidData);
 
@@ -32,11 +32,11 @@ public class RequestDetailServiceImp : RequestDetailService
         this.repository = repository;
     }
 
-    public async Task<IEnumerable<VoidingHistoryModel>> InsertVoidingHistory(string requestIds, int siteDbGroupId, string broadcastSessionId, IEnumerable<RequestDetailTicketModel> groupTickets)
+    public async Task<IEnumerable<VoidingHistoryModel>> InsertVoidingHistory(string requestsJson, int siteDbGroupId, string broadcastSessionId, IEnumerable<RequestDetailTicketModel> groupTickets)
     {
         var criteria = new InsertVoidingHistoryCriteria
         {
-            RequestIds = requestIds,
+            RequestsJson = requestsJson,
             UserId = AutoVoidConstant.ActorId,
             SiteDbGroupId = siteDbGroupId,
             BroadcastSessionId = broadcastSessionId,
