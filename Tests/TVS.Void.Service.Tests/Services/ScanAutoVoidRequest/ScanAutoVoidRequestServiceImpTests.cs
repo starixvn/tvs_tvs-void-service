@@ -10,7 +10,6 @@ namespace TVS.Void.Service.Tests.Services.ScanAutoVoidRequest;
 
 public class ScanAutoVoidRequestServiceImpTests
 {
-
     private readonly AutoVoidWinningProcessStage autoVoidWinningProcessStage;
     private readonly AutoInstantProcessStage autoVoidInstantProcessStage;
     private readonly AutoVoidRequestQueueService autoVoidRequestQueueService;
@@ -42,8 +41,6 @@ public class ScanAutoVoidRequestServiceImpTests
 
     [Theory]
     [InlineData(AutoVoidConstant.QueueActionVoidInstant)]
-    [InlineData(AutoVoidConstant.QueueActionVoidInstant5m)]
-    [InlineData(AutoVoidConstant.QueueActionVoidInstant10m)]
     [InlineData(AutoVoidConstant.QueueActionVoidInstantNoPolicy)]
     public async Task Execute_IsQueueAutoVoidInstant_CalledExpected(string action)
     {

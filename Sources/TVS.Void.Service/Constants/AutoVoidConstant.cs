@@ -6,8 +6,6 @@ public static class AutoVoidConstant
     public const int ActorId = 10_278_938;
     public const string IPAddress = "125.227.140.97";
     public const string QueueActionVoidInstant = "VoidInstant";
-    public const string QueueActionVoidInstant5m = "VoidInstant5m";
-    public const string QueueActionVoidInstant10m = "VoidInstant10m";
     public const string QueueActionVoidInstantNoPolicy = "VoidInstantNopolicy";
     public const string QueueActionVoidInstantWithPolicy = "VoidInstantPolicy";
     public const string QueueActionVoidResultKeyed = "VoidResultKeyed";
@@ -20,8 +18,6 @@ public static class VoidActionTypeConstant
 {
     public const int AutoVoidWinningId = 1;
     public const int AutoVoidInstantId = 4;
-    public const int AutoVoidInstant5mId = 6;
-    public const int AutoVoidInstant10mId = 7;
     public const int AutoVoidInstantNoPolicyId = 8;
     public const int AutoVoidAllResultKeyedId = 9;
     public const int AutoVoidAllInstantWithPolicyId = 10;
