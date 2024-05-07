@@ -15,7 +15,7 @@ public interface TicketVoidingQueueService
 
     Task InsertQueue(int siteDbGroupId, int requestId, int voidingHistoryId, IEnumerable<RequestDetailTicketModel> groupTickets);
 
-    Task InsertQueueForRequests(int siteDbGroupId, IEnumerable<VoidingHistoryModel> voidingHistoryList, IEnumerable<RequestDetailTicketModel> groupTickets);
+    Task InsertQueueForRequests(int siteDbGroupId, IEnumerable<VoidingHistoryModel> voidingHistoryList, IEnumerable<RequestDetailTicketModel> multiMatchesInRequestTickets, IEnumerable<RequestDetailTicketModel> notCareMatchInRequestTickets);
 
     Task<TicketVoidingQueueModel> ProcessVoidQueue(int siteDbGroupId, int queueId, bool? isCalledNetPosition);
 }
@@ -56,11 +56,14 @@ public class TicketVoidingQueueServiceImp : TicketVoidingQueueService
         await repository.ExecuteAsync(criteria);
     }
 
-    public async Task InsertQueueForRequests(int siteDbGroupId, IEnumerable<VoidingHistoryModel> voidingHistoryList, IEnumerable<RequestDetailTicketModel> groupTickets)
+    public async Task InsertQueueForRequests(int siteDbGroupId, IEnumerable<VoidingHistoryModel> voidingHistoryList,
+        IEnumerable<RequestDetailTicketModel> multiMatchesInRequestTickets, IEnumerable<RequestDetailTicketModel> notCareMatchInRequestTickets)
     {
         foreach (var voidingHistory in voidingHistoryList)
         {
-            var ticketsInCurrentRequest = groupTickets.Where(x => x.RequestId == voidingHistory.RequestId);
+            var ticketsInCurrentRequest = voidingHistory.MatchId > 0
+                ? multiMatchesInRequestTickets.Where(x => x.RequestId == voidingHistory.RequestId && x.MatchId == voidingHistory.MatchId)
+                : notCareMatchInRequestTickets.Where(x => x.RequestId == voidingHistory.RequestId);
             await InsertQueue(siteDbGroupId, voidingHistory.RequestId, voidingHistory.VoidingHistoryId, ticketsInCurrentRequest);
         }
     }
