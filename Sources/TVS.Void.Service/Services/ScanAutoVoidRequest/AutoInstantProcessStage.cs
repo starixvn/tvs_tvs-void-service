@@ -88,6 +88,7 @@ public class AutoInstantProcessStageImp : AutoInstantProcessStage
             IssueTypeConstant.NotParticipate,
             IssueTypeConstant.EarlyKickOffTime,
             IssueTypeConstant.WrongKickOffTime,
+            IssueTypeConstant.Abandoned
         };
         return issueTypesReCheckValidation.Contains(issueTypeId);
     }

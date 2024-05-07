@@ -108,11 +108,13 @@ public class ProcessVoidQueuesStageTests
                 VoidingTypeId = VoidingTypeConstant.RecoverCricket
             }
         };
-        var fakeProcessQueuesResult = new TicketVoidingQueueModel { VoidingHistoryId = 113, StatusId = ExecuteStatus.Running };
+        var requestTicketService = Substitute.For<RequestTicketService>();
+
+        var fakeProcessQueuesResult = new TicketVoidingQueueModel { VoidingHistoryId = 113, StatusId = ExecuteStatus.Running, ResettledTransIds = "1" };
         InItService();
         ticketVoidingQueueService.ProcessVoidQueue(default, default, default)
             .ReturnsForAnyArgs(fakeProcessQueuesResult);
-        service = new ProcessVoidQueuesStageImp(ticketVoidingQueueService, null, netPositionService);
+        service = new ProcessVoidQueuesStageImp(ticketVoidingQueueService, requestTicketService, netPositionService);
         netPositionService.UpdateNetPosition(default, Arg.Any<string>(), "").ReturnsForAnyArgs(true);
 
         // Act
@@ -120,5 +122,6 @@ public class ProcessVoidQueuesStageTests
 
         // Assert
         await netPositionService.Received(1).UpdateNetPosition(1, "1", NetPositionConstant.ActionRecover);
+        await requestTicketService.Received(1).UpdateIsProcessed("1");
     }
 }
