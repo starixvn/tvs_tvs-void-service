@@ -9,7 +9,6 @@ public static class AutoVoidConstant
     public const string QueueActionVoidInstantNoPolicy = "VoidInstantNopolicy";
     public const string QueueActionVoidInstantWithPolicy = "VoidInstantPolicy";
     public const string QueueActionVoidResultKeyed = "VoidResultKeyed";
-    public const string QueueActionMixParlay = "MixParlay";
     public const string QueueActionCal = "CAL";
     public const string QueueRecoverInstant = "RecoverInstant";
 }

@@ -47,13 +47,27 @@ public class GetTicketsStageImp : GetTicketsStage
     private async Task<GroupTicketsInRequest> GetTicketsInRequest(int siteDbGroupId, AutoVoidRequestQueueModel queue)
     {
         var getTicketsInRequest = await requestTicketService.GetTicketsByRequestsAndSiteDbGroupId(siteDbGroupId, queue.RequestIds);
-        if (queue.Action.Equals(AutoVoidConstant.QueueActionVoidInstant, StringComparison.InvariantCultureIgnoreCase) &&
-            queue.MatchId > 0)
+
+        if (queue.Action.Equals(AutoVoidConstant.QueueActionVoidInstant, StringComparison.InvariantCultureIgnoreCase) && queue.MatchId > 0)
         {
             var requestId = int.Parse(queue.RequestIds);
             var singleTicketsInMatch = getTicketsInRequest.SingleTickets.Where(x => x.MatchId == queue.MatchId && x.RequestId == requestId);
             var parlayTicketsInMatch = getTicketsInRequest.ParlayTickets.Where(x => x.MatchId == queue.MatchId && x.RequestId == requestId);
             var cricketTicketsInMatch = getTicketsInRequest.CricketTickets.Where(x => x.MatchId == queue.MatchId && x.RequestId == requestId);
+
+            return new GroupTicketsInRequest
+            {
+                SingleTickets = singleTicketsInMatch,
+                ParlayTickets = parlayTicketsInMatch,
+                CricketTickets = cricketTicketsInMatch
+            };
+        }
+
+        if (queue.Action.Equals(AutoVoidConstant.QueueActionCal, StringComparison.InvariantCultureIgnoreCase) && queue.MatchId > 0)
+        {
+            var singleTicketsInMatch = getTicketsInRequest.SingleTickets.Where(x => x.MatchId == queue.MatchId);
+            var parlayTicketsInMatch = getTicketsInRequest.ParlayTickets.Where(x => x.MatchId == queue.MatchId);
+            var cricketTicketsInMatch = getTicketsInRequest.CricketTickets.Where(x => x.MatchId == queue.MatchId);
 
             return new GroupTicketsInRequest
             {

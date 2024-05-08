@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TicketVoidingSystem.Constants;
 using TicketVoidingSystem.Services;
 using TVS.Void.Service.Constants;
 using TVS.Void.Service.Models;
@@ -56,17 +57,30 @@ public class CheckTicketStatusServiceImp : CheckTicketStatusService
     }
 
     private static GroupTicketsInRequest GetGroupTicketsByVoidAction(int voidActionId, GroupTicketsInRequest getTicketsResult)
-
     {
-        var singleTickets = getTicketsResult.SingleTickets.Where(x => x.VoidActionId == voidActionId);
-        var parlayTickets = getTicketsResult.ParlayTickets.Where(x => x.VoidActionId == voidActionId);
-        var cricketTickets = getTicketsResult.CricketTickets.Where(x => x.VoidActionId == voidActionId);
+        var singleTickets = getTicketsResult.SingleTickets.Where(x => x.VoidActionId == voidActionId).ToList();
+        UpdateMatchIdByAutoVoidWinningMultiMatch(singleTickets);
+
+        var parlayTickets = getTicketsResult.ParlayTickets.Where(x => x.VoidActionId == voidActionId).ToList();
+        UpdateMatchIdByAutoVoidWinningMultiMatch(parlayTickets);
+
+        var cricketTickets = getTicketsResult.CricketTickets.Where(x => x.VoidActionId == voidActionId).ToList();
+        UpdateMatchIdByAutoVoidWinningMultiMatch(cricketTickets);
         return new GroupTicketsInRequest
         {
             SingleTickets = singleTickets,
             ParlayTickets = parlayTickets,
             CricketTickets = cricketTickets
         };
+    }
+
+    private static void UpdateMatchIdByAutoVoidWinningMultiMatch(IEnumerable<RequestDetailTicketModel> tickets)
+    {
+        foreach (var ticket in tickets)
+        {
+            var isMultiMatchesInRequestTicket = ticket.IssueTypeId == IssueTypeConstant.AbnormalBet;
+            ticket.MatchId = isMultiMatchesInRequestTicket ? ticket.MatchId : 0;
+        }
     }
 
     private async Task HandleException(IList<string> logData, Exception exception)

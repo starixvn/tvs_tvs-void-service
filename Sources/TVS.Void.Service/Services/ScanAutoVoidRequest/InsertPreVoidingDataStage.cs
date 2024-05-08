@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using TicketVoidingSystem.Constants;
 using TVS.Void.Service.Constants;
 using TVS.Void.Service.Models;
 
@@ -38,16 +37,14 @@ public class InsertPreVoidingDataStageImp : InsertPreVoidingDataStage
             return "No ticket found.";
         }
 
-        var (multiMatchesInRequestTickets, notCareMatchInRequestTickets) = GroupTicketsByAutoVoidMultiMatches(groupTickets);
-        var requestsDistinctJson = DistinctRequestsListJson(multiMatchesInRequestTickets, notCareMatchInRequestTickets);
+        var requestsDistinctJson = DistinctRequestsListJson(groupTickets);
         logData.Add($"{nameof(DistinctRequestsListJson)}: {requestsDistinctJson}");
         var voidingHistoryList = await requestDetailService.InsertVoidingHistory(requestsDistinctJson, siteDbGroupId, queue.BroadcastSessionId, groupTickets);
         logData.Add($"{nameof(voidingHistoryList)}: {JsonSerializer.Serialize(voidingHistoryList)}");
 
         await notificationService.NotifyRequestRunningToAllUser(voidingHistoryList);
-        await ticketVoidingQueueService.InsertQueueForRequests(siteDbGroupId, voidingHistoryList, multiMatchesInRequestTickets, notCareMatchInRequestTickets);
-        logData.Add($"InsertQueues-OK - {nameof(multiMatchesInRequestTickets)}Count: {multiMatchesInRequestTickets.Count()}" +
-                    $" - {nameof(notCareMatchInRequestTickets)}Count: {notCareMatchInRequestTickets.Count()}");
+        await ticketVoidingQueueService.InsertQueueForRequests(siteDbGroupId, voidingHistoryList, groupTickets);
+        logData.Add($"InsertQueues-OK - {nameof(groupTickets)}Count: {groupTickets.Count()}");
 
         await requestTicketService.UpdateIsProcessed(groupTickets);
         logData.Add($"{nameof(RequestTicketService.UpdateIsProcessed)}-AfterInsertVoidQueue-OK");
@@ -55,24 +52,12 @@ public class InsertPreVoidingDataStageImp : InsertPreVoidingDataStage
         return string.Empty;
     }
 
-    private static (IEnumerable<RequestDetailTicketModel> MultiMatchesInRequestTickets, IEnumerable<RequestDetailTicketModel> NotCareMatchInRequestTickets)
-        GroupTicketsByAutoVoidMultiMatches(IEnumerable<RequestDetailTicketModel> groupTickets)
+    private static string DistinctRequestsListJson(IEnumerable<RequestDetailTicketModel> groupTickets)
     {
-        var abnormalBetRequestTickets = groupTickets.Where(x => x.IssueTypeId == IssueTypeConstant.AbnormalBet);
-        var otherRequestTickets = groupTickets.Where(x => x.IssueTypeId != IssueTypeConstant.AbnormalBet);
-        return (abnormalBetRequestTickets, otherRequestTickets);
-    }
-
-    private static string DistinctRequestsListJson(IEnumerable<RequestDetailTicketModel> multiMatchesInRequestTickets, IEnumerable<RequestDetailTicketModel> notCareMatchInRequestTickets)
-    {
-        var multiMatchesInRequests = multiMatchesInRequestTickets
-            .Select(x => new RequestDetail { RequestId = x.RequestId, MatchId = x.MatchId }).DistinctBy(x => new { x.RequestId, x.MatchId });
-
-        var notCareMatchInRequests = notCareMatchInRequestTickets
+        var notCareMatchInRequests = groupTickets
             .Select(x => new RequestDetail { RequestId = x.RequestId }).DistinctBy(x => x.RequestId);
 
-        var mergeRequests = multiMatchesInRequests.Union(notCareMatchInRequests);
-        return JsonSerializer.Serialize(mergeRequests);
+        return JsonSerializer.Serialize(notCareMatchInRequests);
     }
 
     public IEnumerable<RequestDetailTicketModel> MapVoidingTypeToTickets(CheckTicketValidationOutput validation)

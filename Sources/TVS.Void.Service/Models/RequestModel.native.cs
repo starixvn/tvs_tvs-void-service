@@ -9,6 +9,7 @@ public class RequestModel
     public string ActionName { get; set; }
     public int VoidActionId { get; set; }
     public int IssueTypeId { get; set; }
+    public int MatchId { get; set; }
 }
 
 public class RequestDetail

@@ -30,7 +30,8 @@ public class CheckTicketsForAutoVoidWinningStageImp : CheckTicketsForAutoVoidWin
         {
             logData.Add($"{nameof(CheckTicketsForAutoVoidWinningStage)} - {nameof(groupTickets.SingleTickets)}.Count: {groupTickets.SingleTickets.Count()} - "
                         + $"{nameof(groupTickets.ParlayTickets)}.Count: {groupTickets.ParlayTickets.Count()} - {nameof(groupTickets.CricketTickets)}.Count: {groupTickets.CricketTickets.Count()}");
-            var broadcastSessionId = Guid.NewGuid().ToString();
+
+            IDictionary<int, string> broadcastSessionIdCacheByMatch = new Dictionary<int, string>();
             foreach (var siteDbGroupId in SiteDbGroupConstant.ServerList.Select(x => x.Id))
             {
                 var singleTicketsInServer = groupTickets.SingleTickets.Where(x => x.SiteDbGroupId == siteDbGroupId);
@@ -38,11 +39,12 @@ public class CheckTicketsForAutoVoidWinningStageImp : CheckTicketsForAutoVoidWin
                 var cricketTicketsInServer = groupTickets.CricketTickets.Where(x => x.SiteDbGroupId == siteDbGroupId);
 
                 var checkResult = await requestTicketService.CheckStatusTicketForInsertAutoVoidQueue(siteDbGroupId, singleTicketsInServer, parlayTicketsInServer, cricketTicketsInServer);
-                await insertAutoVoidQueueStage.ExecuteForAutoVoidWinning(siteDbGroupId, checkResult.ValidRequests, broadcastSessionId, logData);
+                await insertAutoVoidQueueStage.ExecuteForAutoVoidWinning(siteDbGroupId, checkResult.ValidRequests, broadcastSessionIdCacheByMatch, logData);
                 await requestTicketService.UpdateIsProcessed(checkResult.InvalidSingleTickets, checkResult.InvalidParlayTickets, checkResult.InvalidCricketTickets);
                 logData.Add($"[{siteDbGroupId}]{nameof(requestTicketService.CheckStatusTicketForInsertAutoVoidQueue)} - {JsonSerializer.Serialize(checkResult)}");
             }
 
+            logData.Add($"{nameof(broadcastSessionIdCacheByMatch)}: {JsonSerializer.Serialize(broadcastSessionIdCacheByMatch)}");
             logData.Add($"ServerTime: {DateTimeOffset.Now:MM/dd/yyyy HH:mm:ss.fff}");
             logData.Add("------------------");
         }
