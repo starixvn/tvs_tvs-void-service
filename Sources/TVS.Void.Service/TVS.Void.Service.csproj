@@ -10,6 +10,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Fanex.Data.ProxyClient" Version="0.0.3-alpha02" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\TicketVoidingSystem\TicketVoidingSystem.csproj" />
   </ItemGroup>
 

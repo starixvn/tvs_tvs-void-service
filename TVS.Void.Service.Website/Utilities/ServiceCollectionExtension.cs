@@ -5,7 +5,6 @@ using Fanex.Data.Repository;
 using Fanex.Logging;
 using Fanex.Logging.Extensions;
 using Fanex.Logging.Extensions.AspNetCore;
-using Fanex.Logging.Extensions.Database;
 using Fanex.Logging.Sentry;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -54,8 +53,7 @@ public static class ServiceCollectionExtension
     {
         var configuration = new LoggingConfiguration()
             .GetHttpHeaderInfo()
-            .GetHttpSessionInfo()
-            .UseGetDbExceptionInfo(DatabaseInfoGetters.GetDbExceptionInfo);
+            .GetHttpSessionInfo();
         ExceptionHandler.UseConfig(configuration);
     }
 

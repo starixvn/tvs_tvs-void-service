@@ -37,31 +37,28 @@ public class CheckTicketValidationStageImp : CheckTicketValidationStage
             CricketTicketsJson = JsonSerializer.Serialize(cricketTickets)
         };
 
-        var mappingTypes = new[]
-        {
-            typeof (RequestDetailTicketModel),
-            typeof (RequestDetailTicketModel),
-            typeof (RequestDetailTicketModel),
-            typeof (RequestDetailTicketModel),
-            typeof (RequestDetailTicketModel),
-            typeof (RequestDetailTicketModel),
-            typeof (RequestDetailTicketModel),
-            typeof (RequestDetailTicketModel),
-            typeof (RequestDetailTicketModel)
-        };
+        var results = (await repository.FetchAsync<RequestDetailTicketModel>(criteria)).ToList();
+        var voidSingleTickets = results.Where(x => x.ValidationType == 1);
+        var singleTicketsResettle = results.Where(x => x.ValidationType == 2);
+        var voidParlayTickets = results.Where(x => x.ValidationType == 3);
+        var parlayTicketsResettle = results.Where(x => x.ValidationType == 4);
+        var voidCricketTickets = results.Where(x => x.ValidationType == 5);
+        var cricketTicketsResettle = results.Where(x => x.ValidationType == 6);
+        //// var cancelCOTickets = results.Where(x => x.ValidationType == 7); (Only use for manual void issue type)
+        var voidSingleTickets14 = results.Where(x => x.ValidationType == 8);
+        var voidParlayTickets14 = results.Where(x => x.ValidationType == 9);
 
-        var objectsArray = await repository.FetchMultipleAsync(criteria, mappingTypes);
         var output = new CheckTicketValidationOutput
         {
-            VoidSingleTickets = objectsArray[0].Cast<RequestDetailTicketModel>(),
-            SingleTicketsResettle = objectsArray[1].Cast<RequestDetailTicketModel>(),
-            VoidParlayTickets = objectsArray[2].Cast<RequestDetailTicketModel>(),
-            ParlayTicketsResettle = objectsArray[3].Cast<RequestDetailTicketModel>(),
-            VoidCricketTickets = objectsArray[4].Cast<RequestDetailTicketModel>(),
-            CricketTicketsResettle = objectsArray[5].Cast<RequestDetailTicketModel>(),
+            VoidSingleTickets = voidSingleTickets,
+            SingleTicketsResettle = singleTicketsResettle,
+            VoidParlayTickets = voidParlayTickets,
+            ParlayTicketsResettle = parlayTicketsResettle,
+            VoidCricketTickets = voidCricketTickets,
+            CricketTicketsResettle = cricketTicketsResettle,
             //ValidCancelCOTickets = objectsArray[6].Cast<RequestDetailTicketModel>() (Only use for manual void issue type)
-            VoidSingleTickets14 = objectsArray[7].Cast<RequestDetailTicketModel>(),
-            VoidParlayTickets14 = objectsArray[8].Cast<RequestDetailTicketModel>()
+            VoidSingleTickets14 = voidSingleTickets14,
+            VoidParlayTickets14 = voidParlayTickets14
         };
 
         logData.Add($"{nameof(CheckTicketValidationStage)}.{nameof(ExecuteForVoid)} - vSingle: {output.VoidSingleTickets.Count()} - vParlay: {output.VoidParlayTickets.Count()}"
@@ -92,14 +89,15 @@ public class CheckTicketValidationStageImp : CheckTicketValidationStage
             typeof (RequestDetailTicketModel),
          };
 
-        var objectsArray = await repository.FetchMultipleAsync(criteria, mappingTypes);
+        var (recoverSingleTickets, recoverParlayTickets, recoverCricketTickets, recoverSingleTickets14, recoverParlayTickets14) =
+            await repository.FetchMultipleAsync<RequestDetailTicketModel, RequestDetailTicketModel, RequestDetailTicketModel, RequestDetailTicketModel, RequestDetailTicketModel>(criteria);
         var output = new CheckTicketValidationOutput
         {
-            RecoverSingleTickets = objectsArray[0].Cast<RequestDetailTicketModel>(),
-            RecoverParlayTickets = objectsArray[1].Cast<RequestDetailTicketModel>(),
-            RecoverCricketTickets = objectsArray[2].Cast<RequestDetailTicketModel>(),
-            RecoverSingleTickets14 = objectsArray[3].Cast<RequestDetailTicketModel>(),
-            RecoverParlayTickets14 = objectsArray[4].Cast<RequestDetailTicketModel>()
+            RecoverSingleTickets = recoverSingleTickets,
+            RecoverParlayTickets = recoverParlayTickets,
+            RecoverCricketTickets = recoverCricketTickets,
+            RecoverSingleTickets14 = recoverSingleTickets14,
+            RecoverParlayTickets14 = recoverParlayTickets14
         };
 
         logData.Add($"{nameof(CheckTicketValidationStage)}.{nameof(ExecuteForRecover)} - rSingle: {output.RecoverSingleTickets.Count()} - rParlay: {output.RecoverParlayTickets.Count()}"

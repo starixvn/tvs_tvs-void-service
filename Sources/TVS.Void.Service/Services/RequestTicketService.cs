@@ -78,21 +78,16 @@ public class RequestTicketServiceImp : RequestTicketService
             ParlayTicketsJson = JsonSerializer.Serialize(parlayTickets),
             CricketTicketsJson = JsonSerializer.Serialize(cricketTickets)
         };
-        var mappingTypes = new[]
-        {
-            typeof (RequestModel),
-            typeof (RequestDetailTicketModel),
-            typeof (RequestDetailTicketModel),
-            typeof (RequestDetailTicketModel),
-        };
-        var objectsArray = await repository.FetchMultipleAsync(criteria, mappingTypes);
+
+        var (validRequests, invalidSingleTickets, invalidParlayTickets, invalidCricketTickets) =
+            await repository.FetchMultipleAsync<RequestModel, RequestDetailTicketModel, RequestDetailTicketModel, RequestDetailTicketModel>(criteria);
 
         var outputData = new CheckStatusTicketInsertAutoVoidQueueOutput
         {
-            ValidRequests = objectsArray[0].Cast<RequestModel>(),
-            InvalidSingleTickets = objectsArray[1].Cast<RequestDetailTicketModel>(),
-            InvalidParlayTickets = objectsArray[2].Cast<RequestDetailTicketModel>(),
-            InvalidCricketTickets = objectsArray[3].Cast<RequestDetailTicketModel>()
+            ValidRequests = validRequests,
+            InvalidSingleTickets = invalidSingleTickets,
+            InvalidParlayTickets = invalidParlayTickets,
+            InvalidCricketTickets = invalidCricketTickets
         };
 
         return outputData;
