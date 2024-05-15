@@ -15,7 +15,6 @@
 
   <ItemGroup>
     <PackageReference Include="Fanex.Logging.Extensions.AspNetCore" Version="1.0.1-beta1" />
-    <PackageReference Include="Fanex.Logging.Extensions.Database" Version="1.0.8" />
   </ItemGroup>
 
 </Project>
