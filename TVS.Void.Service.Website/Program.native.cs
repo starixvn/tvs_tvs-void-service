@@ -1,22 +1,23 @@
-using Fanex.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using TicketVoidingSystem.SignalR;
 using TVS.Void.Service.Website.Utilities;
 
 var builder = WebApplication.CreateBuilder(args);
+var services = builder.Services;
+var configuration = builder.Configuration;
 
 // Add services to the container.
-builder.Services.LoadConfig(builder.Configuration);
-builder.Services.AddControllers();
-builder.Services.AddMemoryCache();
-builder.Services.AddFanexData(builder.Configuration);
-builder.Services.RegisterFanexExceptionHandler();
-builder.Services.RegisterSentry();
-builder.Services.RegisterONEbookUM(builder.Configuration);
-builder.Services.RegisterSignalR();
-builder.Services.RegisterBusinessService();
-builder.Services.RegisterQuartzScheduler();
+services.LoadConfig(builder.Configuration);
+services.AddControllers();
+services.AddMemoryCache();
+services.RegisterFanexData(builder.Configuration);
+services.RegisterFanexExceptionHandler();
+services.RegisterSentry();
+services.RegisterONEbookUM(builder.Configuration);
+services.RegisterSignalR();
+services.RegisterBusinessService();
+services.RegisterQuartzScheduler();
 
 // Build app
 var app = builder.Build();

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using Fanex.Data;
 using Fanex.Data.Repository;
 using Fanex.Logging;
 using Fanex.Logging.Extensions;
@@ -76,6 +77,11 @@ public static class ServiceCollectionExtension
             options.Configuration.DefaultDatabase = AppSettingService.AppSetting.RedisConfig.DefaultDatabase;
             options.Configuration.ChannelPrefix = AppSettingService.AppSetting.RedisConfig.SignalRChannelPrefix;
         });
+    }
+
+    public static void RegisterFanexData(this IServiceCollection services, IConfiguration configuration)
+    {
+        DbSettingProviderManager.StartNewSession().Register(configuration, true).Run();
     }
 
     public static void RegisterBusinessService(this IServiceCollection services)
