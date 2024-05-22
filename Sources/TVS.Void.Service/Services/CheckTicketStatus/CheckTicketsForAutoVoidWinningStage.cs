@@ -10,7 +10,7 @@ namespace TVS.Void.Service.Services.CheckTicketStatus;
 
 public interface CheckTicketsForAutoVoidWinningStage
 {
-    Task Execute(IList<string> logData, GroupTicketsInRequest groupTickets);
+    Task Execute(IList<string> logData, GroupTicketsInRequest groupTickets, string actionName);
 }
 
 public class CheckTicketsForAutoVoidWinningStageImp : CheckTicketsForAutoVoidWinningStage
@@ -24,7 +24,7 @@ public class CheckTicketsForAutoVoidWinningStageImp : CheckTicketsForAutoVoidWin
         this.insertAutoVoidQueueStage = insertAutoVoidQueueStage;
     }
 
-    public async Task Execute(IList<string> logData, GroupTicketsInRequest groupTickets)
+    public async Task Execute(IList<string> logData, GroupTicketsInRequest groupTickets, string actionName)
     {
         if (groupTickets.SingleTickets.Any() || groupTickets.ParlayTickets.Any() || groupTickets.CricketTickets.Any())
         {
@@ -39,7 +39,7 @@ public class CheckTicketsForAutoVoidWinningStageImp : CheckTicketsForAutoVoidWin
                 var cricketTicketsInServer = groupTickets.CricketTickets.Where(x => x.SiteDbGroupId == siteDbGroupId);
 
                 var checkResult = await requestTicketService.CheckStatusTicketForInsertAutoVoidQueue(siteDbGroupId, singleTicketsInServer, parlayTicketsInServer, cricketTicketsInServer);
-                await insertAutoVoidQueueStage.ExecuteForAutoVoidWinning(siteDbGroupId, checkResult.ValidRequests, broadcastSessionIdCacheByMatch, logData);
+                await insertAutoVoidQueueStage.ExecuteForAutoVoidWinningAndResultKeyed(siteDbGroupId, checkResult.ValidRequests, actionName, broadcastSessionIdCacheByMatch, logData);
                 await requestTicketService.UpdateIsProcessed(checkResult.InvalidSingleTickets, checkResult.InvalidParlayTickets, checkResult.InvalidCricketTickets);
                 logData.Add($"[{siteDbGroupId}]{nameof(requestTicketService.CheckStatusTicketForInsertAutoVoidQueue)} - {JsonSerializer.Serialize(checkResult)}");
             }

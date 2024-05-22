@@ -94,7 +94,6 @@ public static class ServiceCollectionExtension
 
         services.AddSingleton<CheckTicketStatusService, CheckTicketStatusServiceImp>();
         services.AddSingleton<CheckTicketsForAutoVoidWinningStage, CheckTicketsForAutoVoidWinningStageImp>();
-        services.AddSingleton<CheckTicketsForAutoVoidAllResultKeyedStage, CheckTicketsForAutoVoidAllResultKeyedStageImp>();
         services.AddSingleton<InsertAutoVoidQueueStage, InsertAutoVoidQueueStageImp>();
 
         services.AddSingleton<ScanAutoVoidRequestService, ScanAutoVoidRequestServiceImp>();

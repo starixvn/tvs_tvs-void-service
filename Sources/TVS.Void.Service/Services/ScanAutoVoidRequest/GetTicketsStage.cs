@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TicketVoidingSystem.Constants;
@@ -48,7 +47,15 @@ public class GetTicketsStageImp : GetTicketsStage
     {
         var getTicketsInRequest = await requestTicketService.GetTicketsByRequestsAndSiteDbGroupId(siteDbGroupId, queue.RequestIds);
 
-        if (queue.Action.Equals(AutoVoidConstant.QueueActionVoidInstant, StringComparison.InvariantCultureIgnoreCase) && queue.MatchId > 0)
+        var actionAutoVoidInstants = new List<string>
+        {
+            AutoVoidConstant.QueueActionVoidInstant,
+            AutoVoidConstant.QueueActionVoidInstantNoPolicy,
+            AutoVoidConstant.QueueActionVoidInstantWithPolicy,
+            AutoVoidConstant.QueueRecoverInstant
+        };
+
+        if (actionAutoVoidInstants.Contains(queue.Action) && queue.MatchId > 0)
         {
             var requestId = int.Parse(queue.RequestIds);
             var singleTicketsInMatch = getTicketsInRequest.SingleTickets.Where(x => x.MatchId == queue.MatchId && x.RequestId == requestId);
@@ -63,7 +70,13 @@ public class GetTicketsStageImp : GetTicketsStage
             };
         }
 
-        if (queue.Action.Equals(AutoVoidConstant.QueueActionCal, StringComparison.InvariantCultureIgnoreCase) && queue.MatchId > 0)
+        var actionAutoWinningResultKeyed = new List<string>
+        {
+            AutoVoidConstant.QueueActionCal,
+            AutoVoidConstant.QueueActionVoidResultKeyed
+        };
+
+        if (actionAutoWinningResultKeyed.Contains(queue.Action) && queue.MatchId > 0)
         {
             var singleTicketsInMatch = getTicketsInRequest.SingleTickets.Where(x => x.MatchId == queue.MatchId);
             var parlayTicketsInMatch = getTicketsInRequest.ParlayTickets.Where(x => x.MatchId == queue.MatchId);
