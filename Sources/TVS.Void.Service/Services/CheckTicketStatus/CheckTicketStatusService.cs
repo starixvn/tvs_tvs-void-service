@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TicketVoidingSystem.Constants;
 using TicketVoidingSystem.Services;
 using TVS.Void.Service.Constants;
 using TVS.Void.Service.Models;
@@ -17,15 +18,13 @@ public class CheckTicketStatusServiceImp : CheckTicketStatusService
 {
     private readonly RequestTicketService requestTicketService;
     private readonly CheckTicketsForAutoVoidWinningStage checkTicketsForAutoVoidWinningStage;
-    private readonly CheckTicketsForAutoVoidAllResultKeyedStage checkTicketsForAutoVoidAllResultKeyedStage;
+
     private readonly LoggingService loggingService;
 
-    public CheckTicketStatusServiceImp(RequestTicketService requestTicketService, CheckTicketsForAutoVoidWinningStage checkTicketsForAutoVoidWinningStage,
-        CheckTicketsForAutoVoidAllResultKeyedStage checkTicketsForAutoVoidAllResultKeyedStage, LoggingService loggingService)
+    public CheckTicketStatusServiceImp(RequestTicketService requestTicketService, CheckTicketsForAutoVoidWinningStage checkTicketsForAutoVoidWinningStage, LoggingService loggingService)
     {
         this.requestTicketService = requestTicketService;
         this.checkTicketsForAutoVoidWinningStage = checkTicketsForAutoVoidWinningStage;
-        this.checkTicketsForAutoVoidAllResultKeyedStage = checkTicketsForAutoVoidAllResultKeyedStage;
         this.loggingService = loggingService;
     }
 
@@ -47,26 +46,39 @@ public class CheckTicketStatusServiceImp : CheckTicketStatusService
         var getTicketsResult = await requestTicketService.GetTicketInAllRequests();
 
         var autoVoidWinningGroup = GetGroupTicketsByVoidAction(VoidActionTypeConstant.AutoVoidWinningId, getTicketsResult);
-        await checkTicketsForAutoVoidWinningStage.Execute(logData, autoVoidWinningGroup);
+        await checkTicketsForAutoVoidWinningStage.Execute(logData, autoVoidWinningGroup, AutoVoidConstant.QueueActionCal);
 
         var autoVoidAllResultKeyedGroup = GetGroupTicketsByVoidAction(VoidActionTypeConstant.AutoVoidAllResultKeyedId, getTicketsResult);
-        await checkTicketsForAutoVoidAllResultKeyedStage.Execute(logData, autoVoidAllResultKeyedGroup);
+        await checkTicketsForAutoVoidWinningStage.Execute(logData, autoVoidAllResultKeyedGroup, AutoVoidConstant.QueueActionVoidResultKeyed);
 
         await loggingService.InfoAppendNewLineAsync(logData);
     }
 
     private static GroupTicketsInRequest GetGroupTicketsByVoidAction(int voidActionId, GroupTicketsInRequest getTicketsResult)
-
     {
-        var singleTickets = getTicketsResult.SingleTickets.Where(x => x.VoidActionId == voidActionId);
-        var parlayTickets = getTicketsResult.ParlayTickets.Where(x => x.VoidActionId == voidActionId);
-        var cricketTickets = getTicketsResult.CricketTickets.Where(x => x.VoidActionId == voidActionId);
+        var singleTickets = getTicketsResult.SingleTickets.Where(x => x.VoidActionId == voidActionId).ToList();
+        UpdateMatchIdByAutoVoidWinningMultiMatch(singleTickets);
+
+        var parlayTickets = getTicketsResult.ParlayTickets.Where(x => x.VoidActionId == voidActionId).ToList();
+        UpdateMatchIdByAutoVoidWinningMultiMatch(parlayTickets);
+
+        var cricketTickets = getTicketsResult.CricketTickets.Where(x => x.VoidActionId == voidActionId).ToList();
+        UpdateMatchIdByAutoVoidWinningMultiMatch(cricketTickets);
         return new GroupTicketsInRequest
         {
             SingleTickets = singleTickets,
             ParlayTickets = parlayTickets,
             CricketTickets = cricketTickets
         };
+    }
+
+    private static void UpdateMatchIdByAutoVoidWinningMultiMatch(IEnumerable<RequestDetailTicketModel> tickets)
+    {
+        foreach (var ticket in tickets)
+        {
+            var isMultiMatchesInRequestTicket = ticket.IssueTypeId == IssueTypeConstant.AbnormalBet;
+            ticket.MatchId = isMultiMatchesInRequestTicket ? ticket.MatchId : 0;
+        }
     }
 
     private async Task HandleException(IList<string> logData, Exception exception)

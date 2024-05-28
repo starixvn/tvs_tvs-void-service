@@ -37,13 +37,14 @@ public class InsertPreVoidingDataStageImp : InsertPreVoidingDataStage
             return "No ticket found.";
         }
 
-        var requestIds = string.Join(",", DistinctRequestIdList(groupTickets));
-        var voidingHistoryList = await requestDetailService.InsertVoidingHistory(requestIds, siteDbGroupId, queue.BroadcastSessionId, groupTickets);
+        var requestsDistinctJson = DistinctRequestsListJson(groupTickets);
+        logData.Add($"{nameof(DistinctRequestsListJson)}: {requestsDistinctJson}");
+        var voidingHistoryList = await requestDetailService.InsertVoidingHistory(requestsDistinctJson, siteDbGroupId, queue.BroadcastSessionId, groupTickets);
         logData.Add($"{nameof(voidingHistoryList)}: {JsonSerializer.Serialize(voidingHistoryList)}");
 
         await notificationService.NotifyRequestRunningToAllUser(voidingHistoryList);
         await ticketVoidingQueueService.InsertQueueForRequests(siteDbGroupId, voidingHistoryList, groupTickets);
-        logData.Add("InsertQueues-OK");
+        logData.Add($"InsertQueues-OK - {nameof(groupTickets)}Count: {groupTickets.Count()}");
 
         await requestTicketService.UpdateIsProcessed(groupTickets);
         logData.Add($"{nameof(RequestTicketService.UpdateIsProcessed)}-AfterInsertVoidQueue-OK");
@@ -51,10 +52,12 @@ public class InsertPreVoidingDataStageImp : InsertPreVoidingDataStage
         return string.Empty;
     }
 
-    private static IEnumerable<int> DistinctRequestIdList(IEnumerable<RequestDetailTicketModel> groupTickets)
+    private static string DistinctRequestsListJson(IEnumerable<RequestDetailTicketModel> groupTickets)
     {
-        var requestIdList = groupTickets.Select(x => x.RequestId).Distinct();
-        return requestIdList;
+        var notCareMatchInRequests = groupTickets
+            .Select(x => new RequestDetail { RequestId = x.RequestId }).DistinctBy(x => x.RequestId);
+
+        return JsonSerializer.Serialize(notCareMatchInRequests);
     }
 
     public IEnumerable<RequestDetailTicketModel> MapVoidingTypeToTickets(CheckTicketValidationOutput validation)

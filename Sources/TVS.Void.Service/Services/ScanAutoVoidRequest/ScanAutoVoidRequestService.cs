@@ -67,14 +67,11 @@ public class ScanAutoVoidRequestServiceImp : ScanAutoVoidRequestService
 
     private static bool IsInstantQueue(string action)
     {
-#pragma warning disable S1067 // Expressions should not be too complex
         var isQueueVoidInstant =
                 action.Equals(AutoVoidConstant.QueueActionVoidInstant, StringComparison.OrdinalIgnoreCase)
-                || action.Equals(AutoVoidConstant.QueueActionVoidInstant5m, StringComparison.OrdinalIgnoreCase)
-                || action.Equals(AutoVoidConstant.QueueActionVoidInstant10m, StringComparison.OrdinalIgnoreCase)
                 || action.Equals(AutoVoidConstant.QueueActionVoidInstantNoPolicy, StringComparison.OrdinalIgnoreCase)
                 || action.Equals(AutoVoidConstant.QueueActionVoidInstantWithPolicy, StringComparison.OrdinalIgnoreCase);
-#pragma warning restore S1067 // Expressions should not be too complex
+
         var isVoidLikeAutoWinningButNotRunResettled = action.Equals(AutoVoidConstant.QueueActionVoidResultKeyed, StringComparison.OrdinalIgnoreCase);
         var isRecoverInstant = action.Equals(AutoVoidConstant.QueueRecoverInstant, StringComparison.OrdinalIgnoreCase);
 

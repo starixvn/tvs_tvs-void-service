@@ -4,7 +4,7 @@ namespace TVS.Void.Service.Criteria;
 
 public class InsertVoidingHistoryCriteria : CriteriaBase
 {
-    public string RequestIds { get; set; }
+    public string RequestsJson { get; set; }
 
     public int UserId { get; set; }
 
