@@ -80,15 +80,6 @@ public class CheckTicketValidationStageImp : CheckTicketValidationStage
             CricketTicketsJson = JsonSerializer.Serialize(cricketTickets)
         };
 
-        var mappingTypes = new[]
-         {
-            typeof (RequestDetailTicketModel),
-            typeof (RequestDetailTicketModel),
-            typeof (RequestDetailTicketModel),
-            typeof (RequestDetailTicketModel),
-            typeof (RequestDetailTicketModel),
-         };
-
         var (recoverSingleTickets, recoverParlayTickets, recoverCricketTickets, recoverSingleTickets14, recoverParlayTickets14) =
             await repository.FetchMultipleAsync<RequestDetailTicketModel, RequestDetailTicketModel, RequestDetailTicketModel, RequestDetailTicketModel, RequestDetailTicketModel>(criteria);
         var output = new CheckTicketValidationOutput

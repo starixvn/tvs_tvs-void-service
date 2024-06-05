@@ -13,8 +13,6 @@ public class CheckTicketValidationStageTests
     {
         const int siteDbGroupId = 0;
         var requestDetailTickets = new List<RequestDetailTicketModel>();
-        IEnumerable<object>[] fakeData = { requestDetailTickets, requestDetailTickets, requestDetailTickets, requestDetailTickets, requestDetailTickets,
-            requestDetailTickets, requestDetailTickets, requestDetailTickets, requestDetailTickets };
         var expected = new CheckTicketValidationOutput
         {
             VoidSingleTickets = requestDetailTickets,
@@ -26,14 +24,15 @@ public class CheckTicketValidationStageTests
             VoidSingleTickets14 = requestDetailTickets,
             VoidParlayTickets14 = requestDetailTickets
         };
+
         var repository = Substitute.For<IDynamicRepository>();
-        repository.FetchMultipleAsync(default, default)
-            .ReturnsForAnyArgs(fakeData);
+        repository.FetchAsync<RequestDetailTicketModel>(Arg.Any<CheckTicketsAllowToVoidCriteria>())
+            .ReturnsForAnyArgs(requestDetailTickets);
         var service = new CheckTicketValidationStageImp(repository);
 
         var actual = await service.ExecuteForVoid(siteDbGroupId, requestDetailTickets, requestDetailTickets, requestDetailTickets, new List<string>());
 
-        await repository.Received(1).FetchMultipleAsync(Arg.Any<CheckTicketsAllowToVoidCriteria>(), Arg.Any<Type[]>());
+        await repository.Received(1).FetchAsync<RequestDetailTicketModel>(Arg.Any<CheckTicketsAllowToVoidCriteria>());
         AssertExtension.Equal(expected, actual);
     }
 
@@ -52,13 +51,13 @@ public class CheckTicketValidationStageTests
             RecoverParlayTickets14 = requestDetailTickets
         };
         var repository = Substitute.For<IDynamicRepository>();
-        repository.FetchMultipleAsync(default, default)
-            .ReturnsForAnyArgs(fakeData);
+        repository.FetchMultipleAsync<RequestDetailTicketModel, RequestDetailTicketModel, RequestDetailTicketModel, RequestDetailTicketModel, RequestDetailTicketModel>(Arg.Any<CheckTicketsAllowToRecoverCriteria>())
+            .ReturnsForAnyArgs((requestDetailTickets, requestDetailTickets, requestDetailTickets, requestDetailTickets, requestDetailTickets));
         var service = new CheckTicketValidationStageImp(repository);
 
         var actual = await service.ExecuteForRecover(siteDbGroupId, requestDetailTickets, requestDetailTickets, requestDetailTickets, new List<string>());
 
-        await repository.Received(1).FetchMultipleAsync(Arg.Any<CheckTicketsAllowToRecoverCriteria>(), Arg.Any<Type[]>());
+        await repository.Received(1).FetchMultipleAsync<RequestDetailTicketModel, RequestDetailTicketModel, RequestDetailTicketModel, RequestDetailTicketModel, RequestDetailTicketModel>(Arg.Any<CheckTicketsAllowToRecoverCriteria>());
         AssertExtension.Equal(expected, actual);
     }
 }

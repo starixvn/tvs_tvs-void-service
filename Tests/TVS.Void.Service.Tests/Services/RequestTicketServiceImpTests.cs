@@ -2,6 +2,7 @@
 using NSubstitute;
 using TVS.Void.Service.Constants;
 using TVS.Void.Service.Criteria;
+using TVS.Void.Service.Criteria.MultiSiteDb;
 using TVS.Void.Service.Models;
 using TVS.Void.Service.Services;
 
@@ -66,8 +67,7 @@ public class RequestTicketServiceImpTests
 
     [Theory]
     [MemberData(nameof(CheckStatusTicketForInsertAutoVoidQueueTestData))]
-    public async Task CheckStatusTicketForInsertAutoVoidQueue_ShouldReturnExpectedData(int siteDbGroupId,
-        IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets,
+    public async Task CheckStatusTicketForInsertAutoVoidQueue_ShouldReturnExpectedData(int siteDbGroupId, IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets,
         IEnumerable<RequestDetailTicketModel> cricketTickets)
     {
         // Arrange
@@ -76,15 +76,13 @@ public class RequestTicketServiceImpTests
         var validParlayTickets = new List<RequestDetailTicketModel> { new() };
         var validCricketTickets = new List<RequestDetailTicketModel> { new() };
         var repository = Substitute.For<IDynamicRepository>();
-        IEnumerable<object>[] fakeData = { fakeRequests, validSingleTickets, validParlayTickets, validCricketTickets };
 
-        repository.FetchMultipleAsync(default, default)
-            .ReturnsForAnyArgs(fakeData);
+        repository.FetchMultipleAsync<RequestModel, RequestDetailTicketModel, RequestDetailTicketModel, RequestDetailTicketModel>(Arg.Any<CheckStatusTicketCriteria>())
+            .ReturnsForAnyArgs((fakeRequests, validSingleTickets, validParlayTickets, validCricketTickets));
         var service = new RequestTicketServiceImp(repository);
 
         // Act
-        var actual =
-            await service.CheckStatusTicketForInsertAutoVoidQueue(siteDbGroupId, singleTickets, parlayTickets, cricketTickets);
+        var actual = await service.CheckStatusTicketForInsertAutoVoidQueue(siteDbGroupId, singleTickets, parlayTickets, cricketTickets);
 
         // Assert
         Assert.StrictEqual(fakeRequests, actual.ValidRequests);

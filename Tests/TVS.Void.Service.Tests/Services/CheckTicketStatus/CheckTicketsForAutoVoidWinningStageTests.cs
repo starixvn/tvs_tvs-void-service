@@ -1,4 +1,5 @@
 ﻿using NSubstitute;
+using TVS.Void.Service.Constants;
 using TVS.Void.Service.Models;
 using TVS.Void.Service.Services;
 using TVS.Void.Service.Services.CheckTicketStatus;
@@ -31,7 +32,7 @@ public class CheckTicketsForAutoVoidWinningStageTests : IClassFixture<AppSetting
         var logData = new List<string>();
 
         // Act
-        await service.Execute(logData, groupTickets);
+        await service.Execute(logData, groupTickets, AutoVoidConstant.QueueActionCal);
 
         // Assert
         await requestTicketService.DidNotReceiveWithAnyArgs().CheckStatusTicketForInsertAutoVoidQueue(default,
@@ -60,15 +61,14 @@ public class CheckTicketsForAutoVoidWinningStageTests : IClassFixture<AppSetting
             Arg.Any<IEnumerable<RequestDetailTicketModel>>()).ReturnsForAnyArgs(checkResult);
 
         // Act
-        await service.Execute(logData, groupTickets);
+        await service.Execute(logData, groupTickets, AutoVoidConstant.QueueActionCal);
 
         // Assert
         await requestTicketService.Received(4).CheckStatusTicketForInsertAutoVoidQueue(Arg.Any<int>(),
             Arg.Any<IEnumerable<RequestDetailTicketModel>>(), Arg.Any<IEnumerable<RequestDetailTicketModel>>(),
             Arg.Any<IEnumerable<RequestDetailTicketModel>>());
-        await insertAutoVoidQueueStage.Received(4).ExecuteForAutoVoidWinning(Arg.Any<int>(),
-            checkResult.ValidRequests,
-            Arg.Any<string>(), Arg.Any<List<string>>());
+        await insertAutoVoidQueueStage.Received(4).ExecuteForAutoVoidWinningAndResultKeyed(Arg.Any<int>(),
+            checkResult.ValidRequests, AutoVoidConstant.QueueActionCal, Arg.Any<IDictionary<int, string>>(), Arg.Any<List<string>>());
         await requestTicketService.Received(4).UpdateIsProcessed(Arg.Any<IEnumerable<RequestDetailTicketModel>>(), Arg.Any<IEnumerable<RequestDetailTicketModel>>(),
             Arg.Any<IEnumerable<RequestDetailTicketModel>>());
     }

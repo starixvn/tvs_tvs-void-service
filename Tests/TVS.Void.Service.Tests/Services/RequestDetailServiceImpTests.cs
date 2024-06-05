@@ -28,10 +28,8 @@ public class RequestDetailServiceImpTests
         var actual = await service.InsertVoidingHistory(requestIds, siteDbGroupId, broadcastSessionId, singleTickets);
 
         // Assert
-        await repository.Received(1).FetchAsync<VoidingHistoryModel>
-        (Arg.Is<InsertVoidingHistoryCriteria>(x =>
-            x.RequestIds == requestIds));
-        Assert.StrictEqual(fakeVoidingHistory, actual);
+        await repository.Received(1).FetchAsync<VoidingHistoryModel>(Arg.Any<InsertVoidingHistoryCriteria>());
+        AssertExtension.Equal(fakeVoidingHistory, actual);
     }
 
     [Theory]

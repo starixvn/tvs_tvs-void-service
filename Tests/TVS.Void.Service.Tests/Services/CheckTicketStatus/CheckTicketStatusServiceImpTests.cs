@@ -10,7 +10,6 @@ namespace TVS.Void.Service.Tests.Services.CheckTicketStatus;
 
 public class CheckTicketStatusServiceImpTests
 {
-    private readonly CheckTicketsForAutoVoidAllResultKeyedStage checkTicketsForAutoVoidAllResultKeyedStage;
     private readonly CheckTicketsForAutoVoidWinningStage checkTicketsForAutoVoidWinningStage;
     private readonly LoggingService loggingService;
     private readonly RequestTicketService requestTicketService;
@@ -20,10 +19,8 @@ public class CheckTicketStatusServiceImpTests
     {
         requestTicketService = Substitute.For<RequestTicketService>();
         checkTicketsForAutoVoidWinningStage = Substitute.For<CheckTicketsForAutoVoidWinningStage>();
-        checkTicketsForAutoVoidAllResultKeyedStage = Substitute.For<CheckTicketsForAutoVoidAllResultKeyedStage>();
         loggingService = Substitute.For<LoggingService>();
-        service = new CheckTicketStatusServiceImp(requestTicketService, checkTicketsForAutoVoidWinningStage,
-            checkTicketsForAutoVoidAllResultKeyedStage, loggingService);
+        service = new CheckTicketStatusServiceImp(requestTicketService, checkTicketsForAutoVoidWinningStage, loggingService);
     }
 
     [Fact]
@@ -31,9 +28,9 @@ public class CheckTicketStatusServiceImpTests
     {
         // Arrange
         var ticketAutoVoidWinning = new RequestDetailTicketModel
-            { VoidActionId = VoidActionTypeConstant.AutoVoidWinningId };
+        { VoidActionId = VoidActionTypeConstant.AutoVoidWinningId };
         var ticketAutoVoidAllResultKeyed = new RequestDetailTicketModel
-            { VoidActionId = VoidActionTypeConstant.AutoVoidAllResultKeyedId };
+        { VoidActionId = VoidActionTypeConstant.AutoVoidAllResultKeyedId };
         var getTicketsResult = new GroupTicketsInRequest
         {
             SingleTickets = new List<RequestDetailTicketModel> { ticketAutoVoidWinning, ticketAutoVoidAllResultKeyed },
@@ -46,10 +43,7 @@ public class CheckTicketStatusServiceImpTests
         await service.Execute();
 
         // Assert
-        await checkTicketsForAutoVoidWinningStage.Received(1)
-            .Execute(Arg.Any<List<string>>(), Arg.Any<GroupTicketsInRequest>());
-        await checkTicketsForAutoVoidAllResultKeyedStage.Received(1)
-            .Execute(Arg.Any<List<string>>(), Arg.Any<GroupTicketsInRequest>());
+        await checkTicketsForAutoVoidWinningStage.Received(2).Execute(Arg.Any<List<string>>(), Arg.Any<GroupTicketsInRequest>(), Arg.Any<string>());
         await loggingService.Received(1).InfoAppendNewLineAsync(Arg.Any<IList<string>>());
     }
 
