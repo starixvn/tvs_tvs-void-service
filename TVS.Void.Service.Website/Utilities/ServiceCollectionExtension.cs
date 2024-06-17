@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using Fanex.Data;
 using Fanex.Data.Repository;
 using Fanex.Logging;
 using Fanex.Logging.Extensions;
 using Fanex.Logging.Extensions.AspNetCore;
-using Fanex.Logging.Extensions.Database;
 using Fanex.Logging.Sentry;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -54,8 +54,7 @@ public static class ServiceCollectionExtension
     {
         var configuration = new LoggingConfiguration()
             .GetHttpHeaderInfo()
-            .GetHttpSessionInfo()
-            .UseGetDbExceptionInfo(DatabaseInfoGetters.GetDbExceptionInfo);
+            .GetHttpSessionInfo();
         ExceptionHandler.UseConfig(configuration);
     }
 
@@ -78,6 +77,11 @@ public static class ServiceCollectionExtension
             options.Configuration.DefaultDatabase = AppSettingService.AppSetting.RedisConfig.DefaultDatabase;
             options.Configuration.ChannelPrefix = AppSettingService.AppSetting.RedisConfig.SignalRChannelPrefix;
         });
+    }
+
+    public static void RegisterFanexData(this IServiceCollection services, IConfiguration configuration)
+    {
+        DbSettingProviderManager.StartNewSession().Register(configuration, true).Run();
     }
 
     public static void RegisterBusinessService(this IServiceCollection services)
