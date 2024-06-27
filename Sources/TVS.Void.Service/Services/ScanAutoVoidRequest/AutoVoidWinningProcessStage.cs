@@ -40,8 +40,8 @@ public class AutoVoidWinningProcessStageImp : AutoVoidWinningProcessStage
             return;
         }
 
-        var checkTicketResult = await checkTicketAllowToVoidStage.ExecuteForVoid(siteDbGroupId, getTicketsResult.OutputData.SingleTickets,
-            getTicketsResult.OutputData.ParlayTickets, getTicketsResult.OutputData.CricketTickets, logData);
+        var checkTicketResult = await checkTicketAllowToVoidStage.ExecuteForVoid(siteDbGroupId, getTicketsResult.OutputData.SingleTickets, getTicketsResult.OutputData.ParlayTickets,
+            getTicketsResult.OutputData.CricketTickets, getTicketsResult.OutputData.CancelCOTickets, logData);
 
         await reCalculateTicketsStage.Execute(siteDbGroupId, checkTicketResult.SingleTicketsResettle,
             checkTicketResult.ParlayTicketsResettle, checkTicketResult.CricketTicketsResettle, logData);

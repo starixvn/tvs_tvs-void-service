@@ -55,14 +55,15 @@ public class RequestTicketServiceImp : RequestTicketService
             RequestIds = requestIds,
         };
 
-        var (singleTickets, parlayTickets, cricketTickets) =
-            await repository.FetchMultipleAsync<RequestDetailTicketModel, RequestDetailTicketModel, RequestDetailTicketModel>(criteria);
+        var (singleTickets, parlayTickets, cricketTickets, cancelCashOutTickets) =
+            await repository.FetchMultipleAsync<RequestDetailTicketModel, RequestDetailTicketModel, RequestDetailTicketModel, RequestDetailTicketModel>(criteria);
 
         return new GroupTicketsInRequest
         {
             SingleTickets = singleTickets,
             ParlayTickets = parlayTickets,
-            CricketTickets = cricketTickets
+            CricketTickets = cricketTickets,
+            CancelCOTickets = cancelCashOutTickets
         };
     }
 
@@ -134,7 +135,7 @@ public class RequestTicketServiceImp : RequestTicketService
     {
 #pragma warning disable S1067 // Expressions should not be too complex
         var singleTickets = groupTickets.Where(x => x.VoidingTypeId
-            is VoidingTypeConstant.Single or VoidingTypeConstant.Cricket or VoidingTypeConstant.Single14
+            is VoidingTypeConstant.Single or VoidingTypeConstant.Cricket or VoidingTypeConstant.CancelCashOut or VoidingTypeConstant.Single14
             or VoidingTypeConstant.RecoverSingle or VoidingTypeConstant.RecoverCricket or VoidingTypeConstant.RecoverSingle14);
 #pragma warning restore S1067 // Expressions should not be too complex
 

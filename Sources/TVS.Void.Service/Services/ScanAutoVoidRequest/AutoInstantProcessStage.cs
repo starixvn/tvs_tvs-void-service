@@ -54,7 +54,7 @@ public class AutoInstantProcessStageImp : AutoInstantProcessStage
         if (IsNeedToReCheckVoidValidation(checkQueueResult.IssueTypeId))
         {
             validationResult = await checkTicketValidationStage.ExecuteForVoid(siteDbGroupId, getTicketsResult.OutputData.SingleTickets,
-                getTicketsResult.OutputData.ParlayTickets, getTicketsResult.OutputData.CricketTickets, logData);
+                getTicketsResult.OutputData.ParlayTickets, getTicketsResult.OutputData.CricketTickets, getTicketsResult.OutputData.CancelCOTickets, logData);
         }
         else if (IsRecoverAction(queue.Action))
         {

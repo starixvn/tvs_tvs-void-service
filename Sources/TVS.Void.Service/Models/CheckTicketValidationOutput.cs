@@ -11,7 +11,7 @@ public class CheckTicketValidationOutput
 
     public IEnumerable<RequestDetailTicketModel> VoidCricketTickets { get; set; }
 
-    //// public IEnumerable<RequestDetailTicketModel> CancelCOTickets { get; set; } (Only use for manual void issue type)
+    public IEnumerable<RequestDetailTicketModel> CancelCOTickets { get; set; }
 
     public IEnumerable<RequestDetailTicketModel> VoidSingleTickets14 { get; set; }
 

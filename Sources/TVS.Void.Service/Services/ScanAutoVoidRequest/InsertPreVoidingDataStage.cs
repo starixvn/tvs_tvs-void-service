@@ -66,6 +66,7 @@ public class InsertPreVoidingDataStageImp : InsertPreVoidingDataStage
 
         AddTicketsToGroup(groupTickets, validation.VoidSingleTickets, VoidingTypeConstant.Single);
         AddTicketsToGroup(groupTickets, validation.VoidParlayTickets, VoidingTypeConstant.Parlay);
+        AddTicketsToGroup(groupTickets, validation.CancelCOTickets, VoidingTypeConstant.CancelCashOut);
         AddTicketsToGroup(groupTickets, validation.VoidCricketTickets, VoidingTypeConstant.Cricket);
         AddTicketsToGroup(groupTickets, validation.VoidSingleTickets14, VoidingTypeConstant.Single14);
         AddTicketsToGroup(groupTickets, validation.VoidParlayTickets14, VoidingTypeConstant.Parlay14);
