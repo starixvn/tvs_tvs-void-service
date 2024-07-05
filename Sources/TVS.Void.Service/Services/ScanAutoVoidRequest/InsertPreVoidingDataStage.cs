@@ -9,7 +9,7 @@ namespace TVS.Void.Service.Services.ScanAutoVoidRequest;
 
 public interface InsertPreVoidingDataStage
 {
-    Task<string> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue, IEnumerable<RequestDetailTicketModel> groupTickets, IList<string> logData);
+    Task<string> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue, IEnumerable<RequestDetailTicketModel> groupTickets, string voidDataXml, IList<string> logData);
 
     IEnumerable<RequestDetailTicketModel> MapVoidingTypeToTickets(CheckTicketValidationOutput validation);
 }
@@ -30,7 +30,7 @@ public class InsertPreVoidingDataStageImp : InsertPreVoidingDataStage
         this.notificationService = notificationService;
     }
 
-    public async Task<string> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue, IEnumerable<RequestDetailTicketModel> groupTickets, IList<string> logData)
+    public async Task<string> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue, IEnumerable<RequestDetailTicketModel> groupTickets, string voidDataXml, IList<string> logData)
     {
         if (!groupTickets.Any())
         {
@@ -39,7 +39,7 @@ public class InsertPreVoidingDataStageImp : InsertPreVoidingDataStage
 
         var requestsDistinctJson = DistinctRequestsListJson(groupTickets);
         logData.Add($"{nameof(DistinctRequestsListJson)}: {requestsDistinctJson}");
-        var voidingHistoryList = await requestDetailService.InsertVoidingHistory(requestsDistinctJson, siteDbGroupId, queue.BroadcastSessionId, groupTickets);
+        var voidingHistoryList = await requestDetailService.InsertVoidingHistory(requestsDistinctJson, siteDbGroupId, queue.BroadcastSessionId, voidDataXml);
         logData.Add($"{nameof(voidingHistoryList)}: {JsonSerializer.Serialize(voidingHistoryList)}");
 
         await notificationService.NotifyRequestRunningToAllUser(voidingHistoryList);

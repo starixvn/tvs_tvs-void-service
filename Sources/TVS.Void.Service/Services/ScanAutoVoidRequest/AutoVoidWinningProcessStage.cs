@@ -19,16 +19,18 @@ public class AutoVoidWinningProcessStageImp : AutoVoidWinningProcessStage
     private readonly ReCalculateTicketsStage reCalculateTicketsStage;
     private readonly InsertPreVoidingDataStage insertPreVoidingDataStage;
     private readonly AutoVoidRequestQueueService autoVoidRequestQueueService;
+    private readonly CreateVoidDataXmlStage createVoidDataXmlStage;
     private readonly LoggingService loggingService;
 
     public AutoVoidWinningProcessStageImp(GetTicketsStage getTicketsStage, CheckTicketValidationStage checkTicketAllowToVoidStage, ReCalculateTicketsStage reCalculateTicketsStage,
-        InsertPreVoidingDataStage insertPreVoidingDataStage, AutoVoidRequestQueueService autoVoidRequestQueueService, LoggingService loggingService)
+        InsertPreVoidingDataStage insertPreVoidingDataStage, AutoVoidRequestQueueService autoVoidRequestQueueService, CreateVoidDataXmlStage createVoidDataXmlStage, LoggingService loggingService)
     {
         this.getTicketsStage = getTicketsStage;
         this.checkTicketAllowToVoidStage = checkTicketAllowToVoidStage;
         this.reCalculateTicketsStage = reCalculateTicketsStage;
         this.insertPreVoidingDataStage = insertPreVoidingDataStage;
         this.autoVoidRequestQueueService = autoVoidRequestQueueService;
+        this.createVoidDataXmlStage = createVoidDataXmlStage;
         this.loggingService = loggingService;
     }
 
@@ -47,7 +49,8 @@ public class AutoVoidWinningProcessStageImp : AutoVoidWinningProcessStage
             checkTicketResult.ParlayTicketsResettle, checkTicketResult.CricketTicketsResettle, logData);
 
         var groupTickets = insertPreVoidingDataStage.MapVoidingTypeToTickets(checkTicketResult);
-        var queueErrorMessage = await insertPreVoidingDataStage.Execute(siteDbGroupId, queue, groupTickets, logData);
+        var voidDataXml = createVoidDataXmlStage.ExecuteForAutoVoid(true, checkTicketResult);
+        var queueErrorMessage = await insertPreVoidingDataStage.Execute(siteDbGroupId, queue, groupTickets, voidDataXml, logData);
 
         await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, ExecuteStatus.Done, queueErrorMessage);
         await WriteLog(logData);

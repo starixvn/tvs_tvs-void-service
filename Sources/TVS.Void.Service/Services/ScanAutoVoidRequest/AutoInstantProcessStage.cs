@@ -20,18 +20,19 @@ public class AutoInstantProcessStageImp : AutoInstantProcessStage
     private readonly CheckTicketValidationStage checkTicketValidationStage;
     private readonly InsertPreVoidingDataStage insertPreVoidingDataStage;
     private readonly AutoVoidRequestQueueService autoVoidRequestQueueService;
+    private readonly CreateVoidDataXmlStage createVoidDataXmlStage;
     private readonly LoggingService loggingService;
 
     public AutoInstantProcessStageImp(CheckVoidInstantRequestQueueValidStage checkRequestQueueValidStage, GetTicketsStage getTicketsStage,
         CheckTicketValidationStage checkTicketValidationStage, InsertPreVoidingDataStage insertPreVoidingDataStage,
-        AutoVoidRequestQueueService autoVoidRequestQueueService, LoggingService loggingService)
+        AutoVoidRequestQueueService autoVoidRequestQueueService, CreateVoidDataXmlStage createVoidDataXmlStage, LoggingService loggingService)
     {
         this.checkRequestQueueValidStage = checkRequestQueueValidStage;
         this.getTicketsStage = getTicketsStage;
         this.checkTicketValidationStage = checkTicketValidationStage;
         this.insertPreVoidingDataStage = insertPreVoidingDataStage;
-
         this.autoVoidRequestQueueService = autoVoidRequestQueueService;
+        this.createVoidDataXmlStage = createVoidDataXmlStage;
         this.loggingService = loggingService;
     }
 
@@ -50,7 +51,7 @@ public class AutoInstantProcessStageImp : AutoInstantProcessStage
         }
 
         CheckTicketValidationOutput validationResult;
-        //// Recheck for issue type have Cricket, Archive (some case ticket moved...), and need some ticket info in bettrans
+        //// Recheck for issue type have Cricket, Archive (some case ticket moved...), CancelCO and need some ticket info in bettrans
         if (IsNeedToReCheckVoidValidation(checkQueueResult.IssueTypeId))
         {
             validationResult = await checkTicketValidationStage.ExecuteForVoid(siteDbGroupId, getTicketsResult.OutputData.SingleTickets,
@@ -72,7 +73,8 @@ public class AutoInstantProcessStageImp : AutoInstantProcessStage
         }
 
         var groupTickets = insertPreVoidingDataStage.MapVoidingTypeToTickets(validationResult);
-        var queueErrorMessage = await insertPreVoidingDataStage.Execute(siteDbGroupId, queue, groupTickets, logData);
+        var voidDataXml = createVoidDataXmlStage.ExecuteForAutoVoid(!IsRecoverAction(queue.Action), validationResult);
+        var queueErrorMessage = await insertPreVoidingDataStage.Execute(siteDbGroupId, queue, groupTickets, voidDataXml, logData);
         await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, ExecuteStatus.Done, queueErrorMessage);
         await WriteLog(logData);
     }

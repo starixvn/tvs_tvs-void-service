@@ -2,8 +2,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Fanex.Data.Repository;
-using TicketVoidingSystem.Constants;
-using TicketVoidingSystem.Extension;
 using TVS.Void.Service.Constants;
 using TVS.Void.Service.Criteria;
 using TVS.Void.Service.Models;
@@ -12,7 +10,7 @@ namespace TVS.Void.Service.Services;
 
 public interface RequestDetailService
 {
-    Task<IEnumerable<VoidingHistoryModel>> InsertVoidingHistory(string requestsJson, int siteDbGroupId, string broadcastSessionId, IEnumerable<RequestDetailTicketModel> groupTickets);
+    Task<IEnumerable<VoidingHistoryModel>> InsertVoidingHistory(string requestsJson, int siteDbGroupId, string broadcastSessionId, string voidDataXml);
 
     Task<AfterVoidServiceModel> InsertAfterVoidServiceData(bool isRunAutoAfterVoid, AfterVoidServiceModel afterVoidData);
 
@@ -32,7 +30,7 @@ public class RequestDetailServiceImp : RequestDetailService
         this.repository = repository;
     }
 
-    public async Task<IEnumerable<VoidingHistoryModel>> InsertVoidingHistory(string requestsJson, int siteDbGroupId, string broadcastSessionId, IEnumerable<RequestDetailTicketModel> groupTickets)
+    public async Task<IEnumerable<VoidingHistoryModel>> InsertVoidingHistory(string requestsJson, int siteDbGroupId, string broadcastSessionId, string voidDataXml)
     {
         var criteria = new InsertVoidingHistoryCriteria
         {
@@ -40,7 +38,7 @@ public class RequestDetailServiceImp : RequestDetailService
             UserId = AutoVoidConstant.ActorId,
             SiteDbGroupId = siteDbGroupId,
             BroadcastSessionId = broadcastSessionId,
-            VoidData = CreateVoidDataXmlForAutoVoid(groupTickets)
+            VoidData = voidDataXml
         };
 
         return await repository.FetchAsync<VoidingHistoryModel>(criteria);
@@ -98,23 +96,5 @@ public class RequestDetailServiceImp : RequestDetailService
         };
 
         return await repository.FetchAsync<VoidDataXmlModel>(criteria);
-    }
-
-    private static string CreateVoidDataXmlForAutoVoid(IEnumerable<RequestDetailTicketModel> groupTickets)
-    {
-        var isHasSettledTicket = groupTickets.Any(x => x.StatusId is TicketStatus.WonId or TicketStatus.DrawId or TicketStatus.LoseId);
-        var fromTime = groupTickets.Min(item => item.TransDate).ZoneManila();
-        var fromDate = groupTickets.Min(item => item.WinLostDate).ZoneManila();
-        var toDate = groupTickets.Select(item => item.WinLostDate).Max().ZoneManila();
-        var toTime = groupTickets.Select(item => item.TransDate).Max().ZoneManila();
-
-        return $"<VoidData CreatorName='starixIT' " +
-               $"VoidFromTime='{fromTime.ToString(DateTimeFormatConstant.TimeWithAmPm)}' " +
-               $"VoidToTime='{toTime.ToString(DateTimeFormatConstant.TimeWithAmPm)}' " +
-               $"VoidFromDate='{fromDate.ToString(DateTimeFormatConstant.ShortDateFormatWithSlash)}' " +
-               $"VoidToDate='{toDate.ToString(DateTimeFormatConstant.ShortDateFormatWithSlash)}' " +
-               $"IsRunAutoAfterVoid='{true}' " +
-               $"TotalTicket='{groupTickets.Count()}' " +
-               $"IsHasSettledTicket='{isHasSettledTicket}' />";
     }
 }
