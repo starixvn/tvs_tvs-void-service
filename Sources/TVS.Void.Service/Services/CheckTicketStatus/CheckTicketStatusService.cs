@@ -18,13 +18,16 @@ public class CheckTicketStatusServiceImp : CheckTicketStatusService
 {
     private readonly RequestTicketService requestTicketService;
     private readonly CheckTicketsForAutoVoidWinningStage checkTicketsForAutoVoidWinningStage;
+    private readonly CheckTicketsForAutoVoidAllResultKeyedStage checkTicketsForAutoVoidAllResultKeyedStage;
 
     private readonly LoggingService loggingService;
 
-    public CheckTicketStatusServiceImp(RequestTicketService requestTicketService, CheckTicketsForAutoVoidWinningStage checkTicketsForAutoVoidWinningStage, LoggingService loggingService)
+    public CheckTicketStatusServiceImp(RequestTicketService requestTicketService, CheckTicketsForAutoVoidWinningStage checkTicketsForAutoVoidWinningStage,
+        CheckTicketsForAutoVoidAllResultKeyedStage checkTicketsForAutoVoidAllResultKeyedStage, LoggingService loggingService)
     {
         this.requestTicketService = requestTicketService;
         this.checkTicketsForAutoVoidWinningStage = checkTicketsForAutoVoidWinningStage;
+        this.checkTicketsForAutoVoidAllResultKeyedStage = checkTicketsForAutoVoidAllResultKeyedStage;
         this.loggingService = loggingService;
     }
 
@@ -46,10 +49,11 @@ public class CheckTicketStatusServiceImp : CheckTicketStatusService
         var getTicketsResult = await requestTicketService.GetTicketInAllRequests();
 
         var autoVoidWinningGroup = GetGroupTicketsByVoidAction(VoidActionTypeConstant.AutoVoidWinningId, getTicketsResult);
-        await checkTicketsForAutoVoidWinningStage.Execute(logData, autoVoidWinningGroup, AutoVoidConstant.QueueActionCal);
+        await checkTicketsForAutoVoidWinningStage.Execute(logData, autoVoidWinningGroup);
 
+        //// Currently support Auto Void Result keyed with 1 match
         var autoVoidAllResultKeyedGroup = GetGroupTicketsByVoidAction(VoidActionTypeConstant.AutoVoidAllResultKeyedId, getTicketsResult);
-        await checkTicketsForAutoVoidWinningStage.Execute(logData, autoVoidAllResultKeyedGroup, AutoVoidConstant.QueueActionVoidResultKeyed);
+        await checkTicketsForAutoVoidAllResultKeyedStage.Execute(logData, autoVoidAllResultKeyedGroup);
 
         await loggingService.InfoAppendNewLineAsync(logData);
     }
