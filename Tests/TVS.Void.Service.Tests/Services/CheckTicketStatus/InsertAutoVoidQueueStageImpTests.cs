@@ -24,7 +24,7 @@ public class InsertAutoVoidQueueStageImpTests
         // Arrange
 
         // Act
-        await service.ExecuteForAutoVoidWinningAndResultKeyed(0, new List<RequestModel>(), AutoVoidConstant.QueueActionCal, default, default);
+        await service.ExecuteForAutoVoidWinning(0, new List<RequestModel>(), default, default);
 
         // Assert
         await autoVoidRequestQueueService.DidNotReceiveWithAnyArgs()
@@ -40,7 +40,7 @@ public class InsertAutoVoidQueueStageImpTests
         var fakeRequests = new List<RequestModel> { new() { RequestId = 113, MatchId = 85648 }, new() { RequestId = 224, MatchId = 85648 } };
 
         // Act
-        await service.ExecuteForAutoVoidWinningAndResultKeyed(fakeSiteDbGroupId, fakeRequests, AutoVoidConstant.QueueActionCal, broadcastSessionIdCache,
+        await service.ExecuteForAutoVoidWinning(fakeSiteDbGroupId, fakeRequests, broadcastSessionIdCache,
             new List<string>());
 
         // Assert
@@ -56,7 +56,7 @@ public class InsertAutoVoidQueueStageImpTests
         var broadcastSessionIdCache = new Dictionary<int, string> { { 123, "123" } };
 
         // Act
-        await service.ExecuteForAutoVoidWinningAndResultKeyed(fakeSiteDbGroupId, fakeRequests, AutoVoidConstant.QueueActionCal, broadcastSessionIdCache, new List<string>());
+        await service.ExecuteForAutoVoidWinning(fakeSiteDbGroupId, fakeRequests, broadcastSessionIdCache, new List<string>());
 
         // Assert
         await autoVoidRequestQueueService.Received(1).InsertQueue(fakeSiteDbGroupId, Arg.Any<string>(),

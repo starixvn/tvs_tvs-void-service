@@ -15,6 +15,7 @@ public class AutoVoidWinningProcessStageTests
     private readonly InsertPreVoidingDataStage insertPreVoidingDataStage;
     private readonly LoggingService loggingService;
     private readonly ReCalculateTicketsStage reCalculateTicketsStage;
+    private readonly CreateVoidDataXmlStage createVoidDataXmlStage;
     private readonly AutoVoidWinningProcessStageImp service;
 
     public AutoVoidWinningProcessStageTests()
@@ -24,6 +25,7 @@ public class AutoVoidWinningProcessStageTests
         checkTicketAllowToVoidStage = Substitute.For<CheckTicketValidationStage>();
         insertPreVoidingDataStage = Substitute.For<InsertPreVoidingDataStage>();
         autoVoidRequestQueueService = Substitute.For<AutoVoidRequestQueueService>();
+        createVoidDataXmlStage = Substitute.For<CreateVoidDataXmlStage>();
         loggingService = Substitute.For<LoggingService>();
         service = new AutoVoidWinningProcessStageImp(
             getTicketsStage,
@@ -31,6 +33,7 @@ public class AutoVoidWinningProcessStageTests
             reCalculateTicketsStage,
             insertPreVoidingDataStage,
             autoVoidRequestQueueService,
+            createVoidDataXmlStage,
             loggingService
         );
     }
@@ -57,6 +60,7 @@ public class AutoVoidWinningProcessStageTests
         var queue = new AutoVoidRequestQueueModel { QueueId = 1 };
         var logData = new List<string>();
         var tickets = new List<RequestDetailTicketModel>();
+        var voidDataXml = "xml";
         var outputData = new GroupTicketsInRequest
         {
             SingleTickets = tickets,
@@ -82,16 +86,16 @@ public class AutoVoidWinningProcessStageTests
         };
         getTicketsStage.Execute(1, queue, logData).ReturnsForAnyArgs((true, outputData));
         checkTicketAllowToVoidStage.ExecuteForVoid(1, tickets,
-            tickets, tickets, logData).ReturnsForAnyArgs(checkTicketResult);
-        insertPreVoidingDataStage.Execute(1, queue, Arg.Any<IEnumerable<RequestDetailTicketModel>>(), logData).ReturnsForAnyArgs("error");
+            tickets, tickets, tickets, logData).ReturnsForAnyArgs(checkTicketResult);
+        insertPreVoidingDataStage.Execute(1, queue, Arg.Any<IEnumerable<RequestDetailTicketModel>>(), voidDataXml, logData).ReturnsForAnyArgs("error");
 
         // Act
         _ = service.Execute(1, queue, logData);
 
         // Assert
         checkTicketAllowToVoidStage.Received(1).ExecuteForVoid(1, tickets,
-            tickets, tickets, logData);
-        insertPreVoidingDataStage.Execute(1, queue, Arg.Any<IEnumerable<RequestDetailTicketModel>>(), logData);
+            tickets, tickets, tickets, logData);
+        insertPreVoidingDataStage.Execute(1, queue, Arg.Any<IEnumerable<RequestDetailTicketModel>>(), voidDataXml, logData);
         autoVoidRequestQueueService.UpdateQueue(1, queue.QueueId, ExecuteStatus.Done, "error");
         loggingService.Received(1).InfoAppendNewLineAsync(logData);
     }
