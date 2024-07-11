@@ -21,9 +21,11 @@ public class AutoVoidWinningProcessStageImp : AutoVoidWinningProcessStage
     private readonly AutoVoidRequestQueueService autoVoidRequestQueueService;
     private readonly CreateVoidDataXmlStage createVoidDataXmlStage;
     private readonly LoggingService loggingService;
+    private readonly CheckVoidWinningRequestQueueValidStage checkRequestQueueValidStage;
 
     public AutoVoidWinningProcessStageImp(GetTicketsStage getTicketsStage, CheckTicketValidationStage checkTicketAllowToVoidStage, ReCalculateTicketsStage reCalculateTicketsStage,
-        InsertPreVoidingDataStage insertPreVoidingDataStage, AutoVoidRequestQueueService autoVoidRequestQueueService, CreateVoidDataXmlStage createVoidDataXmlStage, LoggingService loggingService)
+        InsertPreVoidingDataStage insertPreVoidingDataStage, AutoVoidRequestQueueService autoVoidRequestQueueService, CreateVoidDataXmlStage createVoidDataXmlStage, LoggingService loggingService,
+        CheckVoidWinningRequestQueueValidStage checkRequestQueueValidStage)
     {
         this.getTicketsStage = getTicketsStage;
         this.checkTicketAllowToVoidStage = checkTicketAllowToVoidStage;
@@ -32,19 +34,27 @@ public class AutoVoidWinningProcessStageImp : AutoVoidWinningProcessStage
         this.autoVoidRequestQueueService = autoVoidRequestQueueService;
         this.createVoidDataXmlStage = createVoidDataXmlStage;
         this.loggingService = loggingService;
+        this.checkRequestQueueValidStage = checkRequestQueueValidStage;
     }
 
     public async Task Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue, IList<string> logData)
     {
+        var checkQueueResult = await checkRequestQueueValidStage.Execute(siteDbGroupId, queue);
+        if (!checkQueueResult.IsValid)
+        {
+            return;
+        }
+
         var getTicketsResult = await getTicketsStage.Execute(siteDbGroupId, queue, logData);
         if (!getTicketsResult.IsContinueFlow)
         {
+            var errorMessage = GetErrorMessage(checkQueueResult.RequestIdsChangedAction, queue.RequestIds, "No ticket found.");
+            await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, ExecuteStatus.Done, errorMessage);
             return;
         }
 
         var checkTicketResult = await checkTicketAllowToVoidStage.ExecuteForVoid(siteDbGroupId, getTicketsResult.OutputData.SingleTickets, getTicketsResult.OutputData.ParlayTickets,
             getTicketsResult.OutputData.CricketTickets, getTicketsResult.OutputData.CancelCOTickets, logData);
-
         await reCalculateTicketsStage.Execute(siteDbGroupId, checkTicketResult.SingleTicketsResettle,
             checkTicketResult.ParlayTicketsResettle, checkTicketResult.CricketTicketsResettle, logData);
 
@@ -52,8 +62,26 @@ public class AutoVoidWinningProcessStageImp : AutoVoidWinningProcessStage
         var voidDataXml = createVoidDataXmlStage.Execute(true, checkTicketResult);
         var queueErrorMessage = await insertPreVoidingDataStage.Execute(siteDbGroupId, queue, groupTickets, voidDataXml, logData);
 
-        await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, ExecuteStatus.Done, queueErrorMessage);
+        var finalErrorMessage = GetErrorMessage(checkQueueResult.RequestIdsChangedAction, queue.RequestIds, queueErrorMessage);
+        await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, ExecuteStatus.Done, finalErrorMessage);
         await WriteLog(logData);
+    }
+
+    private static string GetErrorMessage(string requestIdsChangedAction, string requestIdsGetTicket, string errMsgGetTickets)
+    {
+        var messages = new List<string>();
+
+        if (!string.IsNullOrWhiteSpace(requestIdsChangedAction))
+        {
+            messages.Add($"Requests ({requestIdsChangedAction}) Action was edited.");
+        }
+
+        if (!string.IsNullOrWhiteSpace(errMsgGetTickets))
+        {
+            messages.Add($"Requests ({requestIdsGetTicket}) {errMsgGetTickets}");
+        }
+
+        return string.Join(" ", messages);
     }
 
     private async Task WriteLog(IList<string> logData)

@@ -47,6 +47,7 @@ public class AutoInstantProcessStageImp : AutoInstantProcessStage
         var getTicketsResult = await getTicketsStage.Execute(siteDbGroupId, queue, logData);
         if (!getTicketsResult.IsContinueFlow)
         {
+            await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, ExecuteStatus.Done, "No ticket found.");
             return;
         }
 
