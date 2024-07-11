@@ -49,7 +49,7 @@ public class AutoVoidWinningProcessStageImp : AutoVoidWinningProcessStage
             checkTicketResult.ParlayTicketsResettle, checkTicketResult.CricketTicketsResettle, logData);
 
         var groupTickets = insertPreVoidingDataStage.MapVoidingTypeToTickets(checkTicketResult);
-        var voidDataXml = createVoidDataXmlStage.ExecuteForAutoVoid(true, checkTicketResult);
+        var voidDataXml = createVoidDataXmlStage.Execute(true, checkTicketResult);
         var queueErrorMessage = await insertPreVoidingDataStage.Execute(siteDbGroupId, queue, groupTickets, voidDataXml, logData);
 
         await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, ExecuteStatus.Done, queueErrorMessage);

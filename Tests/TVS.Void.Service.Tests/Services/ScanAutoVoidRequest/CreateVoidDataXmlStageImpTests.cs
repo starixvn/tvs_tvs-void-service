@@ -22,7 +22,7 @@ public class CreateVoidDataXmlStageImpTests
         const bool isAutoVoid = true;
 
         // Act
-        var result = createVoidDataXmlStage.ExecuteForAutoVoid(isAutoVoid, validation);
+        var result = createVoidDataXmlStage.Execute(isAutoVoid, validation);
 
         // Assert
         Assert.NotEmpty(result);
@@ -38,7 +38,7 @@ public class CreateVoidDataXmlStageImpTests
         var isAutoVoid = false;
 
         // Act
-        var result = createVoidDataXmlStage.ExecuteForAutoVoid(isAutoVoid, validation);
+        var result = createVoidDataXmlStage.Execute(isAutoVoid, validation);
 
         // Assert
         Assert.Empty(result);
@@ -80,7 +80,7 @@ public class CreateVoidDataXmlStageImpTests
         validation.VoidParlayTickets14 = voidParlayTickets14;
 
         // Act
-        var result = createVoidDataXmlStage.ExecuteForAutoVoid(isAutoVoid, validation);
+        var result = createVoidDataXmlStage.Execute(isAutoVoid, validation);
 
         // Assert
         Assert.NotEmpty(result);
@@ -107,7 +107,7 @@ public class CreateVoidDataXmlStageImpTests
         validation.VoidParlayTickets14 = voidParlayTickets14;
 
         // Act
-        var result = createVoidDataXmlStage.ExecuteForAutoVoid(isAutoVoid, validation);
+        var result = createVoidDataXmlStage.Execute(isAutoVoid, validation);
 
         // Assert
         Assert.NotEmpty(result);
@@ -129,7 +129,7 @@ public class CreateVoidDataXmlStageImpTests
         validation.CancelCOTickets = cancelCashOutTickets;
 
         // Act
-        var result = createVoidDataXmlStage.ExecuteForAutoVoid(isAutoVoid, validation);
+        var result = createVoidDataXmlStage.Execute(isAutoVoid, validation);
 
         // Assert
         Assert.NotEmpty(result);
@@ -147,7 +147,7 @@ public class CreateVoidDataXmlStageImpTests
         validation.CancelCOTickets = cancelCashOutTickets;
 
         // Act
-        var result = createVoidDataXmlStage.ExecuteForAutoVoid(isAutoVoid, validation);
+        var result = createVoidDataXmlStage.Execute(isAutoVoid, validation);
 
         // Assert
         Assert.NotEmpty(result);

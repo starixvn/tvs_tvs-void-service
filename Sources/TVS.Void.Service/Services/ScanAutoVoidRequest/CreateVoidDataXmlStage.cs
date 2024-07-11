@@ -9,14 +9,26 @@ namespace TVS.Void.Service.Services.ScanAutoVoidRequest;
 
 public interface CreateVoidDataXmlStage
 {
-    string ExecuteForAutoVoid(bool isAutoVoid, CheckTicketValidationOutput validation);
+    string Execute(bool isAutoVoid, CheckTicketValidationOutput validation);
 }
 
 public class CreateVoidDataXmlStageImp : CreateVoidDataXmlStage
 {
-    public string ExecuteForAutoVoid(bool isAutoVoid, CheckTicketValidationOutput validation)
+    public string Execute(bool isAutoVoid, CheckTicketValidationOutput validation)
     {
-        return isAutoVoid ? ExecuteForAutoVoid(validation) : string.Empty;
+        return isAutoVoid ? ExecuteForAutoVoid(validation) : ExecuteForRecover(validation);
+    }
+
+    private static string ExecuteForRecover(CheckTicketValidationOutput validation)
+    {
+        var recoverTickets = new List<RequestDetailTicketModel>();
+        recoverTickets.AddRange(validation.RecoverSingleTickets ?? new List<RequestDetailTicketModel>());
+        recoverTickets.AddRange(validation.RecoverParlayTickets ?? new List<RequestDetailTicketModel>());
+        recoverTickets.AddRange(validation.RecoverCricketTickets ?? new List<RequestDetailTicketModel>());
+        recoverTickets.AddRange(validation.RecoverSingleTickets14 ?? new List<RequestDetailTicketModel>());
+        recoverTickets.AddRange(validation.RecoverParlayTickets14 ?? new List<RequestDetailTicketModel>());
+
+        return $"<VoidData CreatorName='starixIT' IsRunAutoAfterVoid='{true}' TotalTicket='{recoverTickets.Count}' />";
     }
 
 #pragma warning disable S1541 // Methods and properties should not be too complex

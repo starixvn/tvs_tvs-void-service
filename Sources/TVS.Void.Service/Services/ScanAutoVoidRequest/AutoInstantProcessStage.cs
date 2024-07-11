@@ -73,7 +73,7 @@ public class AutoInstantProcessStageImp : AutoInstantProcessStage
         }
 
         var groupTickets = insertPreVoidingDataStage.MapVoidingTypeToTickets(validationResult);
-        var voidDataXml = createVoidDataXmlStage.ExecuteForAutoVoid(!IsRecoverAction(queue.Action), validationResult);
+        var voidDataXml = createVoidDataXmlStage.Execute(!IsRecoverAction(queue.Action), validationResult);
         var queueErrorMessage = await insertPreVoidingDataStage.Execute(siteDbGroupId, queue, groupTickets, voidDataXml, logData);
         await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, ExecuteStatus.Done, queueErrorMessage);
         await WriteLog(logData);
