@@ -76,7 +76,7 @@ public class AutoVoidInstantProcessStageTests
     public void Execute_HasCheckTicketAllowToVoidStage_ReceivedExpected(int issueTypeId)
     {
         // Arrange
-        var queue = new AutoVoidRequestQueueModel();
+        var queue = new AutoVoidRequestQueueModel { Action = AutoVoidConstant.QueueActionVoidInstant };
         var logData = new List<string>();
         var tickets = new List<RequestDetailTicketModel>();
         var voidDataXml = "xml123";
@@ -108,6 +108,8 @@ public class AutoVoidInstantProcessStageTests
         checkRequestQueueValidStage.Execute(1, queue).ReturnsForAnyArgs((true, issueTypeId));
         getTicketsStage.Execute(1, queue, logData).ReturnsForAnyArgs((true, outputData));
         checkTicketValidationStage.ExecuteForVoid(1, tickets, tickets, tickets, tickets, logData).ReturnsForAnyArgs(checkTicketResult);
+        createVoidDataXmlStage.Execute(Arg.Any<bool>(), Arg.Any<CheckTicketValidationOutput>())
+            .ReturnsForAnyArgs(voidDataXml);
         insertPreVoidingDataStage.Execute(1, queue, Arg.Any<IEnumerable<RequestDetailTicketModel>>(), voidDataXml, logData).ReturnsForAnyArgs(queueErrorMessage);
 
         // Act
@@ -116,6 +118,7 @@ public class AutoVoidInstantProcessStageTests
         // Assert
         checkTicketValidationStage.Received(1).ExecuteForVoid(1, tickets, tickets, tickets, tickets, logData);
         insertPreVoidingDataStage.Received(1).MapVoidingTypeToTickets(Arg.Any<CheckTicketValidationOutput>());
+        createVoidDataXmlStage.Received(1).Execute(Arg.Any<bool>(), Arg.Any<CheckTicketValidationOutput>());
         insertPreVoidingDataStage.Received(1).Execute(1, queue, Arg.Any<IEnumerable<RequestDetailTicketModel>>(), voidDataXml, logData);
         autoVoidRequestQueueService.UpdateQueue(1, queue.QueueId, ExecuteStatus.Done, queueErrorMessage);
     }
@@ -137,6 +140,8 @@ public class AutoVoidInstantProcessStageTests
         const string queueErrorMessage = "error";
         checkRequestQueueValidStage.Execute(1, queue).ReturnsForAnyArgs((true, IssueTypeConstant.DangerAccepted));
         getTicketsStage.Execute(1, queue, logData).ReturnsForAnyArgs((true, outputData));
+        createVoidDataXmlStage.Execute(Arg.Any<bool>(), Arg.Any<CheckTicketValidationOutput>())
+            .ReturnsForAnyArgs(voidDataXml);
         insertPreVoidingDataStage.Execute(1, queue, Arg.Any<IEnumerable<RequestDetailTicketModel>>(), voidDataXml, logData).ReturnsForAnyArgs(queueErrorMessage);
 
         // Act
@@ -147,6 +152,7 @@ public class AutoVoidInstantProcessStageTests
         checkTicketValidationStage.Received(0).ExecuteForRecover(1, Arg.Any<IEnumerable<RequestDetailTicketModel>>(),
             Arg.Any<IEnumerable<RequestDetailTicketModel>>(), Arg.Any<IEnumerable<RequestDetailTicketModel>>(), logData);
         insertPreVoidingDataStage.Received(1).MapVoidingTypeToTickets(Arg.Any<CheckTicketValidationOutput>());
+        createVoidDataXmlStage.Received(1).Execute(Arg.Any<bool>(), Arg.Any<CheckTicketValidationOutput>());
         insertPreVoidingDataStage.Received(1).Execute(1, queue, Arg.Any<IEnumerable<RequestDetailTicketModel>>(), voidDataXml, logData);
         autoVoidRequestQueueService.UpdateQueue(1, queue.QueueId, ExecuteStatus.Done, queueErrorMessage);
     }
@@ -168,6 +174,8 @@ public class AutoVoidInstantProcessStageTests
         const string queueErrorMessage = "error";
         checkRequestQueueValidStage.Execute(1, queue).ReturnsForAnyArgs((true, IssueTypeConstant.DangerAccepted));
         getTicketsStage.Execute(1, queue, logData).ReturnsForAnyArgs((true, outputData));
+        createVoidDataXmlStage.Execute(Arg.Any<bool>(), Arg.Any<CheckTicketValidationOutput>())
+            .ReturnsForAnyArgs(voidDataXml);
         insertPreVoidingDataStage.Execute(1, queue, Arg.Any<IEnumerable<RequestDetailTicketModel>>(), voidDataXml, logData).ReturnsForAnyArgs(queueErrorMessage);
 
         // Act
@@ -178,6 +186,7 @@ public class AutoVoidInstantProcessStageTests
         checkTicketValidationStage.Received(1).ExecuteForRecover(1, Arg.Any<IEnumerable<RequestDetailTicketModel>>(),
             Arg.Any<IEnumerable<RequestDetailTicketModel>>(), Arg.Any<IEnumerable<RequestDetailTicketModel>>(), logData);
         insertPreVoidingDataStage.Received(1).MapVoidingTypeToTickets(Arg.Any<CheckTicketValidationOutput>());
+        createVoidDataXmlStage.Received(1).Execute(Arg.Any<bool>(), Arg.Any<CheckTicketValidationOutput>());
         insertPreVoidingDataStage.Received(1).Execute(1, queue, Arg.Any<IEnumerable<RequestDetailTicketModel>>(), voidDataXml, logData);
         autoVoidRequestQueueService.UpdateQueue(1, queue.QueueId, ExecuteStatus.Done, queueErrorMessage);
     }

@@ -6,78 +6,69 @@ namespace TVS.Void.Service.Tests.Services.ScanAutoVoidRequest;
 
 public class CreateVoidDataXmlStageImpTests
 {
-    private readonly CheckTicketValidationOutput validation;
     private readonly CreateVoidDataXmlStage createVoidDataXmlStage;
 
     public CreateVoidDataXmlStageImpTests()
     {
-        validation = new CheckTicketValidationOutput();
         createVoidDataXmlStage = new CreateVoidDataXmlStageImp();
     }
 
+    private static DateTime CreateDateTimeFromString(string dateTime)
+    {
+        return DateTime.ParseExact(dateTime, "M/d/yyyy h:m:s tt", System.Globalization.CultureInfo.InvariantCulture);
+    }
+
     [Fact]
-    public void ExecuteForAutoVoid_WhenIsAutoVoidIsTrue_ReturnsXmlString()
+    public void Execute_WhenIsAutoVoidIsTrue_ReturnsXmlStringOfVoid()
     {
         // Arrange
         const bool isAutoVoid = true;
 
         // Act
-        var result = createVoidDataXmlStage.Execute(isAutoVoid, validation);
+        var result = createVoidDataXmlStage.Execute(isAutoVoid, new CheckTicketValidationOutput());
 
         // Assert
         Assert.NotEmpty(result);
-        Assert.Contains("VoidData", result);
-        Assert.Contains("CreatorName='starixIT'", result);
+        Assert.Contains("VoidData CreatorName='starixIT' VoidFromTime", result);
         Assert.Contains("IsRunAutoAfterVoid='True'", result);
     }
 
     [Fact]
-    public void ExecuteForAutoVoid_WhenIsAutoVoidIsFalse_ReturnsEmptyString()
+    public void Execute_WhenIsAutoVoidIsFalse_ReturnsXmlStringOfRecover()
     {
         // Arrange
-        var isAutoVoid = false;
+        const bool isAutoVoid = false;
+        var validation = new CheckTicketValidationOutput
+        {
+            RecoverSingleTickets = new List<RequestDetailTicketModel> { new() },
+            RecoverParlayTickets = new List<RequestDetailTicketModel> { new() },
+            RecoverCricketTickets = new List<RequestDetailTicketModel> { new() },
+            RecoverSingleTickets14 = new List<RequestDetailTicketModel> { new() },
+            RecoverParlayTickets14 = new List<RequestDetailTicketModel> { new() }
+        };
 
         // Act
         var result = createVoidDataXmlStage.Execute(isAutoVoid, validation);
 
         // Assert
-        Assert.Empty(result);
+        Assert.NotEmpty(result);
+        Assert.Contains("VoidData CreatorName='starixIT' IsRunAutoAfterVoid='True' TotalTicket='5'", result);
     }
 
     [Fact]
-    public void ExecuteForAutoVoid_WhenVoidTicketsExist_ReturnsXmlStringWithMinTimeOfVoidTickets()
+    public void ExecuteForAutoVoid_WhenVoidTicketsExist_ReturnsXmlStringWithIsHasSettledTicket()
     {
         // Arrange
-        var isAutoVoid = true;
-        var voidSingleTickets = new List<RequestDetailTicketModel>
-                {
-                    new ()
-                    {
-                        StatusId = TicketStatus.WonId, TransDate = DateTime.ParseExact("7/1/2024 5:14:54 PM", "M/d/yyyy h:m:s tt", System.Globalization.CultureInfo.InvariantCulture),
-                        WinLostDate = DateTime.ParseExact("7/2/2024 5:14:54 PM", "M/d/yyyy h:m:s tt", System.Globalization.CultureInfo.InvariantCulture)
-                    }
-                };
-        var voidParlayTickets = new List<RequestDetailTicketModel>
-                {
-                    new ()
-                    {
-                        StatusId = TicketStatus.LoseId, TransDate = DateTime.ParseExact("7/4/2024 3:14:54 PM", "M/d/yyyy h:m:s tt", System.Globalization.CultureInfo.InvariantCulture),
-                        WinLostDate = DateTime.ParseExact("7/2/2024 5:14:54 PM", "M/d/yyyy h:m:s tt", System.Globalization.CultureInfo.InvariantCulture)
-                    }
-                };
-        var cancelCashOutTickets = new List<RequestDetailTicketModel>
+        const bool isAutoVoid = true;
+        var validation = new CheckTicketValidationOutput
         {
-            new () { StatusId = TicketStatus.RunningId, CheckTimeCancelCashOut = DateTime.ParseExact("7/3/2024 6:14:54 PM", "M/d/yyyy h:m:s tt", System.Globalization.CultureInfo.InvariantCulture)}
+            VoidSingleTickets = new List<RequestDetailTicketModel>
+            {
+                new() { StatusId = TicketStatus.WonId },
+                new() { StatusId = TicketStatus.LoseId },
+                new() { StatusId = TicketStatus.DrawId }
+            }
         };
-        var voidCricketTickets = new List<RequestDetailTicketModel>();
-        var voidSingleTickets14 = new List<RequestDetailTicketModel>();
-        var voidParlayTickets14 = new List<RequestDetailTicketModel>();
-        validation.VoidSingleTickets = voidSingleTickets;
-        validation.VoidParlayTickets = voidParlayTickets;
-        validation.CancelCOTickets = cancelCashOutTickets;
-        validation.VoidCricketTickets = voidCricketTickets;
-        validation.VoidSingleTickets14 = voidSingleTickets14;
-        validation.VoidParlayTickets14 = voidParlayTickets14;
 
         // Act
         var result = createVoidDataXmlStage.Execute(isAutoVoid, validation);
@@ -85,74 +76,108 @@ public class CreateVoidDataXmlStageImpTests
         // Assert
         Assert.NotEmpty(result);
         Assert.Contains("VoidData", result);
-        Assert.Contains("VoidFromTIme='xxxx'", result);
         Assert.Contains("TotalTicket='3'", result);
         Assert.Contains("IsHasSettledTicket='True'", result);
     }
 
     [Fact]
-    public void ExecuteForAutoVoid_WhenVoidTicketsDoNotExist_ReturnsXmlStringWithoutVoidTicketData()
+    public void ExecuteForAutoVoid_WhenOnlyVoidTicketsExist_ReturnsXmlStringWithMinTimeOfVoidTickets()
     {
         // Arrange
-        var isAutoVoid = true;
-        var voidSingleTickets = new List<RequestDetailTicketModel>();
-        var voidParlayTickets = new List<RequestDetailTicketModel>();
-        var voidCricketTickets = new List<RequestDetailTicketModel>();
-        var voidSingleTickets14 = new List<RequestDetailTicketModel>();
-        var voidParlayTickets14 = new List<RequestDetailTicketModel>();
-        validation.VoidSingleTickets = voidSingleTickets;
-        validation.VoidParlayTickets = voidParlayTickets;
-        validation.VoidCricketTickets = voidCricketTickets;
-        validation.VoidSingleTickets14 = voidSingleTickets14;
-        validation.VoidParlayTickets14 = voidParlayTickets14;
+        const bool isAutoVoid = true;
+        var validation = new CheckTicketValidationOutput
+        {
+            VoidSingleTickets = new List<RequestDetailTicketModel>
+            {
+                new (){ StatusId = TicketStatus.WonId, TransDate = CreateDateTimeFromString("7/1/2024 5:14:54 PM") , WinLostDate =  CreateDateTimeFromString("7/7/2024 4:14:54 PM") }
+            },
+            VoidParlayTickets = new List<RequestDetailTicketModel>
+            {
+                new () { StatusId = TicketStatus.LoseId, TransDate =  CreateDateTimeFromString("7/4/2024 3:14:54 PM"), WinLostDate =  CreateDateTimeFromString("7/20/2024 4:14:54 PM") }
+            },
+            CancelCOTickets = new List<RequestDetailTicketModel>(),
+            VoidCricketTickets = new List<RequestDetailTicketModel>(),
+            VoidSingleTickets14 = new List<RequestDetailTicketModel>(),
+            VoidParlayTickets14 = new List<RequestDetailTicketModel>()
+        };
 
         // Act
         var result = createVoidDataXmlStage.Execute(isAutoVoid, validation);
 
         // Assert
         Assert.NotEmpty(result);
-        Assert.Contains("VoidData", result);
-        Assert.Contains("TotalTicket='0'", result);
-        Assert.Contains("IsHasSettledTicket='False'", result);
-    }
-
-    [Fact]
-    public void ExecuteForAutoVoid_WhenCancelCashOutTicketsExist_ReturnsXmlStringWithCancelCashOutTicketData()
-    {
-        // Arrange
-        var isAutoVoid = true;
-        var cancelCashOutTickets = new List<RequestDetailTicketModel>
-                {
-                    new RequestDetailTicketModel { StatusId = TicketStatus.WonId },
-                    new RequestDetailTicketModel { StatusId = TicketStatus.DrawId }
-                };
-        validation.CancelCOTickets = cancelCashOutTickets;
-
-        // Act
-        var result = createVoidDataXmlStage.Execute(isAutoVoid, validation);
-
-        // Assert
-        Assert.NotEmpty(result);
-        Assert.Contains("VoidData", result);
+        Assert.Contains("VoidFromTime='07/02/2024 05:14:54 AM'", result);
+        Assert.Contains("VoidToTime='07/05/2024 03:14:54 AM'", result);
+        Assert.Contains("VoidFromDate='07/08/2024'", result);
+        Assert.Contains("VoidToDate='07/21/2024'", result);
         Assert.Contains("TotalTicket='2'", result);
-        Assert.Contains("IsHasSettledTicket='True'", result);
     }
 
     [Fact]
-    public void ExecuteForAutoVoid_WhenCancelCashOutTicketsDoNotExist_ReturnsXmlStringWithoutCancelCashOutTicketData()
+    public void ExecuteForAutoVoid_WhenVoidTicketsAndCancelCashOutTicketsExist_ReturnsXmlStringWithTimeOfTwoSets()
     {
         // Arrange
-        var isAutoVoid = true;
-        var cancelCashOutTickets = new List<RequestDetailTicketModel>();
-        validation.CancelCOTickets = cancelCashOutTickets;
+        const bool isAutoVoid = true;
+        var validation = new CheckTicketValidationOutput
+        {
+            VoidSingleTickets = new List<RequestDetailTicketModel>
+            {
+                new (){ StatusId = TicketStatus.WonId, TransDate = CreateDateTimeFromString("7/5/2024 5:14:54 PM") , WinLostDate =  CreateDateTimeFromString("7/7/2024 4:14:54 PM") }
+            },
+            VoidParlayTickets = new List<RequestDetailTicketModel>
+            {
+                new () { StatusId = TicketStatus.LoseId, TransDate =  CreateDateTimeFromString("7/9/2024 6:14:54 PM"), WinLostDate =  CreateDateTimeFromString("7/20/2024 4:14:54 PM") }
+            },
+            CancelCOTickets = new List<RequestDetailTicketModel>
+            {
+                new () { StatusId = TicketStatus.RunningId,CheckTimeCancelCashOut =  CreateDateTimeFromString("7/2/2024 3:14:54 PM")},
+                new () { StatusId = TicketStatus.RunningId,CheckTimeCancelCashOut =  CreateDateTimeFromString("7/28/2024 3:14:54 PM")}
+            },
+            VoidCricketTickets = new List<RequestDetailTicketModel>(),
+            VoidSingleTickets14 = new List<RequestDetailTicketModel>(),
+            VoidParlayTickets14 = new List<RequestDetailTicketModel>()
+        };
 
         // Act
         var result = createVoidDataXmlStage.Execute(isAutoVoid, validation);
 
         // Assert
         Assert.NotEmpty(result);
-        Assert.Contains("VoidData", result);
-        Assert.Contains("TotalTicket='0'", result);
-        Assert.Contains("IsHasSettledTicket='False'", result);
+        Assert.Contains("VoidFromTime='07/03/2024 03:14:54 AM'", result);
+        Assert.Contains("VoidToTime='07/29/2024 03:14:54 AM'", result);
+        Assert.Contains("VoidFromDate='07/08/2024'", result);
+        Assert.Contains("VoidToDate='07/29/2024'", result);
+        Assert.Contains("TotalTicket='4'", result);
+    }
+
+    [Fact]
+    public void ExecuteForAutoVoid_WhenOnlyCancelCashOutTicketsExist_ReturnsXmlStringWithTimeOfCancelCashOut()
+    {
+        // Arrange
+        const bool isAutoVoid = true;
+        var validation = new CheckTicketValidationOutput
+        {
+            VoidSingleTickets = new List<RequestDetailTicketModel>(),
+            VoidParlayTickets = new List<RequestDetailTicketModel>(),
+            CancelCOTickets = new List<RequestDetailTicketModel>
+            {
+                new () { StatusId = TicketStatus.RunningId,CheckTimeCancelCashOut =  CreateDateTimeFromString("7/4/2024 3:14:54 PM")},
+                new () { StatusId = TicketStatus.RunningId,CheckTimeCancelCashOut =  CreateDateTimeFromString("7/9/2024 3:14:54 PM")}
+            },
+            VoidCricketTickets = new List<RequestDetailTicketModel>(),
+            VoidSingleTickets14 = new List<RequestDetailTicketModel>(),
+            VoidParlayTickets14 = new List<RequestDetailTicketModel>()
+        };
+
+        // Act
+        var result = createVoidDataXmlStage.Execute(isAutoVoid, validation);
+
+        // Assert
+        Assert.NotEmpty(result);
+        Assert.Contains("VoidFromTime='07/05/2024 03:14:54 AM'", result);
+        Assert.Contains("VoidToTime='07/10/2024 03:14:54 AM'", result);
+        Assert.Contains("VoidFromDate='07/05/2024'", result);
+        Assert.Contains("VoidToDate='07/10/2024'", result);
+        Assert.Contains("TotalTicket='2'", result);
     }
 }

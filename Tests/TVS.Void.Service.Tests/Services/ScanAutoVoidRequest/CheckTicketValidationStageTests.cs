@@ -20,6 +20,7 @@ public class CheckTicketValidationStageTests
             VoidParlayTickets = requestDetailTickets,
             ParlayTicketsResettle = requestDetailTickets,
             VoidCricketTickets = requestDetailTickets,
+            CancelCOTickets = requestDetailTickets,
             CricketTicketsResettle = requestDetailTickets,
             VoidSingleTickets14 = requestDetailTickets,
             VoidParlayTickets14 = requestDetailTickets

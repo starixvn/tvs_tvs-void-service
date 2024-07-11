@@ -45,7 +45,8 @@ public class CheckTicketStatusServiceImpTests
         await service.Execute();
 
         // Assert
-        await checkTicketsForAutoVoidWinningStage.Received(2).Execute(Arg.Any<List<string>>(), Arg.Any<GroupTicketsInRequest>());
+        await checkTicketsForAutoVoidWinningStage.Received(1).Execute(Arg.Any<List<string>>(), Arg.Any<GroupTicketsInRequest>());
+        await checkTicketsForAutoVoidAllResultKeyedStage.Received(1).Execute(Arg.Any<List<string>>(), Arg.Any<GroupTicketsInRequest>());
         await loggingService.Received(1).InfoAppendNewLineAsync(Arg.Any<IList<string>>());
     }
 
