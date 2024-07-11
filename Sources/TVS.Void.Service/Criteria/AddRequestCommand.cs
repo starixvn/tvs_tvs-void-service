@@ -4,7 +4,7 @@ namespace TVS.Void.Service.Criteria;
 
 public class AddRequestCommand : NonQueryCommand
 {
-    public int SportType { get; set; }
+    public int SessionTime { get; set; }
     public int SubIssueTypeId { get; set; }
     public int ActionId { get; set; }
     public string MistakenBy { get; set; }
@@ -17,10 +17,10 @@ public class AddRequestCommand : NonQueryCommand
     public string IP { get; set; }
     public bool IsTest { get; set; }
     public int IssueTypeId { get; set; }
-    public int MatchId { get; set; }
     public int RequestId { get; set; }
     public string TransIds { get; set; }
     public int? FilterBy { get; set; }
+    public string TransInfoJson { get; set; }
 
     public string AbnormalAccountInfo { get; set; }
     public string WrongScoreInfo { get; set; }
@@ -32,10 +32,13 @@ public class AddRequestCommand : NonQueryCommand
     public string Wrong1stOuInfo { get; set; }
     public string WrongOddsInfo { get; set; }
     public string ReducedOverInfo { get; set; }
-    public string DuplicateTicketsInfo { get; set; }
     public string NotParticipateInfo { get; set; }
     public string KickOffInfo { get; set; }
-    public string TransInfoJson { get; set; }
+    public string DuplicateTicketsInfo { get; set; }
+    public string RecoverTicketInfo { get; set; }
+    public string AbnormalBetInfo { get; set; }
+    public string WrongMarketOfferedInfo { get; set; }
+    public string TechnicalErrorInfo { get; set; }
 
     public override string GetSettingKey() => "TicketVoiding_Request_Insert";
 

@@ -28,8 +28,6 @@ public class AddRequestStageImp : AddRequestStage
         var command = new AddRequestCommand
         {
             IssueTypeId = IssueTypeConstant.DuplicateTickets,
-            MatchId = param.MatchId,
-            SportType = param.SportType,
             ActionId = VoidActionTypeConstant.AutoVoidInstantId,
             DecidedBy = AutoVoidConstant.ActorName,
             UserId = AutoVoidConstant.ActorId,
