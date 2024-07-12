@@ -8,15 +8,13 @@ namespace TVS.Void.Service.Tests.Services.ScanAutoVoidRequest;
 
 public class GetTicketsStageImpTests
 {
-    private readonly AutoVoidRequestQueueService autoVoidRequestQueueService;
     private readonly RequestTicketService requestTicketService;
     private readonly GetTicketsStageImp service;
 
     public GetTicketsStageImpTests()
     {
-        autoVoidRequestQueueService = Substitute.For<AutoVoidRequestQueueService>();
         requestTicketService = Substitute.For<RequestTicketService>();
-        service = new GetTicketsStageImp(autoVoidRequestQueueService, requestTicketService);
+        service = new GetTicketsStageImp(requestTicketService);
     }
 
     [Fact]
@@ -26,13 +24,16 @@ public class GetTicketsStageImpTests
         var singleTickets = new List<RequestDetailTicketModel> { new() { MatchId = 1, RequestId = 1 }, new() { MatchId = 2, RequestId = 1 } };
         var parlayTickets = new List<RequestDetailTicketModel> { new() { MatchId = 1, RequestId = 1 }, new() { MatchId = 2, RequestId = 1 } };
         var cricketTickets = new List<RequestDetailTicketModel> { new() { MatchId = 1, RequestId = 1 }, new() { MatchId = 2, RequestId = 1 } };
+        var cancelCOTickets = new List<RequestDetailTicketModel> { new() { MatchId = 1, RequestId = 1 }, new() { MatchId = 2, RequestId = 1 } };
+
         var getTicketsResult = new GroupTicketsInRequest
         {
             SingleTickets = singleTickets,
             ParlayTickets = parlayTickets,
-            CricketTickets = cricketTickets
+            CricketTickets = cricketTickets,
+            CancelCOTickets = cancelCOTickets
         };
-        var singleTicketsExpected = new List<RequestDetailTicketModel> { new() { MatchId = 1, RequestId = 1 }};
+        var singleTicketsExpected = new List<RequestDetailTicketModel> { new() { MatchId = 1, RequestId = 1 } };
         var parlayTicketsExpected = new List<RequestDetailTicketModel> { new() { MatchId = 1, RequestId = 1 } };
         var cricketTicketsExpected = new List<RequestDetailTicketModel> { new() { MatchId = 1, RequestId = 1 } };
         var queue = new AutoVoidRequestQueueModel { Action = AutoVoidConstant.QueueActionVoidInstant, MatchId = 1, RequestIds = "1" };
@@ -56,25 +57,20 @@ public class GetTicketsStageImpTests
     public async Task Execute_HasNotSingleOrParlayTickets_CalledExpected(string action, int matchId)
     {
         const int siteDbGroupId = 0;
-        var singleTickets = new List<RequestDetailTicketModel>();
-        var parlayTickets = new List<RequestDetailTicketModel>();
-        var cricketTickets = new List<RequestDetailTicketModel>();
-        var queue = new AutoVoidRequestQueueModel{Action = action, MatchId = matchId, RequestIds = "1"};
+        var queue = new AutoVoidRequestQueueModel { Action = action, MatchId = matchId, RequestIds = "1" };
         var getTicketsResult = new GroupTicketsInRequest
         {
-            SingleTickets = singleTickets,
-            ParlayTickets = parlayTickets,
-            CricketTickets = cricketTickets
+            SingleTickets = new List<RequestDetailTicketModel>(),
+            ParlayTickets = new List<RequestDetailTicketModel>(),
+            CricketTickets = new List<RequestDetailTicketModel>(),
+            CancelCOTickets = new List<RequestDetailTicketModel>(),
         };
         requestTicketService.GetTicketsByRequestsAndSiteDbGroupId(default, default)
             .ReturnsForAnyArgs(getTicketsResult);
 
         var actual = await service.Execute(siteDbGroupId, queue, new List<string>());
 
-        await requestTicketService.Received(1)
-            .GetTicketsByRequestsAndSiteDbGroupId(Arg.Any<int>(), Arg.Any<string>());
-        await autoVoidRequestQueueService.Received(1)
-            .UpdateQueue(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<int?>(), Arg.Any<string>());
+        await requestTicketService.Received(1).GetTicketsByRequestsAndSiteDbGroupId(siteDbGroupId, queue.RequestIds);
         Assert.Null(actual.Item2);
         Assert.False(actual.Item1);
     }
