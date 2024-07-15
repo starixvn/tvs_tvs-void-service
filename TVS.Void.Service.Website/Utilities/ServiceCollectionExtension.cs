@@ -103,6 +103,7 @@ public static class ServiceCollectionExtension
 
         services.AddSingleton<ScanAutoVoidRequestService, ScanAutoVoidRequestServiceImp>();
         services.AddSingleton<CheckVoidInstantRequestQueueValidStage, CheckVoidInstantRequestQueueValidStageImp>();
+        services.AddSingleton<CheckVoidWinningRequestQueueValidStage, CheckVoidWinningRequestQueueValidStageImp>();
         services.AddSingleton<GetTicketsStage, GetTicketsStageImp>();
         services.AddSingleton<CheckTicketValidationStage, CheckTicketValidationStageImp>();
         services.AddSingleton<ReCalculateTicketsStage, ReCalculateTicketsStageImp>();

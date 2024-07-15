@@ -28,16 +28,14 @@ public class CheckVoidWinningRequestQueueValidStageImp : CheckVoidWinningRequest
         var requestIdList = queue.RequestIds.Split(",");
         var requestIdsChangedAction = new List<string>();
 
-        var tasks = requestIdList.Select(async requestId =>
+        foreach (var requestId in requestIdList)
         {
             var (request, _) = await requestDetailService.GetRequestById(int.Parse(requestId));
             if (request.Any() && !request.First().ActionName.Equals(queue.Action, StringComparison.OrdinalIgnoreCase))
             {
                 requestIdsChangedAction.Add(requestId);
             }
-        });
-
-        await Task.WhenAll(tasks);
+        }
 
         if (requestIdList.Length == requestIdsChangedAction.Count)
         {
