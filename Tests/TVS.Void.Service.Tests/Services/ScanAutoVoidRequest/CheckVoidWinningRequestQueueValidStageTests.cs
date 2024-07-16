@@ -58,9 +58,9 @@ public class CheckVoidWinningRequestQueueValidStageTests
         const int siteDbGroupId = 0;
         requestDetailService = Substitute.For<RequestDetailService>();
         autoVoidRequestQueueService = Substitute.For<AutoVoidRequestQueueService>();
-        var request = new List<RequestModel> { new() { RequestId = 1, ActionName = "VoidInstant" } };
+        var request = new List<RequestModel> { new() { RequestId = 1, ActionId = 4 } };
         requestDetailService.GetRequestById(1).Returns((request, null));
-        var request2 = new List<RequestModel> { new() { RequestId = 2, ActionName = "CAL" } };
+        var request2 = new List<RequestModel> { new() { RequestId = 2, ActionId = 1 } };
         requestDetailService.GetRequestById(2).Returns((request2, null));
         service = new CheckVoidWinningRequestQueueValidStageImp(requestDetailService, autoVoidRequestQueueService);
 
@@ -89,7 +89,7 @@ public class CheckVoidWinningRequestQueueValidStageTests
         autoVoidRequestQueueService = Substitute.For<AutoVoidRequestQueueService>();
         foreach (var requestId in requestIdList)
         {
-            var request = new List<RequestModel> { new() { RequestId = int.Parse(requestId), ActionName = "CAL" } };
+            var request = new List<RequestModel> { new() { RequestId = int.Parse(requestId), ActionId = 1 } };
             requestDetailService.GetRequestById(int.Parse(requestId)).Returns((request, null));
         }
 

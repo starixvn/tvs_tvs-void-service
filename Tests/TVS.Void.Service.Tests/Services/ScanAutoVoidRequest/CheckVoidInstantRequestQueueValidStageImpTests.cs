@@ -21,7 +21,7 @@ public class CheckVoidInstantRequestQueueValidStageImpTests
             new()
             {
                 RequestId = 222,
-                ActionName = "CAL"
+                ActionId = 1
             }
         };
         var autoVoidRequestQueueService = Substitute.For<AutoVoidRequestQueueService>();
@@ -93,7 +93,7 @@ public class CheckVoidInstantRequestQueueValidStageImpTests
         {
             new()
             {
-                ActionName = "CAL-HT"
+                ActionId = 4
             }
         };
         var autoVoidRequestQueueService = Substitute.For<AutoVoidRequestQueueService>();

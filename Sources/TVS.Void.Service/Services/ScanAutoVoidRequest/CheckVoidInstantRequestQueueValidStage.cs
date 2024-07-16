@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using TicketVoidingSystem.Constants;
+using TVS.Void.Service.Constants;
 using TVS.Void.Service.Models;
 
 namespace TVS.Void.Service.Services.ScanAutoVoidRequest;
@@ -38,7 +39,9 @@ public class CheckVoidInstantRequestQueueValidStageImp : CheckVoidInstantRequest
             return (false, 0);
         }
 
-        if (!request.First().ActionName.Equals(queue.Action, StringComparison.OrdinalIgnoreCase))
+        var actionNameRequest = VoidActionTypeConstant.VoidActionList.ContainsKey(request.First().ActionId) ?
+            VoidActionTypeConstant.VoidActionList[request.First().ActionId] : string.Empty;
+        if (!actionNameRequest.Equals(queue.Action, StringComparison.OrdinalIgnoreCase))
         {
             await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, ExecuteStatus.Done, "Request Action was edited.");
             return (false, 0);
