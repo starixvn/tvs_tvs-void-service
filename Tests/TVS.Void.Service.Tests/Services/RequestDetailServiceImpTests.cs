@@ -21,11 +21,11 @@ public class RequestDetailServiceImpTests
         var fakeVoidingHistory = new List<VoidingHistoryModel> { new() { VoidingHistoryId = 112 } };
         var repository = Substitute.For<IDynamicRepository>();
         repository.FetchAsync<VoidingHistoryModel>(default).ReturnsForAnyArgs(fakeVoidingHistory);
-        var singleTickets = new List<RequestDetailTicketModel> { new() { StatusId = statusId } };
+        var voidDataXml = "xml";
         var service = new RequestDetailServiceImp(repository);
 
         // Act
-        var actual = await service.InsertVoidingHistory(requestIds, siteDbGroupId, broadcastSessionId, singleTickets);
+        var actual = await service.InsertVoidingHistory(requestIds, siteDbGroupId, broadcastSessionId, voidDataXml);
 
         // Assert
         await repository.Received(1).FetchAsync<VoidingHistoryModel>(Arg.Any<InsertVoidingHistoryCriteria>());

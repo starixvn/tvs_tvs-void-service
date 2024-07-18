@@ -27,9 +27,10 @@ public class GetTicketsStageImp : GetTicketsStage
     {
         var getTicketsResult = await GetTicketsInRequest(siteDbGroupId, queue);
         logData.Add($"{nameof(GetTicketsStage)} - SingleCount: {getTicketsResult.SingleTickets.Count()} " +
-                    $"- ParlayCount: {getTicketsResult.ParlayTickets.Count()} - CricketCount: {getTicketsResult.CricketTickets.Count()}");
+                    $"- ParlayCount: {getTicketsResult.ParlayTickets.Count()} - CricketCount: {getTicketsResult.CricketTickets.Count()} " +
+                    $"- CancelCOCount: {getTicketsResult.CancelCOTickets.Count()}");
 
-        if (!getTicketsResult.SingleTickets.Any() && !getTicketsResult.ParlayTickets.Any() && !getTicketsResult.CricketTickets.Any())
+        if (!getTicketsResult.SingleTickets.Any() && !getTicketsResult.ParlayTickets.Any() && !getTicketsResult.CricketTickets.Any() && !getTicketsResult.CancelCOTickets.Any())
         {
             await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, ExecuteStatus.Done, "No ticket found.");
             return (false, null);
@@ -39,7 +40,8 @@ public class GetTicketsStageImp : GetTicketsStage
         {
             SingleTickets = getTicketsResult.SingleTickets,
             ParlayTickets = getTicketsResult.ParlayTickets,
-            CricketTickets = getTicketsResult.CricketTickets
+            CricketTickets = getTicketsResult.CricketTickets,
+            CancelCOTickets = getTicketsResult.CancelCOTickets
         });
     }
 
@@ -61,12 +63,14 @@ public class GetTicketsStageImp : GetTicketsStage
             var singleTicketsInMatch = getTicketsInRequest.SingleTickets.Where(x => x.MatchId == queue.MatchId && x.RequestId == requestId);
             var parlayTicketsInMatch = getTicketsInRequest.ParlayTickets.Where(x => x.MatchId == queue.MatchId && x.RequestId == requestId);
             var cricketTicketsInMatch = getTicketsInRequest.CricketTickets.Where(x => x.MatchId == queue.MatchId && x.RequestId == requestId);
+            var cancelCashOutTicketsInMatch = getTicketsInRequest.CancelCOTickets.Where(x => x.MatchId == queue.MatchId && x.RequestId == requestId);
 
             return new GroupTicketsInRequest
             {
                 SingleTickets = singleTicketsInMatch,
                 ParlayTickets = parlayTicketsInMatch,
-                CricketTickets = cricketTicketsInMatch
+                CricketTickets = cricketTicketsInMatch,
+                CancelCOTickets = cancelCashOutTicketsInMatch
             };
         }
 
@@ -81,12 +85,14 @@ public class GetTicketsStageImp : GetTicketsStage
             var singleTicketsInMatch = getTicketsInRequest.SingleTickets.Where(x => x.MatchId == queue.MatchId);
             var parlayTicketsInMatch = getTicketsInRequest.ParlayTickets.Where(x => x.MatchId == queue.MatchId);
             var cricketTicketsInMatch = getTicketsInRequest.CricketTickets.Where(x => x.MatchId == queue.MatchId);
-
+            var cancelCashOutTicketsInMatch = getTicketsInRequest.CancelCOTickets.Where(x => x.MatchId == queue.MatchId);
+            //// CancelCO not support yet in auto winning
             return new GroupTicketsInRequest
             {
                 SingleTickets = singleTicketsInMatch,
                 ParlayTickets = parlayTicketsInMatch,
-                CricketTickets = cricketTicketsInMatch
+                CricketTickets = cricketTicketsInMatch,
+                CancelCOTickets = cancelCashOutTicketsInMatch
             };
         }
 

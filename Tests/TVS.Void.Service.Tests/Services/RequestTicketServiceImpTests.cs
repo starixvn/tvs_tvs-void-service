@@ -19,22 +19,24 @@ public class RequestTicketServiceImpTests
         var singleTickets = new List<RequestDetailTicketModel> { new() { TransId = 113 } };
         var parlayTickets = new List<RequestDetailTicketModel> { new() { TransId = 222 } };
         var cricketTickets = new List<RequestDetailTicketModel> { new() { TransId = 222 } };
+        var cancelCashOutTickets = new List<RequestDetailTicketModel> { new() { TransId = 3333 } };
         var repository = Substitute.For<IDynamicRepository>();
         repository
-            .FetchMultipleAsync<RequestDetailTicketModel, RequestDetailTicketModel, RequestDetailTicketModel>(default)
-            .ReturnsForAnyArgs((singleTickets, parlayTickets, cricketTickets));
+            .FetchMultipleAsync<RequestDetailTicketModel, RequestDetailTicketModel, RequestDetailTicketModel, RequestDetailTicketModel>(default)
+            .ReturnsForAnyArgs((singleTickets, parlayTickets, cricketTickets, cancelCashOutTickets));
         var service = new RequestTicketServiceImp(repository);
         var expected = new GroupTicketsInRequest
         {
             SingleTickets = singleTickets,
             ParlayTickets = parlayTickets,
-            CricketTickets = cricketTickets
+            CricketTickets = cricketTickets,
+            CancelCOTickets = cancelCashOutTickets
         };
         // Act
         var actual = await service.GetTicketsByRequestsAndSiteDbGroupId(siteDbGroupId, requestIds);
 
         // Assert
-        await repository.Received(1).FetchMultipleAsync<RequestDetailTicketModel, RequestDetailTicketModel, RequestDetailTicketModel>
+        await repository.Received(1).FetchMultipleAsync<RequestDetailTicketModel, RequestDetailTicketModel, RequestDetailTicketModel, RequestDetailTicketModel>
             (Arg.Is<GetRequestTicketsCriteria>(x => x.SiteDbGroupId == siteDbGroupId && x.RequestIds == requestIds));
         AssertExtension.Equal(expected, actual);
     }
@@ -46,16 +48,18 @@ public class RequestTicketServiceImpTests
         var singleTickets = new List<RequestDetailTicketModel> { new() { TransId = 113 } };
         var parlayTickets = new List<RequestDetailTicketModel> { new() { TransId = 222 } };
         var cricketTickets = new List<RequestDetailTicketModel> { new() { TransId = 222 } };
+        var cancelCashOutTickets = new List<RequestDetailTicketModel> { new() { TransId = 3333 } };
         var repository = Substitute.For<IDynamicRepository>();
         var expected = new GroupTicketsInRequest
         {
             SingleTickets = singleTickets,
             ParlayTickets = parlayTickets,
-            CricketTickets = cricketTickets
+            CricketTickets = cricketTickets,
+            CancelCOTickets = cancelCashOutTickets
         };
         repository
-            .FetchMultipleAsync<RequestDetailTicketModel, RequestDetailTicketModel, RequestDetailTicketModel>(default)
-            .ReturnsForAnyArgs((singleTickets, parlayTickets, cricketTickets));
+            .FetchMultipleAsync<RequestDetailTicketModel, RequestDetailTicketModel, RequestDetailTicketModel, RequestDetailTicketModel>(default)
+            .ReturnsForAnyArgs((singleTickets, parlayTickets, cricketTickets, cancelCashOutTickets));
         var service = new RequestTicketServiceImp(repository);
 
         // Act

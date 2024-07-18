@@ -11,7 +11,8 @@ namespace TVS.Void.Service.Services.ScanAutoVoidRequest;
 public interface CheckTicketValidationStage
 {
     Task<CheckTicketValidationOutput> ExecuteForVoid(int siteDbGroupId, IEnumerable<RequestDetailTicketModel> singleTickets,
-        IEnumerable<RequestDetailTicketModel> parlayTickets, IEnumerable<RequestDetailTicketModel> cricketTickets, IList<string> logData);
+        IEnumerable<RequestDetailTicketModel> parlayTickets, IEnumerable<RequestDetailTicketModel> cricketTickets,
+        IEnumerable<RequestDetailTicketModel> cancelCashOutTickets, IList<string> logData);
 
     Task<CheckTicketValidationOutput> ExecuteForRecover(int siteDbGroupId, IEnumerable<RequestDetailTicketModel> singleTickets,
         IEnumerable<RequestDetailTicketModel> parlayTickets, IEnumerable<RequestDetailTicketModel> cricketTickets, IList<string> logData);
@@ -26,15 +27,16 @@ public class CheckTicketValidationStageImp : CheckTicketValidationStage
         this.repository = repository;
     }
 
-    public async Task<CheckTicketValidationOutput> ExecuteForVoid(int siteDbGroupId, IEnumerable<RequestDetailTicketModel> singleTickets,
-        IEnumerable<RequestDetailTicketModel> parlayTickets, IEnumerable<RequestDetailTicketModel> cricketTickets, IList<string> logData)
+    public async Task<CheckTicketValidationOutput> ExecuteForVoid(int siteDbGroupId, IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets,
+        IEnumerable<RequestDetailTicketModel> cricketTickets, IEnumerable<RequestDetailTicketModel> cancelCashOutTickets, IList<string> logData)
     {
         var criteria = new CheckTicketsAllowToVoidCriteria
         {
             SiteDbGroupId = siteDbGroupId,
             SingleTicketsJson = JsonSerializer.Serialize(singleTickets),
             ParlayTicketsJson = JsonSerializer.Serialize(parlayTickets),
-            CricketTicketsJson = JsonSerializer.Serialize(cricketTickets)
+            CricketTicketsJson = JsonSerializer.Serialize(cricketTickets),
+            CancelCashOutTicketsJson = JsonSerializer.Serialize(cancelCashOutTickets)
         };
 
         var results = (await repository.FetchAsync<RequestDetailTicketModel>(criteria)).ToList();
@@ -44,7 +46,7 @@ public class CheckTicketValidationStageImp : CheckTicketValidationStage
         var parlayTicketsResettle = results.Where(x => x.ValidationType == 4);
         var voidCricketTickets = results.Where(x => x.ValidationType == 5);
         var cricketTicketsResettle = results.Where(x => x.ValidationType == 6);
-        //// var cancelCOTickets = results.Where(x => x.ValidationType == 7); (Only use for manual void issue type)
+        var outputCancelCashOutTickets = results.Where(x => x.ValidationType == 7); // user for auto void instant
         var voidSingleTickets14 = results.Where(x => x.ValidationType == 8);
         var voidParlayTickets14 = results.Where(x => x.ValidationType == 9);
 
@@ -56,7 +58,7 @@ public class CheckTicketValidationStageImp : CheckTicketValidationStage
             ParlayTicketsResettle = parlayTicketsResettle,
             VoidCricketTickets = voidCricketTickets,
             CricketTicketsResettle = cricketTicketsResettle,
-            //ValidCancelCOTickets = objectsArray[6].Cast<RequestDetailTicketModel>() (Only use for manual void issue type)
+            CancelCOTickets = outputCancelCashOutTickets,
             VoidSingleTickets14 = voidSingleTickets14,
             VoidParlayTickets14 = voidParlayTickets14
         };
@@ -64,6 +66,7 @@ public class CheckTicketValidationStageImp : CheckTicketValidationStage
         logData.Add($"{nameof(CheckTicketValidationStage)}.{nameof(ExecuteForVoid)} - vSingle: {output.VoidSingleTickets.Count()} - vParlay: {output.VoidParlayTickets.Count()}"
                         + $" - SingleResettle: {output.SingleTicketsResettle.Count()} - ParlayResettle: {output.ParlayTicketsResettle.Count()}"
                         + $" - vCricketTickets: {output.VoidCricketTickets.Count()} - CricketTicketsResettle: {output.CricketTicketsResettle.Count()}"
+                        + $" - vCancelCOTickets: {output.CancelCOTickets.Count()}"
                         + $" - vSingle14: {output.VoidSingleTickets14.Count()} - vParlay14: {output.VoidParlayTickets14.Count()}");
 
         return output;

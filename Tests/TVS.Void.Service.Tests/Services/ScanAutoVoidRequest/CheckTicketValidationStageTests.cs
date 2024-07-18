@@ -20,6 +20,7 @@ public class CheckTicketValidationStageTests
             VoidParlayTickets = requestDetailTickets,
             ParlayTicketsResettle = requestDetailTickets,
             VoidCricketTickets = requestDetailTickets,
+            CancelCOTickets = requestDetailTickets,
             CricketTicketsResettle = requestDetailTickets,
             VoidSingleTickets14 = requestDetailTickets,
             VoidParlayTickets14 = requestDetailTickets
@@ -30,7 +31,7 @@ public class CheckTicketValidationStageTests
             .ReturnsForAnyArgs(requestDetailTickets);
         var service = new CheckTicketValidationStageImp(repository);
 
-        var actual = await service.ExecuteForVoid(siteDbGroupId, requestDetailTickets, requestDetailTickets, requestDetailTickets, new List<string>());
+        var actual = await service.ExecuteForVoid(siteDbGroupId, requestDetailTickets, requestDetailTickets, requestDetailTickets, requestDetailTickets, new List<string>());
 
         await repository.Received(1).FetchAsync<RequestDetailTicketModel>(Arg.Any<CheckTicketsAllowToVoidCriteria>());
         AssertExtension.Equal(expected, actual);
@@ -41,7 +42,6 @@ public class CheckTicketValidationStageTests
     {
         const int siteDbGroupId = 0;
         var requestDetailTickets = new List<RequestDetailTicketModel>();
-        IEnumerable<object>[] fakeData = { requestDetailTickets, requestDetailTickets, requestDetailTickets, requestDetailTickets, requestDetailTickets };
         var expected = new CheckTicketValidationOutput
         {
             RecoverSingleTickets = requestDetailTickets,

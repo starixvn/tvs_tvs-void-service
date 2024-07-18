@@ -98,6 +98,7 @@ public static class ServiceCollectionExtension
 
         services.AddSingleton<CheckTicketStatusService, CheckTicketStatusServiceImp>();
         services.AddSingleton<CheckTicketsForAutoVoidWinningStage, CheckTicketsForAutoVoidWinningStageImp>();
+        services.AddSingleton<CheckTicketsForAutoVoidAllResultKeyedStage, CheckTicketsForAutoVoidAllResultKeyedStageImp>();
         services.AddSingleton<InsertAutoVoidQueueStage, InsertAutoVoidQueueStageImp>();
 
         services.AddSingleton<ScanAutoVoidRequestService, ScanAutoVoidRequestServiceImp>();
@@ -108,6 +109,7 @@ public static class ServiceCollectionExtension
         services.AddSingleton<InsertPreVoidingDataStage, InsertPreVoidingDataStageImp>();
         services.AddSingleton<AutoInstantProcessStage, AutoInstantProcessStageImp>();
         services.AddSingleton<AutoVoidWinningProcessStage, AutoVoidWinningProcessStageImp>();
+        services.AddSingleton<CreateVoidDataXmlStage, CreateVoidDataXmlStageImp>();
 
         services.AddSingleton<VoidService, VoidServiceImp>();
         services.AddSingleton<ProcessVoidQueuesStage, ProcessVoidQueuesStageImp>();

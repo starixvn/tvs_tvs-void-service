@@ -15,21 +15,20 @@ public class InsertPreVoidingDataStageImpTests
         const int siteDbGroupId = 0;
         var singleTickets = new List<RequestDetailTicketModel> { new() };
         var queue = new AutoVoidRequestQueueModel();
+        var voidDataXml = "xmlAbc";
         var requestDetailService = Substitute.For<RequestDetailService>();
         var ticketVoidingQueueService = Substitute.For<TicketVoidingQueueService>();
         var requestTicketService = Substitute.For<RequestTicketService>();
         var notificationService = Substitute.For<NotificationService>();
-        requestDetailService.InsertVoidingHistory(Arg.Any<string>(), default, Arg.Any<string>(),
-                Arg.Any<IEnumerable<RequestDetailTicketModel>>())
+        requestDetailService.InsertVoidingHistory(Arg.Any<string>(), default, Arg.Any<string>(), voidDataXml)
             .ReturnsForAnyArgs(new List<VoidingHistoryModel>());
 
         var service = new InsertPreVoidingDataStageImp(requestDetailService, ticketVoidingQueueService,
             requestTicketService, notificationService);
 
-        var actual = await service.Execute(siteDbGroupId, queue, singleTickets, new List<string>());
+        var actual = await service.Execute(siteDbGroupId, queue, singleTickets, voidDataXml, new List<string>());
 
-        await requestDetailService.Received().InsertVoidingHistory(Arg.Any<string>(), default, Arg.Any<string>(),
-            Arg.Any<IEnumerable<RequestDetailTicketModel>>());
+        await requestDetailService.Received().InsertVoidingHistory(Arg.Any<string>(), default, Arg.Any<string>(), voidDataXml);
         Assert.Equal(expected, actual);
     }
 
@@ -41,7 +40,7 @@ public class InsertPreVoidingDataStageImpTests
 
         var service = new InsertPreVoidingDataStageImp(default, default, default, default);
 
-        var actual = await service.Execute(default, default, singleTickets, default);
+        var actual = await service.Execute(default, default, singleTickets, default, default);
 
         Assert.Equal(expected, actual);
     }

@@ -28,6 +28,7 @@ public class RequestDetailTicketModel
     public int MainTransId { get; set; }
     public DateTime TransDate { get; set; }
     public DateTime WinLostDate { get; set; }
+    public DateTime CheckTimeCancelCashOut { get; set; }
     public int StatusId { get; set; }
     public int VoidActionId { get; set; }
     public int VoidingTypeId { get; set; }
