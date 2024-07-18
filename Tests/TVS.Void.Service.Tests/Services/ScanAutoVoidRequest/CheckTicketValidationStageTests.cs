@@ -12,26 +12,37 @@ public class CheckTicketValidationStageTests
     public async Task ExecuteForVoid_ReturnExpected()
     {
         const int siteDbGroupId = 0;
-        var requestDetailTickets = new List<RequestDetailTicketModel>();
+        var results = new List<RequestDetailTicketModel>()
+        {
+            new() { ValidationType = 1 },
+            new() { ValidationType = 2 },
+            new() { ValidationType = 3 },
+            new() { ValidationType = 4 },
+            new() { ValidationType = 5 },
+            new() { ValidationType = 6 },
+            new() { ValidationType = 7 },
+            new() { ValidationType = 8 },
+            new() { ValidationType = 9 }
+        };
         var expected = new CheckTicketValidationOutput
         {
-            VoidSingleTickets = requestDetailTickets,
-            SingleTicketsResettle = requestDetailTickets,
-            VoidParlayTickets = requestDetailTickets,
-            ParlayTicketsResettle = requestDetailTickets,
-            VoidCricketTickets = requestDetailTickets,
-            CancelCOTickets = requestDetailTickets,
-            CricketTicketsResettle = requestDetailTickets,
-            VoidSingleTickets14 = requestDetailTickets,
-            VoidParlayTickets14 = requestDetailTickets
+            VoidSingleTickets = new List<RequestDetailTicketModel> { new() { ValidationType = 1 } },
+            SingleTicketsResettle = new List<RequestDetailTicketModel> { new() { ValidationType = 2 } },
+            VoidParlayTickets = new List<RequestDetailTicketModel> { new() { ValidationType = 3 } },
+            ParlayTicketsResettle = new List<RequestDetailTicketModel> { new() { ValidationType = 4 } },
+            VoidCricketTickets = new List<RequestDetailTicketModel> { new() { ValidationType = 5 } },
+            CricketTicketsResettle = new List<RequestDetailTicketModel> { new() { ValidationType = 6 } },
+            VoidSingleTickets14 = new List<RequestDetailTicketModel> { new() { ValidationType = 8 } },
+            VoidParlayTickets14 = new List<RequestDetailTicketModel> { new() { ValidationType = 9 } },
+            CancelCOTickets = new List<RequestDetailTicketModel> { new() { ValidationType = 7 } }
         };
 
         var repository = Substitute.For<IDynamicRepository>();
         repository.FetchAsync<RequestDetailTicketModel>(Arg.Any<CheckTicketsAllowToVoidCriteria>())
-            .ReturnsForAnyArgs(requestDetailTickets);
+            .ReturnsForAnyArgs(results);
         var service = new CheckTicketValidationStageImp(repository);
 
-        var actual = await service.ExecuteForVoid(siteDbGroupId, requestDetailTickets, requestDetailTickets, requestDetailTickets, requestDetailTickets, new List<string>());
+        var actual = await service.ExecuteForVoid(siteDbGroupId, default, default, default, default, new List<string>());
 
         await repository.Received(1).FetchAsync<RequestDetailTicketModel>(Arg.Any<CheckTicketsAllowToVoidCriteria>());
         AssertExtension.Equal(expected, actual);

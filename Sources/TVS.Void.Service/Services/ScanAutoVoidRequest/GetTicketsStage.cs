@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using TicketVoidingSystem.Constants;
 using TVS.Void.Service.Constants;
 using TVS.Void.Service.Models;
 
@@ -14,12 +13,10 @@ public interface GetTicketsStage
 
 public class GetTicketsStageImp : GetTicketsStage
 {
-    private readonly AutoVoidRequestQueueService autoVoidRequestQueueService;
     private readonly RequestTicketService requestTicketService;
 
-    public GetTicketsStageImp(AutoVoidRequestQueueService autoVoidRequestQueueService, RequestTicketService requestTicketService)
+    public GetTicketsStageImp(RequestTicketService requestTicketService)
     {
-        this.autoVoidRequestQueueService = autoVoidRequestQueueService;
         this.requestTicketService = requestTicketService;
     }
 
@@ -32,7 +29,6 @@ public class GetTicketsStageImp : GetTicketsStage
 
         if (!getTicketsResult.SingleTickets.Any() && !getTicketsResult.ParlayTickets.Any() && !getTicketsResult.CricketTickets.Any() && !getTicketsResult.CancelCOTickets.Any())
         {
-            await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, ExecuteStatus.Done, "No ticket found.");
             return (false, null);
         }
 

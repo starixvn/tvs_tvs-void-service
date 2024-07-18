@@ -19,7 +19,8 @@ public class RequestTicketServiceImpTests
         var singleTickets = new List<RequestDetailTicketModel> { new() { TransId = 113 } };
         var parlayTickets = new List<RequestDetailTicketModel> { new() { TransId = 222 } };
         var cricketTickets = new List<RequestDetailTicketModel> { new() { TransId = 222 } };
-        var cancelCashOutTickets = new List<RequestDetailTicketModel> { new() { TransId = 3333 } };
+        var cancelCashOutTickets = new List<RequestDetailTicketModel> { new() { TransId = 444 } };
+
         var repository = Substitute.For<IDynamicRepository>();
         repository
             .FetchMultipleAsync<RequestDetailTicketModel, RequestDetailTicketModel, RequestDetailTicketModel, RequestDetailTicketModel>(default)
@@ -48,7 +49,8 @@ public class RequestTicketServiceImpTests
         var singleTickets = new List<RequestDetailTicketModel> { new() { TransId = 113 } };
         var parlayTickets = new List<RequestDetailTicketModel> { new() { TransId = 222 } };
         var cricketTickets = new List<RequestDetailTicketModel> { new() { TransId = 222 } };
-        var cancelCashOutTickets = new List<RequestDetailTicketModel> { new() { TransId = 3333 } };
+        var cancelCashOutTickets = new List<RequestDetailTicketModel> { new() { TransId = 444 } };
+
         var repository = Substitute.For<IDynamicRepository>();
         var expected = new GroupTicketsInRequest
         {
