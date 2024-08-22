@@ -1,3 +1,4 @@
+using Fanex.Data.SqlServer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using TicketVoidingSystem.SignalR;
@@ -11,7 +12,7 @@ var configuration = builder.Configuration;
 services.LoadConfig(builder.Configuration);
 services.AddControllers();
 services.AddMemoryCache();
-services.RegisterFanexData(builder.Configuration);
+services.AddFanexSql(builder.Configuration);
 services.RegisterFanexExceptionHandler();
 services.RegisterSentry();
 services.RegisterONEbookUM(builder.Configuration);

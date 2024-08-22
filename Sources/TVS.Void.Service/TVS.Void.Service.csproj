@@ -10,7 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Fanex.Data.ProxyClient" Version="0.0.4-beta4" />
+    <PackageReference Include="Fanex.Data.Repository" Version="4.2.5.3" />
   </ItemGroup>
 
   <ItemGroup>

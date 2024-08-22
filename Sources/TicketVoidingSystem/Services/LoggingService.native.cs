@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Fanex.Logging;
 using Fanex.Logging.Extensions;
+using Fanex.Logging.Extensions.Database;
 
 namespace TicketVoidingSystem.Services;
 
@@ -56,8 +57,9 @@ public class LoggingServiceImp : LoggingService
     private static async Task HandleException(Exception exception)
     {
         var logMessage = new LogMessage(exception.Message)
+            .AddSection("Database Info", DatabaseInfoGetters.GetDbExceptionInfo(exception))
             .AddSection("Server Info", CommonInfoGetters.GetServerInfo())
-            .AddSection("Exception Info", CommonInfoGetters.GetExceptionInfo(exception.InnerException))
+            .AddSection("Exception Info", CommonInfoGetters.GetExceptionInfo(exception.InnerException ?? exception))
             .ToString();
         await LogService.ErrorAsync(logMessage);
     }
