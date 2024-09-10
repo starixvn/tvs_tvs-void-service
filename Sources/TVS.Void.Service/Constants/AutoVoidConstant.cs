@@ -15,7 +15,7 @@ public static class AutoVoidConstant
     public const string QueueRecoverInstant = "RecoverInstant";
 }
 
-public class VoidActionTypeConstant
+public static class VoidActionTypeConstant
 {
     public const int AutoVoidWinningId = 1;
     public const int AutoVoidInstantId = 4;
