@@ -119,6 +119,7 @@ public static class ServiceCollectionExtension
         services.AddSingleton<GetDuplicatedTicketsStage, GetDuplicatedTicketsStageImp>();
         services.AddSingleton<InsertAutoVoidRequestQueueStage, InsertAutoVoidRequestQueueStageImp>();
         services.AddSingleton<MarkTicketsStage, MarkTicketsStageImp>();
+        services.AddSingleton<AutoVoidWinningBeforeVoidService, AutoVoidWinningBeforeVoidServiceImp>();
     }
 
     public static void RegisterQuartzScheduler(this IServiceCollection services)
