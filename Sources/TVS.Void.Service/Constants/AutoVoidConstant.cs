@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace TVS.Void.Service.Constants;
 
@@ -24,7 +25,7 @@ public static class VoidActionTypeConstant
     public const int AutoVoidAllInstantWithPolicyId = 10;
     public const int AutoRecoverInstant = 11;
 
-    public static readonly Dictionary<int, string> VoidActionList = new()
+    public static readonly ImmutableDictionary<int, string> VoidActionList = new Dictionary<int, string>
     {
         { AutoVoidWinningId, AutoVoidConstant.QueueActionCal },
         { AutoVoidInstantId, AutoVoidConstant.QueueActionVoidInstant },
@@ -32,5 +33,5 @@ public static class VoidActionTypeConstant
         { AutoVoidAllResultKeyedId, AutoVoidConstant.QueueActionVoidResultKeyed },
         { AutoVoidAllInstantWithPolicyId, AutoVoidConstant.QueueActionVoidInstantWithPolicy },
         { AutoRecoverInstant, AutoVoidConstant.QueueRecoverInstant }
-    };
+    }.ToImmutableDictionary();
 }

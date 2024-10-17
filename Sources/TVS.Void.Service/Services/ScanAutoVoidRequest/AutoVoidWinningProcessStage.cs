@@ -14,38 +14,36 @@ public interface AutoVoidWinningProcessStage
 
 public class AutoVoidWinningProcessStageImp : AutoVoidWinningProcessStage
 {
-    private readonly GetTicketsStage getTicketsStage;
     private readonly CheckTicketValidationStage checkTicketAllowToVoidStage;
     private readonly ReCalculateTicketsStage reCalculateTicketsStage;
     private readonly InsertPreVoidingDataStage insertPreVoidingDataStage;
     private readonly AutoVoidRequestQueueService autoVoidRequestQueueService;
     private readonly CreateVoidDataXmlStage createVoidDataXmlStage;
     private readonly LoggingService loggingService;
-    private readonly CheckVoidWinningRequestQueueValidStage checkRequestQueueValidStage;
+    private readonly AutoVoidWinningBeforeVoidService autoVoidWinningBeforeVoidService;
 
-    public AutoVoidWinningProcessStageImp(GetTicketsStage getTicketsStage, CheckTicketValidationStage checkTicketAllowToVoidStage, ReCalculateTicketsStage reCalculateTicketsStage,
-        InsertPreVoidingDataStage insertPreVoidingDataStage, AutoVoidRequestQueueService autoVoidRequestQueueService, CreateVoidDataXmlStage createVoidDataXmlStage, LoggingService loggingService,
-        CheckVoidWinningRequestQueueValidStage checkRequestQueueValidStage)
+    public AutoVoidWinningProcessStageImp(CheckTicketValidationStage checkTicketAllowToVoidStage, ReCalculateTicketsStage reCalculateTicketsStage,
+        InsertPreVoidingDataStage insertPreVoidingDataStage, AutoVoidRequestQueueService autoVoidRequestQueueService, CreateVoidDataXmlStage createVoidDataXmlStage,
+        LoggingService loggingService, AutoVoidWinningBeforeVoidService autoVoidWinningBeforeVoidService)
     {
-        this.getTicketsStage = getTicketsStage;
         this.checkTicketAllowToVoidStage = checkTicketAllowToVoidStage;
         this.reCalculateTicketsStage = reCalculateTicketsStage;
         this.insertPreVoidingDataStage = insertPreVoidingDataStage;
         this.autoVoidRequestQueueService = autoVoidRequestQueueService;
         this.createVoidDataXmlStage = createVoidDataXmlStage;
         this.loggingService = loggingService;
-        this.checkRequestQueueValidStage = checkRequestQueueValidStage;
+        this.autoVoidWinningBeforeVoidService = autoVoidWinningBeforeVoidService;
     }
 
     public async Task Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue, IList<string> logData)
     {
-        var checkQueueResult = await checkRequestQueueValidStage.Execute(siteDbGroupId, queue);
+        var checkQueueResult = await autoVoidWinningBeforeVoidService.CheckVoidWinningRequestQueueValid(siteDbGroupId, queue);
         if (!checkQueueResult.IsValid)
         {
             return;
         }
 
-        var getTicketsResult = await getTicketsStage.Execute(siteDbGroupId, queue, logData);
+        var getTicketsResult = await autoVoidWinningBeforeVoidService.GetTickets(siteDbGroupId, queue, logData);
         if (!getTicketsResult.IsContinueFlow)
         {
             var errorMessage = GetErrorMessage(checkQueueResult.RequestIdsChangedAction, queue.RequestIds, "No ticket found.");

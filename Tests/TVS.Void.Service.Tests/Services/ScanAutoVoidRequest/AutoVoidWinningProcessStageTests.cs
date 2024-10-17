@@ -10,36 +10,32 @@ namespace TVS.Void.Service.Tests.Services.ScanAutoVoidRequest;
 
 public class AutoVoidWinningProcessStageTests
 {
-    private readonly AutoVoidRequestQueueService autoVoidRequestQueueService;
     private readonly CheckTicketValidationStage checkTicketAllowToVoidStage;
-    private readonly GetTicketsStage getTicketsStage;
     private readonly InsertPreVoidingDataStage insertPreVoidingDataStage;
-    private readonly LoggingService loggingService;
-    private readonly ReCalculateTicketsStage reCalculateTicketsStage;
+    private readonly AutoVoidRequestQueueService autoVoidRequestQueueService;
     private readonly CreateVoidDataXmlStage createVoidDataXmlStage;
-    private readonly CheckVoidWinningRequestQueueValidStage checkRequestQueueValidStage;
+    private readonly LoggingService loggingService;
+    private readonly AutoVoidWinningBeforeVoidService autoVoidWinningBeforeVoidService;
 
     private readonly AutoVoidWinningProcessStageImp service;
 
     public AutoVoidWinningProcessStageTests()
     {
-        reCalculateTicketsStage = Substitute.For<ReCalculateTicketsStage>();
-        getTicketsStage = Substitute.For<GetTicketsStage>();
+        var reCalculateTicketsStage = Substitute.For<ReCalculateTicketsStage>();
+        autoVoidWinningBeforeVoidService = Substitute.For<AutoVoidWinningBeforeVoidService>();
         checkTicketAllowToVoidStage = Substitute.For<CheckTicketValidationStage>();
         insertPreVoidingDataStage = Substitute.For<InsertPreVoidingDataStage>();
         autoVoidRequestQueueService = Substitute.For<AutoVoidRequestQueueService>();
         createVoidDataXmlStage = Substitute.For<CreateVoidDataXmlStage>();
         loggingService = Substitute.For<LoggingService>();
-        checkRequestQueueValidStage = Substitute.For<CheckVoidWinningRequestQueueValidStage>();
         service = new AutoVoidWinningProcessStageImp(
-            getTicketsStage,
             checkTicketAllowToVoidStage,
             reCalculateTicketsStage,
             insertPreVoidingDataStage,
             autoVoidRequestQueueService,
             createVoidDataXmlStage,
             loggingService,
-            checkRequestQueueValidStage
+            autoVoidWinningBeforeVoidService
         );
     }
 
@@ -49,15 +45,15 @@ public class AutoVoidWinningProcessStageTests
         // Arrange
         var queue = new AutoVoidRequestQueueModel();
         var logData = new List<string>();
-        checkRequestQueueValidStage.Execute(1, queue).Returns((false, string.Empty));
-        getTicketsStage.Execute(1, queue, logData).ReturnsForAnyArgs((false, null));
+        autoVoidWinningBeforeVoidService.CheckVoidWinningRequestQueueValid(1, queue).Returns((false, string.Empty));
+        autoVoidWinningBeforeVoidService.GetTickets(1, queue, logData).ReturnsForAnyArgs((false, null));
 
         // Act
         _ = service.Execute(1, queue, logData);
 
         // Assert
-        checkRequestQueueValidStage.Received(1).Execute(1, queue);
-        getTicketsStage.Received(0).Execute(1, queue, logData);
+        autoVoidWinningBeforeVoidService.Received(1).CheckVoidWinningRequestQueueValid(1, queue);
+        autoVoidWinningBeforeVoidService.Received(0).GetTickets(1, queue, logData);
     }
 
     [Fact]
@@ -66,14 +62,14 @@ public class AutoVoidWinningProcessStageTests
         // Arrange
         var queue = new AutoVoidRequestQueueModel();
         var logData = new List<string>();
-        checkRequestQueueValidStage.Execute(1, queue).Returns((true, string.Empty));
-        getTicketsStage.Execute(1, queue, logData).ReturnsForAnyArgs((false, null));
+        autoVoidWinningBeforeVoidService.CheckVoidWinningRequestQueueValid(1, queue).Returns((true, string.Empty));
+        autoVoidWinningBeforeVoidService.GetTickets(1, queue, logData).ReturnsForAnyArgs((false, null));
 
         // Act
         _ = service.Execute(1, queue, logData);
 
         // Assert
-        getTicketsStage.Received(1).Execute(1, queue, logData);
+        autoVoidWinningBeforeVoidService.Received(1).GetTickets(1, queue, logData);
     }
 
     [Fact]
@@ -96,8 +92,8 @@ public class AutoVoidWinningProcessStageTests
             ParlayTicketsResettle = new List<RequestDetailTicketModel>(),
             CricketTicketsResettle = new List<RequestDetailTicketModel>()
         };
-        checkRequestQueueValidStage.Execute(1, queue).Returns((true, string.Empty));
-        getTicketsStage.Execute(1, queue, logData).ReturnsForAnyArgs((true, outputData));
+        autoVoidWinningBeforeVoidService.CheckVoidWinningRequestQueueValid(1, queue).Returns((true, string.Empty));
+        autoVoidWinningBeforeVoidService.GetTickets(1, queue, logData).ReturnsForAnyArgs((true, outputData));
         checkTicketAllowToVoidStage.ExecuteForVoid(1, default, default, default, default, logData).ReturnsForAnyArgs(checkTicketResult);
         createVoidDataXmlStage.Execute(true, Arg.Any<CheckTicketValidationOutput>()).ReturnsForAnyArgs(voidDataXml);
         insertPreVoidingDataStage.Execute(1, queue, Arg.Any<IEnumerable<RequestDetailTicketModel>>(), voidDataXml, logData).ReturnsForAnyArgs(string.Empty);
