@@ -32,12 +32,12 @@ namespace TVS.Void.Service.Website.Utilities;
 [ExcludeFromCodeCoverage(Justification = "non-logic")]
 public static class ServiceCollectionExtension
 {
-    public static void LoadConfig(this IServiceCollection services, IConfiguration configuration)
+    public static void AddTvsConfig(this IServiceCollection services, IConfiguration configuration)
     {
         AppSettingService.InitSetting(configuration);
     }
 
-    public static void RegisterSentry(this IServiceCollection services)
+    public static void AddSentry(this IServiceCollection services)
     {
         LogManager
             .SetDefaultLogCategory(AppSettingService.AppSetting.CategorySentryLog)
@@ -50,7 +50,7 @@ public static class ServiceCollectionExtension
             });
     }
 
-    public static void RegisterFanexExceptionHandler(this IServiceCollection services)
+    public static void AddFanexExceptionHandler(this IServiceCollection services)
     {
         var configuration = new LoggingConfiguration()
             .GetHttpHeaderInfo()
@@ -59,7 +59,7 @@ public static class ServiceCollectionExtension
         ExceptionHandler.UseConfig(configuration);
     }
 
-    public static void RegisterONEbookUM(this IServiceCollection services, IConfiguration configuration)
+    public static void AddONEbookUM(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddSingleton(new UMClientConfiguration().Initialize(configuration));
         services.AddSingleton<IUMCacheService, MemoryUMCacheService>();
@@ -69,7 +69,7 @@ public static class ServiceCollectionExtension
         services.AddSingleton<IMaintenanceService, MaintenanceService>();
     }
 
-    public static void RegisterSignalR(this IServiceCollection services)
+    public static void AddTvsSignalR(this IServiceCollection services)
     {
         services.AddSignalR().AddStackExchangeRedis(options =>
         {
@@ -80,7 +80,7 @@ public static class ServiceCollectionExtension
         });
     }
 
-    public static void RegisterBusinessService(this IServiceCollection services)
+    public static void AddBusinessService(this IServiceCollection services)
     {
         services.AddSingleton<IDynamicRepository, DynamicRepository>();
 
@@ -122,7 +122,7 @@ public static class ServiceCollectionExtension
         services.AddSingleton<AutoVoidWinningBeforeVoidService, AutoVoidWinningBeforeVoidServiceImp>();
     }
 
-    public static void RegisterQuartzScheduler(this IServiceCollection services)
+    public static void AddQuartzScheduler(this IServiceCollection services)
     {
         const int maxConcurrencyThread = 10;
         services.AddTransient<CheckTicketStatusJob>();

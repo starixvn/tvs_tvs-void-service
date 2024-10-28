@@ -9,16 +9,16 @@ var services = builder.Services;
 var configuration = builder.Configuration;
 
 // Add services to the container.
-services.LoadConfig(builder.Configuration);
+services.AddTvsConfig(builder.Configuration);
 services.AddControllers();
 services.AddMemoryCache();
 services.AddFanexSql(builder.Configuration);
-services.RegisterFanexExceptionHandler();
-services.RegisterSentry();
-services.RegisterONEbookUM(builder.Configuration);
-services.RegisterSignalR();
-services.RegisterBusinessService();
-services.RegisterQuartzScheduler();
+services.AddFanexExceptionHandler();
+services.AddSentry();
+services.AddONEbookUM(builder.Configuration);
+services.AddTvsSignalR();
+services.AddBusinessService();
+services.AddQuartzScheduler();
 
 // Build app
 var app = builder.Build();
