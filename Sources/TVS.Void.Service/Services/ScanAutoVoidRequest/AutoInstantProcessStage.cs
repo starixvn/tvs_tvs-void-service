@@ -93,7 +93,8 @@ public class AutoInstantProcessStageImp : AutoInstantProcessStage
             IssueTypeConstant.WrongKickOffTime,
             IssueTypeConstant.Abandoned,
             IssueTypeConstant.WrongMarketOffered,
-            IssueTypeConstant.TechnicalError
+            IssueTypeConstant.TechnicalError,
+            IssueTypeConstant.WrongOfferedName
         };
         return issueTypesReCheckValidation.Contains(issueTypeId);
     }
