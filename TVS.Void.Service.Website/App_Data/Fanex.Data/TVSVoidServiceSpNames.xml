@@ -2,59 +2,59 @@
 <Functions>
     <Function Name="Scanning Auto Void Request Service">
         <Setting Key="DBCTG.TicketVoiding_AutoVoidRequest_Queue_Select" SpName="TicketVoiding_AutoVoidRequest_Queue_Select" DbName="DBCTG.bodb02.wsv_nap" TimeOut="600" />
-        <Setting Key="DBSIG.TicketVoiding_AutoVoidRequest_Queue_Select" SpName="TicketVoiding_AutoVoidRequest_Queue_Select" DbName="DBSIG.bodb02.wsv_nap" TimeOut="600" />
-        <Setting Key="DBSIG2.TicketVoiding_AutoVoidRequest_Queue_Select" SpName="TicketVoiding_AutoVoidRequest_Queue_Select" DbName="DBSIG2.bodb02.wsv_nap" TimeOut="600" />
-        <Setting Key="DBSIG3.TicketVoiding_AutoVoidRequest_Queue_Select" SpName="TicketVoiding_AutoVoidRequest_Queue_Select" DbName="DBSIG3.bodb02.wsv_nap" TimeOut="600" />
+        <Setting Key="DBSITE01.TicketVoiding_AutoVoidRequest_Queue_Select" SpName="TicketVoiding_AutoVoidRequest_Queue_Select" DbName="DBSITE01.bodb02.wsv_nap" TimeOut="600" />
+        <Setting Key="DBSITE02.TicketVoiding_AutoVoidRequest_Queue_Select" SpName="TicketVoiding_AutoVoidRequest_Queue_Select" DbName="DBSITE02.bodb02.wsv_nap" TimeOut="600" />
+        <Setting Key="DBSITE03.TicketVoiding_AutoVoidRequest_Queue_Select" SpName="TicketVoiding_AutoVoidRequest_Queue_Select" DbName="DBSITE03.bodb02.wsv_nap" TimeOut="600" />
 
         <Setting Key="DBCTG.TicketVoiding_AutoVoidRequest_Validation" SpName="TicketVoiding_AutoVoidRequest_Validation" DbName="DBCTG.bodb02.wsv_nap" TimeOut="600" />
-        <Setting Key="DBSIG.TicketVoiding_AutoVoidRequest_Validation" SpName="TicketVoiding_AutoVoidRequest_Validation" DbName="DBSIG.bodb02.wsv_nap" TimeOut="600" />
-        <Setting Key="DBSIG2.TicketVoiding_AutoVoidRequest_Validation" SpName="TicketVoiding_AutoVoidRequest_Validation" DbName="DBSIG2.bodb02.wsv_nap" TimeOut="600" />
-        <Setting Key="DBSIG3.TicketVoiding_AutoVoidRequest_Validation" SpName="TicketVoiding_AutoVoidRequest_Validation" DbName="DBSIG3.bodb02.wsv_nap" TimeOut="600" />
+        <Setting Key="DBSITE01.TicketVoiding_AutoVoidRequest_Validation" SpName="TicketVoiding_AutoVoidRequest_Validation" DbName="DBSITE01.bodb02.wsv_nap" TimeOut="600" />
+        <Setting Key="DBSITE02.TicketVoiding_AutoVoidRequest_Validation" SpName="TicketVoiding_AutoVoidRequest_Validation" DbName="DBSITE02.bodb02.wsv_nap" TimeOut="600" />
+        <Setting Key="DBSITE03.TicketVoiding_AutoVoidRequest_Validation" SpName="TicketVoiding_AutoVoidRequest_Validation" DbName="DBSITE03.bodb02.wsv_nap" TimeOut="600" />
 
         <Setting Key="DBCTG.TicketVoiding_AutoRecover_Validation" SpName="TicketVoiding_AutoRecover_Validation" DbName="DBCTG.bodb02.wsv_nap" TimeOut="600" />
-        <Setting Key="DBSIG.TicketVoiding_AutoRecover_Validation" SpName="TicketVoiding_AutoRecover_Validation" DbName="DBSIG.bodb02.wsv_nap" TimeOut="600" />
-        <Setting Key="DBSIG2.TicketVoiding_AutoRecover_Validation" SpName="TicketVoiding_AutoRecover_Validation" DbName="DBSIG2.bodb02.wsv_nap" TimeOut="600" />
-        <Setting Key="DBSIG3.TicketVoiding_AutoRecover_Validation" SpName="TicketVoiding_AutoRecover_Validation" DbName="DBSIG3.bodb02.wsv_nap" TimeOut="600" />
+        <Setting Key="DBSITE01.TicketVoiding_AutoRecover_Validation" SpName="TicketVoiding_AutoRecover_Validation" DbName="DBSITE01.bodb02.wsv_nap" TimeOut="600" />
+        <Setting Key="DBSITE02.TicketVoiding_AutoRecover_Validation" SpName="TicketVoiding_AutoRecover_Validation" DbName="DBSITE02.bodb02.wsv_nap" TimeOut="600" />
+        <Setting Key="DBSITE03.TicketVoiding_AutoRecover_Validation" SpName="TicketVoiding_AutoRecover_Validation" DbName="DBSITE03.bodb02.wsv_nap" TimeOut="600" />
 
         <Setting Key="DBCTG.TicketVoiding_AutoVoidRequest_Queue_Update" SpName="TicketVoiding_AutoVoidRequest_Queue_Update" DbName="DBCTG.bodb02.wsv_nap" TimeOut="600" />
-        <Setting Key="DBSIG.TicketVoiding_AutoVoidRequest_Queue_Update" SpName="TicketVoiding_AutoVoidRequest_Queue_Update" DbName="DBSIG.bodb02.wsv_nap" TimeOut="600" />
-        <Setting Key="DBSIG2.TicketVoiding_AutoVoidRequest_Queue_Update" SpName="TicketVoiding_AutoVoidRequest_Queue_Update" DbName="DBSIG2.bodb02.wsv_nap" TimeOut="600" />
-        <Setting Key="DBSIG3.TicketVoiding_AutoVoidRequest_Queue_Update" SpName="TicketVoiding_AutoVoidRequest_Queue_Update" DbName="DBSIG3.bodb02.wsv_nap" TimeOut="600" />
+        <Setting Key="DBSITE01.TicketVoiding_AutoVoidRequest_Queue_Update" SpName="TicketVoiding_AutoVoidRequest_Queue_Update" DbName="DBSITE01.bodb02.wsv_nap" TimeOut="600" />
+        <Setting Key="DBSITE02.TicketVoiding_AutoVoidRequest_Queue_Update" SpName="TicketVoiding_AutoVoidRequest_Queue_Update" DbName="DBSITE02.bodb02.wsv_nap" TimeOut="600" />
+        <Setting Key="DBSITE03.TicketVoiding_AutoVoidRequest_Queue_Update" SpName="TicketVoiding_AutoVoidRequest_Queue_Update" DbName="DBSITE03.bodb02.wsv_nap" TimeOut="600" />
 
         <Setting Key="DBCTG.TicketVoiding_AutoVoidRequest_Queue_Insert" SpName="TicketVoiding_AutoVoidRequest_Queue_Insert" DbName="DBCTG.bodb02.wsv_nap" TimeOut="600" />
-        <Setting Key="DBSIG.TicketVoiding_AutoVoidRequest_Queue_Insert" SpName="TicketVoiding_AutoVoidRequest_Queue_Insert" DbName="DBSIG.bodb02.wsv_nap" TimeOut="600" />
-        <Setting Key="DBSIG2.TicketVoiding_AutoVoidRequest_Queue_Insert" SpName="TicketVoiding_AutoVoidRequest_Queue_Insert" DbName="DBSIG2.bodb02.wsv_nap" TimeOut="600" />
-        <Setting Key="DBSIG3.TicketVoiding_AutoVoidRequest_Queue_Insert" SpName="TicketVoiding_AutoVoidRequest_Queue_Insert" DbName="DBSIG3.bodb02.wsv_nap" TimeOut="600" />
+        <Setting Key="DBSITE01.TicketVoiding_AutoVoidRequest_Queue_Insert" SpName="TicketVoiding_AutoVoidRequest_Queue_Insert" DbName="DBSITE01.bodb02.wsv_nap" TimeOut="600" />
+        <Setting Key="DBSITE02.TicketVoiding_AutoVoidRequest_Queue_Insert" SpName="TicketVoiding_AutoVoidRequest_Queue_Insert" DbName="DBSITE02.bodb02.wsv_nap" TimeOut="600" />
+        <Setting Key="DBSITE03.TicketVoiding_AutoVoidRequest_Queue_Insert" SpName="TicketVoiding_AutoVoidRequest_Queue_Insert" DbName="DBSITE03.bodb02.wsv_nap" TimeOut="600" />
 
         <Setting Key="DBCTG.TicketVoiding_Auto_Unmark_ReCalculate" SpName="TicketVoiding_Auto_Unmark_ReCalculate" DbName="DBCTG.bodb02.wsv_nap" TimeOut="600" />
-        <Setting Key="DBSIG.TicketVoiding_Auto_Unmark_ReCalculate" SpName="TicketVoiding_Auto_Unmark_ReCalculate" DbName="DBSIG.bodb02.wsv_nap" TimeOut="600" />
-        <Setting Key="DBSIG2.TicketVoiding_Auto_Unmark_ReCalculate" SpName="TicketVoiding_Auto_Unmark_ReCalculate" DbName="DBSIG2.bodb02.wsv_nap" TimeOut="600" />
-        <Setting Key="DBSIG3.TicketVoiding_Auto_Unmark_ReCalculate" SpName="TicketVoiding_Auto_Unmark_ReCalculate" DbName="DBSIG3.bodb02.wsv_nap" TimeOut="600" />
+        <Setting Key="DBSITE01.TicketVoiding_Auto_Unmark_ReCalculate" SpName="TicketVoiding_Auto_Unmark_ReCalculate" DbName="DBSITE01.bodb02.wsv_nap" TimeOut="600" />
+        <Setting Key="DBSITE02.TicketVoiding_Auto_Unmark_ReCalculate" SpName="TicketVoiding_Auto_Unmark_ReCalculate" DbName="DBSITE02.bodb02.wsv_nap" TimeOut="600" />
+        <Setting Key="DBSITE03.TicketVoiding_Auto_Unmark_ReCalculate" SpName="TicketVoiding_Auto_Unmark_ReCalculate" DbName="DBSITE03.bodb02.wsv_nap" TimeOut="600" />
 
         <Setting Key="DBCTG.TicketVoiding_Queue_Select" SpName="TicketVoiding_Queue_Select" DbName="DBCTG.bodb02.wsv_nap" TimeOut="600" />
-        <Setting Key="DBSIG.TicketVoiding_Queue_Select" SpName="TicketVoiding_Queue_Select" DbName="DBSIG.bodb02.wsv_nap" TimeOut="600" />
-        <Setting Key="DBSIG2.TicketVoiding_Queue_Select" SpName="TicketVoiding_Queue_Select" DbName="DBSIG2.bodb02.wsv_nap" TimeOut="600" />
-        <Setting Key="DBSIG3.TicketVoiding_Queue_Select" SpName="TicketVoiding_Queue_Select" DbName="DBSIG3.bodb02.wsv_nap" TimeOut="600" />
+        <Setting Key="DBSITE01.TicketVoiding_Queue_Select" SpName="TicketVoiding_Queue_Select" DbName="DBSITE01.bodb02.wsv_nap" TimeOut="600" />
+        <Setting Key="DBSITE02.TicketVoiding_Queue_Select" SpName="TicketVoiding_Queue_Select" DbName="DBSITE02.bodb02.wsv_nap" TimeOut="600" />
+        <Setting Key="DBSITE03.TicketVoiding_Queue_Select" SpName="TicketVoiding_Queue_Select" DbName="DBSITE03.bodb02.wsv_nap" TimeOut="600" />
 
         <Setting Key="DBCTG.TicketVoiding_Queue_Insert" SpName="TicketVoiding_Queue_Insert" DbName="DBCTG.bodb02.wsv_nap" TimeOut="600" />
-        <Setting Key="DBSIG.TicketVoiding_Queue_Insert" SpName="TicketVoiding_Queue_Insert" DbName="DBSIG.bodb02.wsv_nap" TimeOut="600" />
-        <Setting Key="DBSIG2.TicketVoiding_Queue_Insert" SpName="TicketVoiding_Queue_Insert" DbName="DBSIG2.bodb02.wsv_nap" TimeOut="600" />
-        <Setting Key="DBSIG3.TicketVoiding_Queue_Insert" SpName="TicketVoiding_Queue_Insert" DbName="DBSIG3.bodb02.wsv_nap" TimeOut="600" />
+        <Setting Key="DBSITE01.TicketVoiding_Queue_Insert" SpName="TicketVoiding_Queue_Insert" DbName="DBSITE01.bodb02.wsv_nap" TimeOut="600" />
+        <Setting Key="DBSITE02.TicketVoiding_Queue_Insert" SpName="TicketVoiding_Queue_Insert" DbName="DBSITE02.bodb02.wsv_nap" TimeOut="600" />
+        <Setting Key="DBSITE03.TicketVoiding_Queue_Insert" SpName="TicketVoiding_Queue_Insert" DbName="DBSITE03.bodb02.wsv_nap" TimeOut="600" />
 
         <Setting Key="DBCTG.TicketVoiding_Queue_Job" SpName="TicketVoiding_Queue_Job" DbName="DBCTG.bodb02.wsv_nap" TimeOut="600" />
-        <Setting Key="DBSIG.TicketVoiding_Queue_Job" SpName="TicketVoiding_Queue_Job" DbName="DBSIG.bodb02.wsv_nap" TimeOut="600" />
-        <Setting Key="DBSIG2.TicketVoiding_Queue_Job" SpName="TicketVoiding_Queue_Job" DbName="DBSIG2.bodb02.wsv_nap" TimeOut="600" />
-        <Setting Key="DBSIG3.TicketVoiding_Queue_Job" SpName="TicketVoiding_Queue_Job" DbName="DBSIG3.bodb02.wsv_nap" TimeOut="600" />
+        <Setting Key="DBSITE01.TicketVoiding_Queue_Job" SpName="TicketVoiding_Queue_Job" DbName="DBSITE01.bodb02.wsv_nap" TimeOut="600" />
+        <Setting Key="DBSITE02.TicketVoiding_Queue_Job" SpName="TicketVoiding_Queue_Job" DbName="DBSITE02.bodb02.wsv_nap" TimeOut="600" />
+        <Setting Key="DBSITE03.TicketVoiding_Queue_Job" SpName="TicketVoiding_Queue_Job" DbName="DBSITE03.bodb02.wsv_nap" TimeOut="600" />
 
         <Setting Key="DBCTG.TicketVoiding_AutoVoidRequest_CheckQueue" SpName="TicketVoiding_AutoVoidRequest_CheckQueue" DbName="DBCTG.bodb02.wsv_nap" TimeOut="600" />
-        <Setting Key="DBSIG.TicketVoiding_AutoVoidRequest_CheckQueue" SpName="TicketVoiding_AutoVoidRequest_CheckQueue" DbName="DBSIG.bodb02.wsv_nap" TimeOut="600" />
-        <Setting Key="DBSIG2.TicketVoiding_AutoVoidRequest_CheckQueue" SpName="TicketVoiding_AutoVoidRequest_CheckQueue" DbName="DBSIG2.bodb02.wsv_nap" TimeOut="600" />
-        <Setting Key="DBSIG3.TicketVoiding_AutoVoidRequest_CheckQueue" SpName="TicketVoiding_AutoVoidRequest_CheckQueue" DbName="DBSIG3.bodb02.wsv_nap" TimeOut="600" />
+        <Setting Key="DBSITE01.TicketVoiding_AutoVoidRequest_CheckQueue" SpName="TicketVoiding_AutoVoidRequest_CheckQueue" DbName="DBSITE01.bodb02.wsv_nap" TimeOut="600" />
+        <Setting Key="DBSITE02.TicketVoiding_AutoVoidRequest_CheckQueue" SpName="TicketVoiding_AutoVoidRequest_CheckQueue" DbName="DBSITE02.bodb02.wsv_nap" TimeOut="600" />
+        <Setting Key="DBSITE03.TicketVoiding_AutoVoidRequest_CheckQueue" SpName="TicketVoiding_AutoVoidRequest_CheckQueue" DbName="DBSITE03.bodb02.wsv_nap" TimeOut="600" />
 
         <Setting Key="DBCTG.Nap_SpecialDelete_MarkTickets_Update" SpName="Nap_SpecialDelete_MarkTickets_Update" DbName="DBCTG.bodb02.wsv_nap" TimeOut="600" />
-        <Setting Key="DBSIG.Nap_SpecialDelete_MarkTickets_Update" SpName="Nap_SpecialDelete_MarkTickets_Update" DbName="DBSIG.bodb02.wsv_nap" TimeOut="600" />
-        <Setting Key="DBSIG2.Nap_SpecialDelete_MarkTickets_Update" SpName="Nap_SpecialDelete_MarkTickets_Update" DbName="DBSIG2.bodb02.wsv_nap" TimeOut="600" />
-        <Setting Key="DBSIG3.Nap_SpecialDelete_MarkTickets_Update" SpName="Nap_SpecialDelete_MarkTickets_Update" DbName="DBSIG3.bodb02.wsv_nap" TimeOut="600" />
+        <Setting Key="DBSITE01.Nap_SpecialDelete_MarkTickets_Update" SpName="Nap_SpecialDelete_MarkTickets_Update" DbName="DBSITE01.bodb02.wsv_nap" TimeOut="600" />
+        <Setting Key="DBSITE02.Nap_SpecialDelete_MarkTickets_Update" SpName="Nap_SpecialDelete_MarkTickets_Update" DbName="DBSITE02.bodb02.wsv_nap" TimeOut="600" />
+        <Setting Key="DBSITE03.Nap_SpecialDelete_MarkTickets_Update" SpName="Nap_SpecialDelete_MarkTickets_Update" DbName="DBSITE03.bodb02.wsv_nap" TimeOut="600" />
 
         <Setting Key="TicketVoiding_AutoVoidRequest_Ticket_Select" SpName="TicketVoiding_AutoVoidRequest_Ticket_Select" DbName="DBCTG.bodb02.wsv_nap" TimeOut="600" />
         <Setting Key="TicketVoiding_VoidingHistory_Insert" SpName="TicketVoiding_VoidingHistory_Insert" DbName="DBCTG.bodb02.wsv_nap" TimeOut="600" />
@@ -70,6 +70,6 @@
     </Function>
     <Function Name="NetPosition">
         <Setting Key="DBCTG.NAP_TicketVoiding_NetPosition" SpName="NAP_TicketVoiding_NetPosition" DbName="DBCTG.bodb02.wsv_nap" TimeOut="600" />
-        <Setting Key="DBSIG3.NAP_TicketVoiding_NetPosition" SpName="NAP_TicketVoiding_NetPosition" DbName="DBSIG3.bodb02.wsv_nap" TimeOut="600" />
+        <Setting Key="DBSITE03.NAP_TicketVoiding_NetPosition" SpName="NAP_TicketVoiding_NetPosition" DbName="DBSITE03.bodb02.wsv_nap" TimeOut="600" />
     </Function>
 </Functions>
