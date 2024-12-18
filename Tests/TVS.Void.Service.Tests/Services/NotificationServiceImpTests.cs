@@ -27,7 +27,7 @@ public class NotificationServiceImpTests
         var service = new NotificationServiceImp(hubContext, default);
 
         // Act
-        await service.NotifyRequestRunningToAllUser(new List<VoidingHistoryModel> { new VoidingHistoryModel { RequestId = requestId } });
+        await service.NotifyRequestRunningToAllUser(new List<VoidingHistoryModel> { new() { RequestId = requestId } });
 
         // Assert
         await clientEvent.Received(1)
@@ -44,7 +44,7 @@ public class NotificationServiceImpTests
         var service = new NotificationServiceImp(default, loggingService);
 
         // Act
-        await service.NotifyRequestRunningToAllUser(new List<VoidingHistoryModel> { new VoidingHistoryModel { RequestId = requestId } });
+        await service.NotifyRequestRunningToAllUser(new List<VoidingHistoryModel> { new() { RequestId = requestId } });
 
         // Assert
         await loggingService.Received(1).ErrorAsync(Arg.Any<Exception>());
@@ -129,10 +129,10 @@ public class NotificationServiceImpTests
         await loggingService.Received(1).ErrorAsync(Arg.Any<Exception>());
     }
 
-    public static IEnumerable<object[]> NotifyVoidFailedToUserThrowExceptionTestData =>
-        new List<object[]>
+    public static IEnumerable<object?[]> NotifyVoidFailedToUserThrowExceptionTestData =>
+        new List<object?[]>
         {
-            new object[] {  123, new List<TicketVoidingQueueModel>() },
-            new object[] {  0, null},
+            new object?[] {  123, new List<TicketVoidingQueueModel>() },
+            new object?[] {  0, null}
         };
 }

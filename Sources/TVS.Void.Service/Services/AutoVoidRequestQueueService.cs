@@ -20,7 +20,7 @@ public class AutoVoidRequestQueueServiceImp(IDynamicRepository repository) : Aut
     {
         var criteria = new GetAutoVoidRequestQueueCriteria
         {
-            SiteDbGroupId = siteDbGroupId,
+            SiteDbGroupId = siteDbGroupId
         };
 
         var result = await repository.GetAsync<AutoVoidRequestQueueModel>(criteria);

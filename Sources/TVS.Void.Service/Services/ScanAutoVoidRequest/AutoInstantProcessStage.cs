@@ -39,7 +39,7 @@ public class AutoInstantProcessStageImp(
         }
 
         CheckTicketValidationOutput validationResult;
-        //// Recheck for issue type have Cricket, Archive (some case ticket moved...), CancelCO and need some ticket info in bettrans
+        //// Recheck for issue type have Cricket, Archive (some case ticket moved...), CancelCO and need some ticket info in bet trans
         if (IsNeedToReCheckVoidValidation(checkQueueResult.IssueTypeId))
         {
             validationResult = await checkTicketValidationStage.ExecuteForVoid(siteDbGroupId, getTicketsResult.OutputData.SingleTickets,

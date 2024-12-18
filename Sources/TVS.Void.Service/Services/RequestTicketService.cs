@@ -45,7 +45,7 @@ public class RequestTicketServiceImp(IDynamicRepository repository) : RequestTic
         var criteria = new GetRequestTicketsCriteria
         {
             SiteDbGroupId = siteDbGroupId,
-            RequestIds = requestIds,
+            RequestIds = requestIds
         };
 
         var (singleTickets, parlayTickets, cricketTickets, cancelCashOutTickets) =

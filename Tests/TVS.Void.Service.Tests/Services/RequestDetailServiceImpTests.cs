@@ -21,7 +21,7 @@ public class RequestDetailServiceImpTests
         var fakeVoidingHistory = new List<VoidingHistoryModel> { new() { VoidingHistoryId = 112 } };
         var repository = Substitute.For<IDynamicRepository>();
         repository.FetchAsync<VoidingHistoryModel>(default).ReturnsForAnyArgs(fakeVoidingHistory);
-        var voidDataXml = "xml";
+        const string voidDataXml = "xml";
         var service = new RequestDetailServiceImp(repository);
 
         // Act
@@ -65,7 +65,7 @@ public class RequestDetailServiceImpTests
         var repository = Substitute.For<IDynamicRepository>();
         var counter = 0;
         repository.When(x => x.ExecuteAsync(Arg.Any<UpdateTicketVoidingHistoryCriteria>()))
-            .Do(x => counter++);
+            .Do(_ => counter++);
         var service = new RequestDetailServiceImp(repository);
 
         // Act
@@ -103,10 +103,10 @@ public class RequestDetailServiceImpTests
     {
         // Arrange
         var voidingHistory = new VoidDataXmlModel { VoidingHistoryId = 1 };
-        var voidingHistorys = new List<VoidDataXmlModel> { voidingHistory };
+        var voidingHistories = new List<VoidDataXmlModel> { voidingHistory };
         var repository = Substitute.For<IDynamicRepository>();
         repository.FetchAsync<VoidDataXmlModel>(Arg.Any<GetVoidDataOfVoidingHistoryCriteria>())
-            .ReturnsForAnyArgs(voidingHistorys);
+            .ReturnsForAnyArgs(voidingHistories);
         var service = new RequestDetailServiceImp(repository);
 
         // Act

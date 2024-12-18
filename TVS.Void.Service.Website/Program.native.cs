@@ -9,13 +9,13 @@ var services = builder.Services;
 var configuration = builder.Configuration;
 
 // Add services to the container.
-services.AddTvsConfig(builder.Configuration);
+services.AddTvsConfig(configuration);
 services.AddControllers();
 services.AddMemoryCache();
-services.AddFanexSql(builder.Configuration);
+services.AddFanexSql(configuration);
 services.AddFanexExceptionHandler();
 services.AddSentry();
-services.AddONEbookUM(builder.Configuration);
+services.AddONEbookUM(configuration);
 services.AddTvsSignalR();
 services.AddBusinessService();
 services.AddQuartzScheduler();

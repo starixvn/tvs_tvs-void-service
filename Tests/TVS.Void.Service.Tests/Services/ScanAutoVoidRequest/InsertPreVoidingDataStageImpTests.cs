@@ -15,7 +15,7 @@ public class InsertPreVoidingDataStageImpTests
         const int siteDbGroupId = 0;
         var singleTickets = new List<RequestDetailTicketModel> { new() };
         var queue = new AutoVoidRequestQueueModel();
-        var voidDataXml = "xmlAbc";
+        const string voidDataXml = "xmlAbc";
         var requestDetailService = Substitute.For<RequestDetailService>();
         var ticketVoidingQueueService = Substitute.For<TicketVoidingQueueService>();
         var requestTicketService = Substitute.For<RequestTicketService>();

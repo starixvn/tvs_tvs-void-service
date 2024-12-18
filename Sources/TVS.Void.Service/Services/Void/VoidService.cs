@@ -15,26 +15,15 @@ public interface VoidService
     Task Execute(int siteDbGroupId);
 }
 
-public class VoidServiceImp : VoidService
+public class VoidServiceImp(
+    TicketVoidingQueueService ticketVoidingQueueService,
+    RequestDetailService requestDetailService,
+    ProcessVoidQueuesStage processVoidQueuesStage,
+    InsertAfterVoidDataStage insertAfterVoidDataStage,
+    NotificationService notificationService,
+    LoggingService loggingService)
+    : VoidService
 {
-    private readonly TicketVoidingQueueService ticketVoidingQueueService;
-    private readonly RequestDetailService requestDetailService;
-    private readonly ProcessVoidQueuesStage processVoidQueuesStage;
-    private readonly InsertAfterVoidDataStage insertAfterVoidDataStage;
-    private readonly NotificationService notificationService;
-    private readonly LoggingService loggingService;
-
-    public VoidServiceImp(TicketVoidingQueueService ticketVoidingQueueService, RequestDetailService requestDetailService, ProcessVoidQueuesStage processVoidQueuesStage,
-        InsertAfterVoidDataStage insertAfterVoidDataStage, NotificationService notificationService, NetPositionService netPositionService, LoggingService loggingService)
-    {
-        this.ticketVoidingQueueService = ticketVoidingQueueService;
-        this.requestDetailService = requestDetailService;
-        this.processVoidQueuesStage = processVoidQueuesStage;
-        this.insertAfterVoidDataStage = insertAfterVoidDataStage;
-        this.notificationService = notificationService;
-        this.loggingService = loggingService;
-    }
-
     public async Task Execute(int siteDbGroupId)
     {
         var voidingQueues = await ticketVoidingQueueService.GetQueues(siteDbGroupId, null);

@@ -39,7 +39,7 @@ public class TicketVoidingQueueServiceImpTests
         var counter = 0;
         var repository = Substitute.For<IDynamicRepository>();
         repository.When(x => x.ExecuteAsync(Arg.Any<InsertTicketVoidingQueueCriteria>()))
-            .Do(x => counter++);
+            .Do(_ => counter++);
         var service = new TicketVoidingQueueServiceImp(repository);
 
         // Act
@@ -51,7 +51,7 @@ public class TicketVoidingQueueServiceImpTests
         Assert.Equal(1, counter);
     }
 
-    [Fact()]
+    [Fact]
     public async Task InsertQueueForRequests_ShouldExecuteRepositorySuccessful()
     {
         // Arrange
@@ -63,7 +63,7 @@ public class TicketVoidingQueueServiceImpTests
         var counter = 0;
         var repository = Substitute.For<IDynamicRepository>();
         repository.When(x => x.ExecuteAsync(Arg.Any<InsertTicketVoidingQueueCriteria>()))
-            .Do(x => counter++);
+            .Do(_ => counter++);
         var service = new TicketVoidingQueueServiceImp(repository);
 
         // Act

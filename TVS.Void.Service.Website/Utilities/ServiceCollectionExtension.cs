@@ -133,7 +133,7 @@ public static class ServiceCollectionExtension
         services.AddTransient<AddRequestDuplicatedTicketsJob>();
         services.AddQuartz(q =>
         {
-            // handy when part of cluster or you want to otherwise identify multiple schedulers
+            // handy when part of cluster, or you want to otherwise identify multiple schedulers
             q.SchedulerId = "Scheduler-TVS-Void-Service-Id";
             q.SchedulerName = "Scheduler-TVS-Void-Service";
 

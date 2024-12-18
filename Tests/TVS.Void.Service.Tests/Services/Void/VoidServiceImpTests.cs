@@ -15,11 +15,10 @@ public class VoidServiceImpTests
         // Arrange
         const int fakeSiteDbGroupId = 2;
         var ticketVoidingQueueService = Substitute.For<TicketVoidingQueueService>();
-        var netPositionService = Substitute.For<NetPositionService>();
         var processVoidQueuesStage = Substitute.For<ProcessVoidQueuesStage>();
         ticketVoidingQueueService.GetQueues(default, default).ReturnsForAnyArgs(new List<TicketVoidingQueueModel>());
         var service = new VoidServiceImp(ticketVoidingQueueService, default, processVoidQueuesStage, default,
-            default, netPositionService, default);
+            default, default);
         // Act
         await service.Execute(fakeSiteDbGroupId);
 
@@ -41,12 +40,11 @@ public class VoidServiceImpTests
         var processVoidQueuesStage = Substitute.For<ProcessVoidQueuesStage>();
         var requestDetailService = Substitute.For<RequestDetailService>();
         var notificationService = Substitute.For<NotificationService>();
-        var netPositionService = Substitute.For<NetPositionService>();
         var loggingService = Substitute.For<LoggingService>();
         ticketVoidingQueueService.GetQueues(default, default).ReturnsForAnyArgs(fakeGetQueues);
         processVoidQueuesStage.Execute(default, default).ReturnsForAnyArgs(fakeProcessResults);
         var service = new VoidServiceImp(ticketVoidingQueueService, requestDetailService, processVoidQueuesStage, default,
-            notificationService, netPositionService, loggingService);
+            notificationService, loggingService);
 
         // Act
         await service.Execute(fakeSiteDbGroupId);
@@ -72,12 +70,11 @@ public class VoidServiceImpTests
         var processVoidQueuesStage = Substitute.For<ProcessVoidQueuesStage>();
         var requestDetailService = Substitute.For<RequestDetailService>();
         var notificationService = Substitute.For<NotificationService>();
-        var netPositionService = Substitute.For<NetPositionService>();
         var loggingService = Substitute.For<LoggingService>();
         ticketVoidingQueueService.GetQueues(default, default).ReturnsForAnyArgs(fakeGetQueues);
         processVoidQueuesStage.Execute(default, default).ReturnsForAnyArgs(fakeProcessResults);
         var service = new VoidServiceImp(ticketVoidingQueueService, requestDetailService, processVoidQueuesStage, default,
-            notificationService, netPositionService, loggingService);
+            notificationService, loggingService);
 
         // Act
         await service.Execute(fakeSiteDbGroupId);
@@ -104,12 +101,11 @@ public class VoidServiceImpTests
         var requestDetailService = Substitute.For<RequestDetailService>();
         var notificationService = Substitute.For<NotificationService>();
         var insertAfterVoidDataStage = Substitute.For<InsertAfterVoidDataStage>();
-        var netPositionService = Substitute.For<NetPositionService>();
         var loggingService = Substitute.For<LoggingService>();
         ticketVoidingQueueService.GetQueues(default, default).ReturnsForAnyArgs(fakeGetQueues);
         processVoidQueuesStage.Execute(default, default).ReturnsForAnyArgs(fakeProcessResults);
         var service = new VoidServiceImp(ticketVoidingQueueService, requestDetailService, processVoidQueuesStage, insertAfterVoidDataStage,
-            notificationService, netPositionService, loggingService);
+            notificationService, loggingService);
 
         // Act
         await service.Execute(fakeSiteDbGroupId);
@@ -132,12 +128,11 @@ public class VoidServiceImpTests
         const int fakeSiteDbGroupId = 2;
         var fakeGetQueues = new List<TicketVoidingQueueModel> { new() { QueueId = 123 } };
         var ticketVoidingQueueService = Substitute.For<TicketVoidingQueueService>();
-        var netPositionService = Substitute.For<NetPositionService>();
         var loggingService = Substitute.For<LoggingService>();
         ticketVoidingQueueService.GetQueues(default, default).ReturnsForAnyArgs(fakeGetQueues);
 
         var service = new VoidServiceImp(ticketVoidingQueueService, default, default, default,
-            default, netPositionService, loggingService);
+            default, loggingService);
 
         // Act
         await service.Execute(fakeSiteDbGroupId);

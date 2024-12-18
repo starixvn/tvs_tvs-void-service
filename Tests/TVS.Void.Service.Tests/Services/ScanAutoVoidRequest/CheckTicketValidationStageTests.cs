@@ -12,7 +12,7 @@ public class CheckTicketValidationStageTests
     public async Task ExecuteForVoid_ReturnExpected()
     {
         const int siteDbGroupId = 0;
-        var results = new List<RequestDetailTicketModel>()
+        var results = new List<RequestDetailTicketModel>
         {
             new() { ValidationType = 1 },
             new() { ValidationType = 2 },

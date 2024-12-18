@@ -44,7 +44,7 @@ public class TicketVoidingQueueServiceImp(IDynamicRepository repository) : Ticke
             VoidingHistoryId = voidingHistoryId,
             TicketsJson = JsonSerializer.Serialize(groupTickets),
             UserId = AutoVoidConstant.ActorId,
-            IP = AutoVoidConstant.IPAddress,
+            IP = AutoVoidConstant.IPAddress
         };
         await repository.ExecuteAsync(criteria);
     }

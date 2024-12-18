@@ -54,7 +54,7 @@ public class InsertAfterVoidDataPrivateServiceImpTests
             new object[] { IssueTypeConstant.AbnormalAccount, new List<RequestDetail> {new () {MatchId = 0}}, new List<TicketVoidingQueueModel>() },
             new object[] { IssueTypeConstant.AbnormalBet, new List<RequestDetail> {new () {MatchId = 29}, new () {MatchId = 1133}}, new List<TicketVoidingQueueModel>() },
             new object[] { IssueTypeConstant.DangerAccepted, new List<RequestDetail> (), new List<TicketVoidingQueueModel> {new () {MatchId = 113}, new() {MatchId = 223}} },
-            new object[] { IssueTypeConstant.WrongScore, new List<RequestDetail> (), new List<TicketVoidingQueueModel> {new () {MatchId = 334}, new() {MatchId = 445}} },
+            new object[] { IssueTypeConstant.WrongScore, new List<RequestDetail> (), new List<TicketVoidingQueueModel> {new () {MatchId = 334}, new() {MatchId = 445}} }
         };
 
     public static IEnumerable<object[]> GetMatchIdForAfterVoidShouldReturnValidMatchIdTestData =>
@@ -62,7 +62,7 @@ public class InsertAfterVoidDataPrivateServiceImpTests
         {
             new object[] { IssueTypeConstant.AbnormalBet, new List<RequestDetail> {new () {MatchId = 1133 }, new () {MatchId = 1133}}, new List<TicketVoidingQueueModel>{new() {MatchId = 1133 } } },
             new object[] { IssueTypeConstant.DangerAccepted, new List<RequestDetail> (), new List<TicketVoidingQueueModel> {new () {MatchId = 223 }, new() {MatchId = 223}} },
-            new object[] { IssueTypeConstant.WrongScore, new List<RequestDetail> (), new List<TicketVoidingQueueModel> {new () {MatchId = 334}, new() {MatchId = 334 } } },
+            new object[] { IssueTypeConstant.WrongScore, new List<RequestDetail> (), new List<TicketVoidingQueueModel> {new () {MatchId = 334}, new() {MatchId = 334 } } }
         };
 
     public static IEnumerable<object[]> CombineNegativeBalanceUsersTestData =>

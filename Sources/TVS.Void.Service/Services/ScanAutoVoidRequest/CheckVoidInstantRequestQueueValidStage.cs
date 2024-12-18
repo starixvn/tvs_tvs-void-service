@@ -33,8 +33,8 @@ public class CheckVoidInstantRequestQueueValidStageImp(
             return (false, 0);
         }
 
-        var actionNameRequest = VoidActionTypeConstant.VoidActionList.ContainsKey(request.First().ActionId) ?
-            VoidActionTypeConstant.VoidActionList[request.First().ActionId] : string.Empty;
+        var actionNameRequest = VoidActionTypeConstant.VoidActionList.TryGetValue(request.First().ActionId, out var value) ?
+            value : string.Empty;
         if (!actionNameRequest.Equals(queue.Action, StringComparison.OrdinalIgnoreCase))
         {
             await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, ExecuteStatus.Done, "Request Action was edited.");

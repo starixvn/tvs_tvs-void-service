@@ -32,7 +32,7 @@ public class AutoVoidRequestQueueServiceImpTests
     {
         // Arrange
         const int fakeSiteDbGroupId = 113;
-        var fakeAutoVoidRequestQueue = new AutoVoidRequestQueueModel() { QueueId = 22222222 };
+        var fakeAutoVoidRequestQueue = new AutoVoidRequestQueueModel { QueueId = 22222222 };
         var repository = Substitute.For<IDynamicRepository>();
         repository.GetAsync<AutoVoidRequestQueueModel>(default).ReturnsForAnyArgs(fakeAutoVoidRequestQueue);
         var service = new AutoVoidRequestQueueServiceImp(repository);
