@@ -12,17 +12,11 @@ public interface CheckVoidInstantRequestQueueValidStage
     Task<(bool IsValid, int IssueTypeId)> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue);
 }
 
-public class CheckVoidInstantRequestQueueValidStageImp : CheckVoidInstantRequestQueueValidStage
+public class CheckVoidInstantRequestQueueValidStageImp(
+    AutoVoidRequestQueueService autoVoidRequestQueueService,
+    RequestDetailService requestDetailService)
+    : CheckVoidInstantRequestQueueValidStage
 {
-    private readonly AutoVoidRequestQueueService autoVoidRequestQueueService;
-    private readonly RequestDetailService requestDetailService;
-
-    public CheckVoidInstantRequestQueueValidStageImp(AutoVoidRequestQueueService autoVoidRequestQueueService, RequestDetailService requestDetailService)
-    {
-        this.autoVoidRequestQueueService = autoVoidRequestQueueService;
-        this.requestDetailService = requestDetailService;
-    }
-
     public async Task<(bool IsValid, int IssueTypeId)> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue)
     {
         var requestIdList = queue.RequestIds.Split(",");

@@ -20,15 +20,8 @@ public interface TicketVoidingQueueService
     Task<TicketVoidingQueueModel> ProcessVoidQueue(int siteDbGroupId, int queueId, bool? isCalledNetPosition);
 }
 
-public class TicketVoidingQueueServiceImp : TicketVoidingQueueService
+public class TicketVoidingQueueServiceImp(IDynamicRepository repository) : TicketVoidingQueueService
 {
-    private readonly IDynamicRepository repository;
-
-    public TicketVoidingQueueServiceImp(IDynamicRepository repository)
-    {
-        this.repository = repository;
-    }
-
     public async Task<IList<TicketVoidingQueueModel>> GetQueues(int siteDbGroupId, int? voidingHistoryId)
     {
         var criteria = new GetTicketVoidingQueueCriteria

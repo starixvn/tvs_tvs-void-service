@@ -14,15 +14,8 @@ public interface AddRequestStage
     Task<int> Execute(CheckDuplicatedTicketsResult param, IList<string> logData);
 }
 
-public class AddRequestStageImp : AddRequestStage
+public class AddRequestStageImp(IDynamicRepository repository) : AddRequestStage
 {
-    private readonly IDynamicRepository repository;
-
-    public AddRequestStageImp(IDynamicRepository repository)
-    {
-        this.repository = repository;
-    }
-
     public async Task<int> Execute(CheckDuplicatedTicketsResult param, IList<string> logData)
     {
         var command = new AddRequestCommand

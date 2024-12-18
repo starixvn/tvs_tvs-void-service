@@ -14,23 +14,13 @@ public interface ScanAutoVoidRequestService
     Task Execute(int siteDbGroupId);
 }
 
-public class ScanAutoVoidRequestServiceImp : ScanAutoVoidRequestService
+public class ScanAutoVoidRequestServiceImp(
+    AutoVoidWinningProcessStage autoVoidWinningProcessStage,
+    AutoInstantProcessStage autoInstantProcessStage,
+    AutoVoidRequestQueueService autoVoidRequestQueueService,
+    LoggingService loggingService)
+    : ScanAutoVoidRequestService
 {
-    private readonly AutoVoidWinningProcessStage autoVoidWinningProcessStage;
-    private readonly AutoInstantProcessStage autoInstantProcessStage;
-    private readonly AutoVoidRequestQueueService autoVoidRequestQueueService;
-    private readonly LoggingService loggingService;
-
-    public ScanAutoVoidRequestServiceImp(AutoVoidWinningProcessStage autoVoidWinningProcessStage, AutoInstantProcessStage autoInstantProcessStage,
-        AutoVoidRequestQueueService autoVoidRequestQueueService, LoggingService loggingService)
-    {
-        this.autoVoidWinningProcessStage = autoVoidWinningProcessStage;
-        this.autoInstantProcessStage = autoInstantProcessStage;
-
-        this.autoVoidRequestQueueService = autoVoidRequestQueueService;
-        this.loggingService = loggingService;
-    }
-
     public async Task Execute(int siteDbGroupId)
     {
         var queue = await autoVoidRequestQueueService.GetQueue(siteDbGroupId);

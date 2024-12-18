@@ -11,15 +11,8 @@ using Quartz;
 namespace TVS.Void.Service.Website.Jobs.Listener;
 
 [ExcludeFromCodeCoverage(Justification = "non-logic")]
-public class CustomSchedulerListener : ISchedulerListener
+public class CustomSchedulerListener(ILogger<CustomSchedulerListener> logger) : ISchedulerListener
 {
-    private readonly ILogger<CustomSchedulerListener> logger;
-
-    public CustomSchedulerListener(ILogger<CustomSchedulerListener> logger)
-    {
-        this.logger = logger;
-    }
-
     public Task JobScheduled(ITrigger trigger, CancellationToken cancellationToken = new())
     {
         return Task.CompletedTask;

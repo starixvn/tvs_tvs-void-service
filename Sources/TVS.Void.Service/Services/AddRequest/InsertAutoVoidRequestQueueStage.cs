@@ -13,15 +13,9 @@ public interface InsertAutoVoidRequestQueueStage
     Task Execute(int requestId, CheckDuplicatedTicketsResult validation, IList<string> logData);
 }
 
-public class InsertAutoVoidRequestQueueStageImp : InsertAutoVoidRequestQueueStage
+public class InsertAutoVoidRequestQueueStageImp(AutoVoidRequestQueueService autoVoidRequestQueueService)
+    : InsertAutoVoidRequestQueueStage
 {
-    private readonly AutoVoidRequestQueueService autoVoidRequestQueueService;
-
-    public InsertAutoVoidRequestQueueStageImp(AutoVoidRequestQueueService autoVoidRequestQueueService)
-    {
-        this.autoVoidRequestQueueService = autoVoidRequestQueueService;
-    }
-
     public async Task Execute(int requestId, CheckDuplicatedTicketsResult validation, IList<string> logData)
     {
         var guid = Guid.NewGuid().ToString();

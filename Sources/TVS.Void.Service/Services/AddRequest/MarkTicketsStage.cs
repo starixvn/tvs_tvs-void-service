@@ -17,17 +17,9 @@ public interface MarkTicketsStage
     Task<bool> Execute(string markTransIds, IList<string> logData);
 }
 
-public class MarkTicketsStageImp : MarkTicketsStage
+public class MarkTicketsStageImp(IDynamicRepository repository, LoggingService loggingService)
+    : MarkTicketsStage
 {
-    private readonly IDynamicRepository repository;
-    private readonly LoggingService loggingService;
-
-    public MarkTicketsStageImp(IDynamicRepository repository, LoggingService loggingService)
-    {
-        this.repository = repository;
-        this.loggingService = loggingService;
-    }
-
     public async Task<bool> Execute(string markTransIds, IList<string> logData)
     {
         try

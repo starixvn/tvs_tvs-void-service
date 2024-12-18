@@ -10,15 +10,8 @@ public interface GetDuplicatedTicketsStage
     Task<DuplicatedTickets> Execute();
 }
 
-public class GetDuplicatedTicketsStageImp : GetDuplicatedTicketsStage
+public class GetDuplicatedTicketsStageImp(IDynamicRepository repository) : GetDuplicatedTicketsStage
 {
-    private readonly IDynamicRepository repository;
-
-    public GetDuplicatedTicketsStageImp(IDynamicRepository repository)
-    {
-        this.repository = repository;
-    }
-
     public async Task<DuplicatedTickets> Execute()
     {
         var criteria = new GetDuplicatedTicketsCriteria();

@@ -5,12 +5,7 @@ namespace TVS.Void.Service.Tests.Services.Models;
 
 public class RequestModelTests
 {
-    private readonly RequestDetailTicketModelEqualityComparer service;
-
-    public RequestModelTests()
-    {
-        service = new RequestDetailTicketModelEqualityComparer();
-    }
+    private readonly RequestDetailTicketModelEqualityComparer service = new();
 
     [Fact]
     public void Equals_ModelHasValue_ReturnTrue()
@@ -63,7 +58,6 @@ public class RequestModelTests
         // Assert
         Assert.True(result);
     }
-
 
     [Fact]
     public void Equals_ModelsHasDifferentType_ReturnFalse()

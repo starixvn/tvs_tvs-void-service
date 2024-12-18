@@ -8,19 +8,12 @@ using TVS.Void.Service.Services.AddRequest;
 namespace TVS.Void.Service.Website.Jobs;
 
 [DisallowConcurrentExecution]
-public class AddRequestDuplicatedTicketsJob : IJob
+public class AddRequestDuplicatedTicketsJob(
+    IMaintenanceService maintenanceService,
+    LoggingService loggingService,
+    AddRequestDuplicatedTicketsService addRequestDuplicatedTicketsService)
+    : IJob
 {
-    private readonly LoggingService loggingService;
-    private readonly IMaintenanceService maintenanceService;
-    private readonly AddRequestDuplicatedTicketsService addRequestDuplicatedTicketsService;
-
-    public AddRequestDuplicatedTicketsJob(IMaintenanceService maintenanceService, LoggingService loggingService, AddRequestDuplicatedTicketsService addRequestDuplicatedTicketsService)
-    {
-        this.maintenanceService = maintenanceService;
-        this.loggingService = loggingService;
-        this.addRequestDuplicatedTicketsService = addRequestDuplicatedTicketsService;
-    }
-
     public async Task Execute(IJobExecutionContext context)
     {
         try

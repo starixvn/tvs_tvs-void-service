@@ -6,12 +6,7 @@ namespace TVS.Void.Service.Tests.Services.ScanAutoVoidRequest;
 
 public class CreateVoidDataXmlStageImpTests
 {
-    private readonly CreateVoidDataXmlStage createVoidDataXmlStage;
-
-    public CreateVoidDataXmlStageImpTests()
-    {
-        createVoidDataXmlStage = new CreateVoidDataXmlStageImp();
-    }
+    private readonly CreateVoidDataXmlStage createVoidDataXmlStage = new CreateVoidDataXmlStageImp();
 
     private static DateTime CreateDateTimeFromString(string dateTime)
     {

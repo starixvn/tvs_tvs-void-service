@@ -8,19 +8,12 @@ using TVS.Void.Service.Services.CheckTicketStatus;
 namespace TVS.Void.Service.Website.Jobs;
 
 [DisallowConcurrentExecution]
-public class CheckTicketStatusJob : IJob
+public class CheckTicketStatusJob(
+    IMaintenanceService maintenanceService,
+    LoggingService loggingService,
+    CheckTicketStatusService checkTicketStatusService)
+    : IJob
 {
-    private readonly LoggingService loggingService;
-    private readonly IMaintenanceService maintenanceService;
-    private readonly CheckTicketStatusService checkTicketStatusService;
-
-    public CheckTicketStatusJob(IMaintenanceService maintenanceService, LoggingService loggingService, CheckTicketStatusService checkTicketStatusService)
-    {
-        this.maintenanceService = maintenanceService;
-        this.loggingService = loggingService;
-        this.checkTicketStatusService = checkTicketStatusService;
-    }
-
     public async Task Execute(IJobExecutionContext context)
     {
         try

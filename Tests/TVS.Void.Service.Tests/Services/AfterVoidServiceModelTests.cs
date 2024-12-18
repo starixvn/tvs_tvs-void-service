@@ -5,12 +5,7 @@ namespace TVS.Void.Service.Tests.Services;
 
 public class AfterVoidServiceModelTests
 {
-    private readonly AfterVoidServiceModelEqualComparer service;
-
-    public AfterVoidServiceModelTests()
-    {
-        service = new AfterVoidServiceModelEqualComparer();
-    }
+    private readonly AfterVoidServiceModelEqualComparer service = new();
 
     [Fact]
     public void Equals_ModelHasValue_ReturnTrue()
@@ -63,7 +58,6 @@ public class AfterVoidServiceModelTests
         // Assert
         Assert.True(result);
     }
-
 
     [Fact]
     public void Equals_ModelsHasDifferentType_ReturnFalse()

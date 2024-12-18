@@ -28,15 +28,8 @@ public interface RequestTicketService
     Task UpdateIsProcessed(string resettledTransId);
 }
 
-public class RequestTicketServiceImp : RequestTicketService
+public class RequestTicketServiceImp(IDynamicRepository repository) : RequestTicketService
 {
-    private readonly IDynamicRepository repository;
-
-    public RequestTicketServiceImp(IDynamicRepository repository)
-    {
-        this.repository = repository;
-    }
-
     public async Task<GroupTicketsInRequest> GetTicketsByRequestsAndSiteDbGroupId(int siteDbGroupId, string requestIds)
     {
         return await GetTicketsInRequests(siteDbGroupId, requestIds);

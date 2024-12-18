@@ -11,17 +11,11 @@ public interface InsertAfterVoidDataStage
     Task Execute(IEnumerable<TicketVoidingQueueModel> voidQueueResults, IList<string> logData);
 }
 
-public class InsertAfterVoidDataStageImp : InsertAfterVoidDataStage
+public class InsertAfterVoidDataStageImp(
+    RequestDetailService requestDetailService,
+    InsertAfterVoidDataPrivateService privateService)
+    : InsertAfterVoidDataStage
 {
-    private readonly InsertAfterVoidDataPrivateService privateService;
-    private readonly RequestDetailService requestDetailService;
-
-    public InsertAfterVoidDataStageImp(RequestDetailService requestDetailService, InsertAfterVoidDataPrivateService privateService)
-    {
-        this.requestDetailService = requestDetailService;
-        this.privateService = privateService;
-    }
-
     public async Task Execute(IEnumerable<TicketVoidingQueueModel> voidQueueResults, IList<string> logData)
     {
         var firstVoidQueue = voidQueueResults.First();

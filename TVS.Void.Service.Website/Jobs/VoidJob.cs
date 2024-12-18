@@ -8,19 +8,9 @@ using TVS.Void.Service.Services.Void;
 namespace TVS.Void.Service.Website.Jobs;
 
 [DisallowConcurrentExecution]
-public class VoidJob : IJob
+public class VoidJob(IMaintenanceService maintenanceService, LoggingService loggingService, VoidService voidService)
+    : IJob
 {
-    private readonly LoggingService loggingService;
-    private readonly IMaintenanceService maintenanceService;
-    private readonly VoidService voidService;
-
-    public VoidJob(IMaintenanceService maintenanceService, LoggingService loggingService, VoidService voidService)
-    {
-        this.maintenanceService = maintenanceService;
-        this.loggingService = loggingService;
-        this.voidService = voidService;
-    }
-
     public async Task Execute(IJobExecutionContext context)
     {
         var currentSiteDbGroupId = context.MergedJobDataMap.GetIntValue("siteDbGroupId");

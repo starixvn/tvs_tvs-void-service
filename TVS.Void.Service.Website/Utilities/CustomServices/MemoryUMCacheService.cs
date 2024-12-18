@@ -4,15 +4,8 @@ using ONEbook.UM.Helpers;
 
 namespace TVS.Void.Service.Website.Utilities.CustomServices;
 
-public class MemoryUMCacheService : IUMCacheService
+public class MemoryUMCacheService(IMemoryCache memoryCache) : IUMCacheService
 {
-    private readonly IMemoryCache memoryCache;
-
-    public MemoryUMCacheService(IMemoryCache memoryCache)
-    {
-        this.memoryCache = memoryCache;
-    }
-
     public T Get<T>(string key) => memoryCache.Get<T>(key)
     ;
 

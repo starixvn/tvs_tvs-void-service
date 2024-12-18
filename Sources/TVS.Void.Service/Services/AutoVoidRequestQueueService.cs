@@ -14,15 +14,8 @@ public interface AutoVoidRequestQueueService
     Task InsertQueue(int siteDbGroupId, string broadcastSessionId, string requestIds, int statusId, string action, int? matchId);
 }
 
-public class AutoVoidRequestQueueServiceImp : AutoVoidRequestQueueService
+public class AutoVoidRequestQueueServiceImp(IDynamicRepository repository) : AutoVoidRequestQueueService
 {
-    private readonly IDynamicRepository repository;
-
-    public AutoVoidRequestQueueServiceImp(IDynamicRepository repository)
-    {
-        this.repository = repository;
-    }
-
     public async Task<AutoVoidRequestQueueModel> GetQueue(int siteDbGroupId)
     {
         var criteria = new GetAutoVoidRequestQueueCriteria

@@ -14,23 +14,13 @@ public interface CheckTicketStatusService
     Task Execute();
 }
 
-public class CheckTicketStatusServiceImp : CheckTicketStatusService
+public class CheckTicketStatusServiceImp(
+    RequestTicketService requestTicketService,
+    CheckTicketsForAutoVoidWinningStage checkTicketsForAutoVoidWinningStage,
+    CheckTicketsForAutoVoidAllResultKeyedStage checkTicketsForAutoVoidAllResultKeyedStage,
+    LoggingService loggingService)
+    : CheckTicketStatusService
 {
-    private readonly RequestTicketService requestTicketService;
-    private readonly CheckTicketsForAutoVoidWinningStage checkTicketsForAutoVoidWinningStage;
-    private readonly CheckTicketsForAutoVoidAllResultKeyedStage checkTicketsForAutoVoidAllResultKeyedStage;
-
-    private readonly LoggingService loggingService;
-
-    public CheckTicketStatusServiceImp(RequestTicketService requestTicketService, CheckTicketsForAutoVoidWinningStage checkTicketsForAutoVoidWinningStage,
-        CheckTicketsForAutoVoidAllResultKeyedStage checkTicketsForAutoVoidAllResultKeyedStage, LoggingService loggingService)
-    {
-        this.requestTicketService = requestTicketService;
-        this.checkTicketsForAutoVoidWinningStage = checkTicketsForAutoVoidWinningStage;
-        this.checkTicketsForAutoVoidAllResultKeyedStage = checkTicketsForAutoVoidAllResultKeyedStage;
-        this.loggingService = loggingService;
-    }
-
     public async Task Execute()
     {
         var logData = new List<string>();

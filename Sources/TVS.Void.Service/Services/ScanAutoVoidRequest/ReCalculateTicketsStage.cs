@@ -16,17 +16,9 @@ public interface ReCalculateTicketsStage
         IEnumerable<RequestDetailTicketModel> cricketTicketsResettle, ICollection<string> logData);
 }
 
-public class ReCalculateTicketsStageImp : ReCalculateTicketsStage
+public class ReCalculateTicketsStageImp(IDynamicRepository repository, RequestTicketService requestTicketService)
+    : ReCalculateTicketsStage
 {
-    private readonly RequestTicketService requestTicketService;
-    private readonly IDynamicRepository repository;
-
-    public ReCalculateTicketsStageImp(IDynamicRepository repository, RequestTicketService requestTicketService)
-    {
-        this.repository = repository;
-        this.requestTicketService = requestTicketService;
-    }
-
     public async Task Execute(int siteDbGroupId, IEnumerable<RequestDetailTicketModel> singleTicketsResettle,
         IEnumerable<RequestDetailTicketModel> parlayTicketsResettle,
         IEnumerable<RequestDetailTicketModel> cricketTicketsResettle, ICollection<string> logData)

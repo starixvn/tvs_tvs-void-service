@@ -21,15 +21,8 @@ public interface RequestDetailService
     Task<VoidDataXmlModel> GetVoidDataOfVoidingHistory(int voidingHistoryId);
 }
 
-public class RequestDetailServiceImp : RequestDetailService
+public class RequestDetailServiceImp(IDynamicRepository repository) : RequestDetailService
 {
-    private readonly IDynamicRepository repository;
-
-    public RequestDetailServiceImp(IDynamicRepository repository)
-    {
-        this.repository = repository;
-    }
-
     public async Task<IEnumerable<VoidingHistoryModel>> InsertVoidingHistory(string requestsJson, int siteDbGroupId, string broadcastSessionId, string voidDataXml)
     {
         var criteria = new InsertVoidingHistoryCriteria

@@ -8,19 +8,12 @@ using TVS.Void.Service.Services.ScanAutoVoidRequest;
 namespace TVS.Void.Service.Website.Jobs;
 
 [DisallowConcurrentExecution]
-public class ScanAutoVoidRequestJob : IJob
+public class ScanAutoVoidRequestJob(
+    IMaintenanceService maintenanceService,
+    LoggingService loggingService,
+    ScanAutoVoidRequestService scanningService)
+    : IJob
 {
-    private readonly LoggingService loggingService;
-    private readonly IMaintenanceService maintenanceService;
-    private readonly ScanAutoVoidRequestService scanningService;
-
-    public ScanAutoVoidRequestJob(IMaintenanceService maintenanceService, LoggingService loggingService, ScanAutoVoidRequestService scanningService)
-    {
-        this.maintenanceService = maintenanceService;
-        this.loggingService = loggingService;
-        this.scanningService = scanningService;
-    }
-
     public async Task Execute(IJobExecutionContext context)
     {
         var currentSiteDbGroupId = context.MergedJobDataMap.GetIntValue("siteDbGroupId");
