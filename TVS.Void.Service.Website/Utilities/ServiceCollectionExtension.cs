@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using Fanex.Data.Repository;
 using Fanex.Logging;
 using Fanex.Logging.Extensions;
@@ -14,10 +13,8 @@ using ONEbook.UM.Configurations;
 using ONEbook.UM.Helpers;
 using ONEbook.UM.Services;
 using ONEbook.UM.Transport;
-using Quartz;
 using Sentry;
 using StackExchange.Redis;
-using TicketVoidingSystem.Constants;
 using TicketVoidingSystem.Services;
 using TVS.Void.Service.Services;
 using TVS.Void.Service.Services.AddRequest;
@@ -25,7 +22,6 @@ using TVS.Void.Service.Services.CheckTicketStatus;
 using TVS.Void.Service.Services.ScanAutoVoidRequest;
 using TVS.Void.Service.Services.Void;
 using TVS.Void.Service.Website.Jobs;
-using TVS.Void.Service.Website.Jobs.Listener;
 using TVS.Void.Service.Website.Utilities.CustomServices;
 
 namespace TVS.Void.Service.Website.Utilities;
@@ -124,70 +120,18 @@ public static class ServiceCollectionExtension
         services.AddSingleton<AutoVoidWinningBeforeVoidService, AutoVoidWinningBeforeVoidServiceImp>();
     }
 
-    public static void AddQuartzScheduler(this IServiceCollection services)
+    public static IServiceCollection AddBackgroundService(this IServiceCollection services)
     {
-        const int maxConcurrencyThread = 10;
-        services.AddTransient<CheckTicketStatusJob>();
-        services.AddTransient<ScanAutoVoidRequestJob>();
-        services.AddTransient<VoidJob>();
-        services.AddTransient<AddRequestDuplicatedTicketsJob>();
-        services.AddQuartz(q =>
-        {
-            // handy when part of cluster, or you want to otherwise identify multiple schedulers
-            q.SchedulerId = "Scheduler-TVS-Void-Service-Id";
-            q.SchedulerName = "Scheduler-TVS-Void-Service";
+        services.AddSingleton<AddRequestDuplicatedTicketsJob>();
+        services.AddSingleton<CheckTicketStatusJob>();
+        services.AddSingleton<ScanAutoVoidRequestJob>();
+        services.AddSingleton<VoidJob>();
 
-            // these are the defaults
-            q.UseSimpleTypeLoader();
-            q.UseInMemoryStore();
-            q.UseDefaultThreadPool(tp =>
-            {
-                tp.MaxConcurrency = maxConcurrencyThread;
-            });
+        services.AddHostedService<AddRequestDuplicatedTicketsJob>();
+        services.AddHostedService<CheckTicketStatusJob>();
+        services.AddHostedService<ScanAutoVoidRequestJob>();
+        services.AddHostedService<VoidJob>();
 
-            const int schedulerInterval = 5;
-            q.ScheduleJob<CheckTicketStatusJob>(trigger => trigger
-                .WithIdentity($"{nameof(CheckTicketStatusJob)} Trigger")
-                .StartNow()
-                .WithSimpleSchedule(x => x.WithIntervalInMinutes(schedulerInterval).RepeatForever())
-            );
-
-            foreach (var siteDbGroupId in SiteDbGroupConstant.ServerList.Select(x => x.Id))
-            {
-                q.ScheduleJob<VoidJob>(trigger => trigger
-                    .UsingJobData("siteDbGroupId", siteDbGroupId)
-                    .WithIdentity($"{nameof(VoidJob)}{siteDbGroupId}Trigger")
-                    .StartNow()
-                    .WithSimpleSchedule(x => x.WithIntervalInSeconds(1).RepeatForever()));
-
-                q.ScheduleJob<ScanAutoVoidRequestJob>(trigger => trigger
-                    .UsingJobData("siteDbGroupId", siteDbGroupId)
-                    .WithIdentity($"{nameof(ScanAutoVoidRequestJob)}{siteDbGroupId}Trigger")
-                    .StartNow()
-                    .WithSimpleSchedule(x => x.WithIntervalInSeconds(1).RepeatForever())
-                );
-            }
-
-            q.ScheduleJob<AddRequestDuplicatedTicketsJob>(trigger => trigger
-                .WithIdentity($"{nameof(AddRequestDuplicatedTicketsJob)} Trigger")
-                .StartNow()
-                .WithSimpleSchedule(x => x.WithIntervalInMinutes(1).RepeatForever())
-            );
-
-            q.AddSchedulerListener<CustomSchedulerListener>();
-
-            //// auto-interrupt long-running job
-            //// q.UseJobAutoInterrupt(options =>
-            //// {
-            ////    // this is the default
-            ////    options.DefaultMaxRunTime = TimeSpan.FromMinutes(5);
-            //// });
-        });
-
-        services.AddQuartzHostedService(options =>
-        {
-            // when shutting down we want jobs to complete gracefully
-            options.WaitForJobsToComplete = true;
-        });
+        return services;
     }
 }

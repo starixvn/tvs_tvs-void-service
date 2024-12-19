@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Linq;
+﻿using System.Linq;
 using System.Net.Http;
 using System.Net.Mime;
 using System.Text;
@@ -9,7 +8,6 @@ using TicketVoidingSystem.Constants;
 
 namespace TicketVoidingSystem.Utilities;
 
-[ExcludeFromCodeCoverage(Justification = "non-logic")]
 public static class Helper
 {
     public static string GetSettingKeyBySiteDbGroupId(int siteDbGroupId, string spName)

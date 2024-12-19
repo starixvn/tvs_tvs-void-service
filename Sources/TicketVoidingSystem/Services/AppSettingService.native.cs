@@ -1,10 +1,8 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using TicketVoidingSystem.Models;
 
 namespace TicketVoidingSystem.Services;
 
-[ExcludeFromCodeCoverage(Justification = "non-logic")]
 public static class AppSettingService
 {
     public static AppSettingModel AppSetting { get; set; }

@@ -1,4 +1,6 @@
+using System;
 using Fanex.Data.SqlServer;
+using Fanex.Logging;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using TicketVoidingSystem.SignalR;
@@ -18,7 +20,7 @@ services.AddSentry();
 services.AddONEbookUM(configuration);
 services.AddTvsSignalR();
 services.AddBusinessService();
-services.AddQuartzScheduler();
+services.AddBackgroundService();
 
 // Build app
 var app = builder.Build();
@@ -30,4 +32,12 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 app.MapHub<NotificationHub>("/SignalR/NotificationHub");
 
-app.Run();
+var message = $"Fanex.TVS.AfterVoid.Service - Started - {DateTimeOffset.Now}";
+Console.WriteLine(message);
+await LogService.InfoAsync(message);
+
+await app.RunAsync();
+
+message = $"Fanex.TVS.AfterVoid.Service - Shutdown!!! - {DateTimeOffset.Now}";
+Console.WriteLine(message);
+await LogService.InfoAsync(message);

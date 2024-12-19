@@ -1,31 +1,47 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Hosting;
 using ONEbook.UM.Services;
-using Quartz;
 using TicketVoidingSystem.Services;
 using TVS.Void.Service.Services.CheckTicketStatus;
 
 namespace TVS.Void.Service.Website.Jobs;
 
-[DisallowConcurrentExecution]
 public class CheckTicketStatusJob(
     IMaintenanceService maintenanceService,
     LoggingService loggingService,
     CheckTicketStatusService checkTicketStatusService)
-    : IJob
+    : BackgroundService
 {
-    public async Task Execute(IJobExecutionContext context)
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        while (!stoppingToken.IsCancellationRequested)
+        {
+            await TryDoTask();
+            await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
+        }
+    }
+
+    private async Task TryDoTask()
     {
         try
         {
-            if (!await maintenanceService.IsUnderMaintenanceAsync())
-            {
-                await checkTicketStatusService.Execute();
-            }
+            await DoTask();
         }
         catch (Exception ex)
         {
             await loggingService.ErrorAsync("CheckTicketStatusJob execute failed!", ex);
         }
+    }
+
+    private async Task DoTask()
+    {
+        if (await maintenanceService.IsUnderMaintenanceAsync())
+        {
+            return;
+        }
+
+        await checkTicketStatusService.Execute();
     }
 }

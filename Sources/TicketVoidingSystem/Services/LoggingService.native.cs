@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 using Fanex.Logging;
@@ -22,7 +21,6 @@ public interface LoggingService
     Task InfoAppendNewLineAsync(IList<string> logData);
 }
 
-[ExcludeFromCodeCoverage]
 public class LoggingServiceImp : LoggingService
 {
     public async Task ErrorAsync(string message, Exception exception)

@@ -11,7 +11,7 @@ public class CustomHttpContextHelper : IHttpContextHelper
         return string.Empty;
     }
 
-    public string GetValueFromQueryString(string queryKey)
+    public string GetValueFromQueryString(string key)
     {
         return string.Empty;
     }
