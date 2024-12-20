@@ -1,4 +1,4 @@
-FROM hub.nexdev.net/base/dotnet/core/sdk:8.0-alpine AS builder
+FROM hub.nexdev.net/base/dotnet/core/sdk:9.0-alpine AS builder
 WORKDIR /src
 
 COPY ./Sources/TicketVoidingSystem ./Sources/TicketVoidingSystem
@@ -6,14 +6,14 @@ COPY ./Sources/TVS.Void.Service ./Sources/TVS.Void.Service
 COPY ./TVS.Void.Service.Website/TVS.Void.Service.Website.csproj ./TVS.Void.Service.Website/TVS.Void.Service.Website.csproj
 
 WORKDIR /src/TVS.Void.Service.Website
-RUN dotnet nuget add source http://nuget.nexdev.net/api/v2
+RUN dotnet nuget add source https://nuget.nexdev.net/api/v2
 RUN dotnet restore -v n
 
 COPY ./TVS.Void.Service.Website .
 
 RUN dotnet publish -r linux-x64 --self-contained false -c Release -o /app
 
-FROM hub.nexdev.net/base/dotnet/core/aspnet:8.0-alpine AS base
+FROM hub.nexdev.net/base/dotnet/core/aspnet:9.0-alpine AS base
 
 # Don’t run as root
 RUN adduser --disabled-password \

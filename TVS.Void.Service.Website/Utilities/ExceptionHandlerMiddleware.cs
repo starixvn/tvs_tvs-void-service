@@ -9,7 +9,9 @@ namespace TVS.Void.Service.Website.Utilities;
 
 public class ExceptionHandlerMiddleware(RequestDelegate next, IConfiguration configuration)
 {
+#pragma warning disable S3604
     public IConfiguration Configuration { get; } = configuration;
+#pragma warning restore S3604
 
     public async Task InvokeAsync(HttpContext context)
     {
