@@ -1,7 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Fanex.Data.Repository;
+using TicketVoidingSystem.Services;
+using TicketVoidingSystem.Utilities;
 using TVS.Void.Service.Constants;
 using TVS.Void.Service.Criteria;
 using TVS.Void.Service.Models;
@@ -12,16 +16,18 @@ public interface RequestDetailService
 {
     Task<IEnumerable<VoidingHistoryModel>> InsertVoidingHistory(string requestsJson, int siteDbGroupId, string broadcastSessionId, string voidDataXml);
 
-    Task<AfterVoidServiceModel> InsertAfterVoidServiceData(bool isRunAutoAfterVoid, AfterVoidServiceModel afterVoidData);
+    Task InsertAfterVoidServiceData(bool isRunAutoAfterVoid, AfterVoidServiceModel afterVoidData, IList<string> logData);
 
     Task UpdateTicketVoidingHistory(int voidingHistoryId, int statusId);
 
     Task<(IEnumerable<RequestModel>, IEnumerable<RequestDetail>)> GetRequestById(int requestId);
 
     Task<VoidDataXmlModel> GetVoidDataOfVoidingHistory(int voidingHistoryId);
+
+    Task InsertLetstalk(int requestId, int issueTypeId, string broadcastSessionId, int statusId, IList<string> logData);
 }
 
-public class RequestDetailServiceImp(IDynamicRepository repository) : RequestDetailService
+public class RequestDetailServiceImp(IDynamicRepository repository, LoggingService loggingService) : RequestDetailService
 {
     public async Task<IEnumerable<VoidingHistoryModel>> InsertVoidingHistory(string requestsJson, int siteDbGroupId, string broadcastSessionId, string voidDataXml)
     {
@@ -37,7 +43,7 @@ public class RequestDetailServiceImp(IDynamicRepository repository) : RequestDet
         return await repository.FetchAsync<VoidingHistoryModel>(criteria);
     }
 
-    public async Task<AfterVoidServiceModel> InsertAfterVoidServiceData(bool isRunAutoAfterVoid, AfterVoidServiceModel afterVoidData)
+    public async Task InsertAfterVoidServiceData(bool isRunAutoAfterVoid, AfterVoidServiceModel afterVoidData, IList<string> logData)
     {
         var criteria = new InsertAfterVoidServiceDataCriteria
         {
@@ -49,7 +55,7 @@ public class RequestDetailServiceImp(IDynamicRepository repository) : RequestDet
         };
 
         var result = await repository.GetAsync<AfterVoidServiceModel>(criteria);
-        return result;
+        logData.Add($"{nameof(RequestDetailService.InsertAfterVoidServiceData)}: {JsonSerializer.Serialize(result)}");
     }
 
     public async Task UpdateTicketVoidingHistory(int voidingHistoryId, int statusId)
@@ -89,5 +95,31 @@ public class RequestDetailServiceImp(IDynamicRepository repository) : RequestDet
         };
 
         return await repository.FetchAsync<VoidDataXmlModel>(criteria);
+    }
+
+    public async Task InsertLetstalk(int requestId, int issueTypeId, string broadcastSessionId, int statusId, IList<string> logData)
+    {
+        try
+        {
+            if (!Helper.IsCanSendLetstalk(issueTypeId))
+            {
+                return;
+            }
+
+            var command = new InsertLetstalkCommand
+            {
+                RequestId = requestId,
+                BroadcastSessionId = broadcastSessionId,
+                StatusId = statusId
+            };
+
+            await repository.ExecuteAsync(command);
+            logData.Add($"{nameof(RequestDetailService.InsertLetstalk)}: Done");
+        }
+        catch (Exception e)
+        {
+            await loggingService.ErrorAsync(e);
+            logData.Add($"{nameof(RequestDetailService.InsertLetstalk)}: Failed");
+        }
     }
 }

@@ -63,6 +63,7 @@
         <Setting Key="TicketVoiding_VoidBetAutomation_Service_Insert" SpName="TicketVoiding_VoidBetAutomation_Service_Insert" DbName="DBCTG.bodb02.wsv_nap" TimeOut="600" />
         <Setting Key="TicketVoiding_Request_Select" SpName="TicketVoiding_Request_Select" DbName="DBCTG.bodb02.wsv_nap" TimeOut="600" />
         <Setting Key="TicketVoiding_TicketProcess_Update" SpName="TicketVoiding_TicketProcess_Update" DbName="DBCTG.bodb02.wsv_nap" TimeOut="600" />
+        <Setting Key="TicketVoiding_Letstalk_Insert" SpName="TicketVoiding_Letstalk_Insert" DbName="DBCTG.bodb02.wsv_nap" TimeOut="600" />
 
         <Setting Key="TicketVoiding_Request_Insert" SpName="TicketVoiding_Request_Insert" DbName="DBCTG.bodb02.wsv_nap" TimeOut="600" />
         <Setting Key="TicketVoiding_Request_CheckDuplicateTickets" SpName="TicketVoiding_Request_CheckDuplicateTickets" DbName="DBCTG.bodb02.wsv_nap" TimeOut="600" />

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
 using System.Threading.Tasks;
+using TicketVoidingSystem.Constants;
 using TVS.Void.Service.Models;
 
 namespace TVS.Void.Service.Services.Void;
@@ -30,7 +30,7 @@ public class InsertAfterVoidDataStageImp(
         };
 
         var voidDataXmlModel = await requestDetailService.GetVoidDataOfVoidingHistory(firstVoidQueue.VoidingHistoryId);
-        var insertedAfterVoidData = await requestDetailService.InsertAfterVoidServiceData(voidDataXmlModel.IsRunAutoAfterVoid, afterVoidData);
-        logData.Add($"{nameof(RequestDetailService.InsertAfterVoidServiceData)}: {JsonSerializer.Serialize(insertedAfterVoidData)}");
+        await requestDetailService.InsertAfterVoidServiceData(voidDataXmlModel.IsRunAutoAfterVoid, afterVoidData, logData);
+        await requestDetailService.InsertLetstalk(firstVoidQueue.RequestId, voidDataXmlModel.IssueTypeId, voidDataXmlModel.BroadcastSessionId, ExecuteStatus.Running, logData);
     }
 }

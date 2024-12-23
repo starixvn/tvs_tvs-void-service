@@ -6,6 +6,8 @@ public class VoidDataXmlModel
 
     public int VoidingHistoryId { get; set; }
 
+    public string BroadcastSessionId { get; set; }
+
     public int SubIssueTypeId { get; set; }
 
     public string SubIssueTypeName { get; set; }
