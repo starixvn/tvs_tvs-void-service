@@ -1,4 +1,12 @@
+ARG CI_REGISTRY_IMAGE
+FROM $CI_REGISTRY_IMAGE:builder as deps
+RUN mkdir -p /src/packages
+
 FROM hub.nexdev.net/base/dotnet/core/sdk:9.0-alpine AS builder
+
+ENV NUGET_PACKAGES=/src/packages
+COPY --from=deps $NUGET_PACKAGES/. $NUGET_PACKAGES/
+
 WORKDIR /src
 
 COPY ./Sources/TicketVoidingSystem ./Sources/TicketVoidingSystem
@@ -7,11 +15,11 @@ COPY ./TVS.Void.Service.Website/TVS.Void.Service.Website.csproj ./TVS.Void.Servi
 
 WORKDIR /src/TVS.Void.Service.Website
 RUN dotnet nuget add source https://nuget.nexdev.net/api/v2
-RUN dotnet restore -v n
+RUN dotnet restore -v n -r linux-x64
 
 COPY ./TVS.Void.Service.Website .
 
-RUN dotnet publish -r linux-x64 --self-contained false -c Release -o /app
+RUN dotnet publish -r linux-x64 --self-contained false -o /app
 
 FROM hub.nexdev.net/base/dotnet/core/aspnet:9.0-alpine AS base
 
