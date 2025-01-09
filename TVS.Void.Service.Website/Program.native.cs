@@ -32,12 +32,12 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 app.MapHub<NotificationHub>("/SignalR/NotificationHub");
 
-var message = $"Fanex.TVS.AfterVoid.Service - Started - {DateTimeOffset.Now}";
+var message = $"Fanex.TVS.Void.Service - Started - {DateTimeOffset.Now}";
 Console.WriteLine(message);
 await LogService.InfoAsync(message);
 
 await app.RunAsync();
 
-message = $"Fanex.TVS.AfterVoid.Service - Shutdown!!! - {DateTimeOffset.Now}";
+message = $"Fanex.TVS.Void.Service - Shutdown!!! - {DateTimeOffset.Now}";
 Console.WriteLine(message);
 await LogService.InfoAsync(message);
