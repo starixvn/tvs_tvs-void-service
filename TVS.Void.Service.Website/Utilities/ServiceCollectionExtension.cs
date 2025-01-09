@@ -8,11 +8,6 @@ using Fanex.Logging.Extensions.Database;
 using Fanex.Logging.Sentry;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using ONEbook.UM.AspNetCore;
-using ONEbook.UM.Configurations;
-using ONEbook.UM.Helpers;
-using ONEbook.UM.Services;
-using ONEbook.UM.Transport;
 using Sentry;
 using StackExchange.Redis;
 using TicketVoidingSystem.Services;
@@ -22,7 +17,6 @@ using TVS.Void.Service.Services.CheckTicketStatus;
 using TVS.Void.Service.Services.ScanAutoVoidRequest;
 using TVS.Void.Service.Services.Void;
 using TVS.Void.Service.Website.Jobs;
-using TVS.Void.Service.Website.Utilities.CustomServices;
 
 namespace TVS.Void.Service.Website.Utilities;
 
@@ -54,16 +48,6 @@ public static class ServiceCollectionExtension
             .GetHttpSessionInfo()
             .UseGetDbExceptionInfo(DatabaseInfoGetters.GetDbExceptionInfo);
         ExceptionHandler.UseConfig(configuration);
-    }
-
-    public static void AddONEbookUM(this IServiceCollection services, IConfiguration configuration)
-    {
-        services.AddSingleton(new UMClientConfiguration().Initialize(configuration));
-        services.AddSingleton<IUMCacheService, MemoryUMCacheService>();
-        services.AddSingleton<IUMRestClient, UMRestClient>();
-        services.AddSingleton<IPHelper, IPHelperImpl>();
-        services.AddSingleton<IHttpContextHelper, CustomHttpContextHelper>();
-        services.AddSingleton<IMaintenanceService, MaintenanceService>();
     }
 
     public static void AddTvsSignalR(this IServiceCollection services)

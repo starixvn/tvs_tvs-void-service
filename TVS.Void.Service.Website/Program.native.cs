@@ -3,6 +3,7 @@ using Fanex.Data.SqlServer;
 using Fanex.Logging;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using ONEbook.UM.DependencyInjection;
 using TicketVoidingSystem.SignalR;
 using TVS.Void.Service.Website.Utilities;
 
@@ -17,7 +18,7 @@ services.AddMemoryCache();
 services.AddFanexSql(configuration);
 services.AddFanexExceptionHandler();
 services.AddSentry();
-services.AddONEbookUM(configuration);
+services.AddOneBookUm(configuration);
 services.AddTvsSignalR();
 services.AddBusinessService();
 services.AddBackgroundService();
