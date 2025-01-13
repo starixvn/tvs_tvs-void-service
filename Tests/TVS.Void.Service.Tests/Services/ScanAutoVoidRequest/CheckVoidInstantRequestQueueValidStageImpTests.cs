@@ -49,7 +49,7 @@ public class CheckVoidInstantRequestQueueValidStageImpTests
         var requestDetailService = Substitute.For<RequestDetailService>();
         autoVoidRequestQueueService
             .WhenForAnyArgs(x => x.UpdateQueue(default, default, default, default))
-            .Do(x => countUpdateQueue++);
+            .Do(_ => countUpdateQueue++);
         var service = new CheckVoidInstantRequestQueueValidStageImp(autoVoidRequestQueueService, requestDetailService);
 
         var actual = await service.Execute(siteDbGroupId, queue);

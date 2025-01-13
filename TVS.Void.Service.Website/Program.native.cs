@@ -1,6 +1,9 @@
+using System;
 using Fanex.Data.SqlServer;
+using Fanex.Logging;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using ONEbook.UM.DependencyInjection;
 using TicketVoidingSystem.SignalR;
 using TVS.Void.Service.Website.Utilities;
 
@@ -9,16 +12,16 @@ var services = builder.Services;
 var configuration = builder.Configuration;
 
 // Add services to the container.
-services.AddTvsConfig(builder.Configuration);
+services.AddTvsConfig(configuration);
 services.AddControllers();
 services.AddMemoryCache();
-services.AddFanexSql(builder.Configuration);
+services.AddFanexSql(configuration);
 services.AddFanexExceptionHandler();
 services.AddSentry();
-services.AddONEbookUM(builder.Configuration);
+services.AddOneBookUm(configuration);
 services.AddTvsSignalR();
 services.AddBusinessService();
-services.AddQuartzScheduler();
+services.AddBackgroundService();
 
 // Build app
 var app = builder.Build();
@@ -30,4 +33,12 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 app.MapHub<NotificationHub>("/SignalR/NotificationHub");
 
-app.Run();
+var message = $"Fanex.TVS.Void.Service - Started - {DateTimeOffset.Now}";
+Console.WriteLine(message);
+await LogService.InfoAsync(message);
+
+await app.RunAsync();
+
+message = $"Fanex.TVS.Void.Service - Shutdown!!! - {DateTimeOffset.Now}";
+Console.WriteLine(message);
+await LogService.InfoAsync(message);

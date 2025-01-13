@@ -18,15 +18,8 @@ public interface CheckTicketValidationStage
         IEnumerable<RequestDetailTicketModel> parlayTickets, IEnumerable<RequestDetailTicketModel> cricketTickets, IList<string> logData);
 }
 
-public class CheckTicketValidationStageImp : CheckTicketValidationStage
+public class CheckTicketValidationStageImp(IDynamicRepository repository) : CheckTicketValidationStage
 {
-    private readonly IDynamicRepository repository;
-
-    public CheckTicketValidationStageImp(IDynamicRepository repository)
-    {
-        this.repository = repository;
-    }
-
     public async Task<CheckTicketValidationOutput> ExecuteForVoid(int siteDbGroupId, IEnumerable<RequestDetailTicketModel> singleTickets, IEnumerable<RequestDetailTicketModel> parlayTickets,
         IEnumerable<RequestDetailTicketModel> cricketTickets, IEnumerable<RequestDetailTicketModel> cancelCashOutTickets, IList<string> logData)
     {

@@ -13,17 +13,11 @@ public interface CheckTicketsForAutoVoidWinningStage
     Task Execute(IList<string> logData, GroupTicketsInRequest groupTickets);
 }
 
-public class CheckTicketsForAutoVoidWinningStageImp : CheckTicketsForAutoVoidWinningStage
+public class CheckTicketsForAutoVoidWinningStageImp(
+    RequestTicketService requestTicketService,
+    InsertAutoVoidQueueStage insertAutoVoidQueueStage)
+    : CheckTicketsForAutoVoidWinningStage
 {
-    private readonly RequestTicketService requestTicketService;
-    private readonly InsertAutoVoidQueueStage insertAutoVoidQueueStage;
-
-    public CheckTicketsForAutoVoidWinningStageImp(RequestTicketService requestTicketService, InsertAutoVoidQueueStage insertAutoVoidQueueStage)
-    {
-        this.requestTicketService = requestTicketService;
-        this.insertAutoVoidQueueStage = insertAutoVoidQueueStage;
-    }
-
     public async Task Execute(IList<string> logData, GroupTicketsInRequest groupTickets)
     {
         if (groupTickets.SingleTickets.Any() || groupTickets.ParlayTickets.Any() || groupTickets.CricketTickets.Any())

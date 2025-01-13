@@ -13,26 +13,15 @@ public interface AddRequestDuplicatedTicketsService
     Task Execute();
 }
 
-public class AddRequestDuplicatedTicketsServiceImp : AddRequestDuplicatedTicketsService
+public class AddRequestDuplicatedTicketsServiceImp(
+    GetDuplicatedTicketsStage getDuplicatedTicketsStage,
+    CheckDuplicatedTicketsStage checkDuplicatedTicketsStage,
+    MarkTicketsStage markTicketsStage,
+    AddRequestStage addRequestStage,
+    InsertAutoVoidRequestQueueStage insertAutoVoidRequestQueueStage,
+    LoggingService loggingService)
+    : AddRequestDuplicatedTicketsService
 {
-    private readonly GetDuplicatedTicketsStage getDuplicatedTicketsStage;
-    private readonly CheckDuplicatedTicketsStage checkDuplicatedTicketsStage;
-    private readonly MarkTicketsStage markTicketsStage;
-    private readonly AddRequestStage addRequestStage;
-    private readonly InsertAutoVoidRequestQueueStage insertAutoVoidRequestQueueStage;
-    private readonly LoggingService loggingService;
-
-    public AddRequestDuplicatedTicketsServiceImp(GetDuplicatedTicketsStage getDuplicatedTicketsStage, CheckDuplicatedTicketsStage checkDuplicatedTicketsStage,
-        MarkTicketsStage markTicketsStage, AddRequestStage addRequestStage, InsertAutoVoidRequestQueueStage insertAutoVoidRequestQueueStage, LoggingService loggingService)
-    {
-        this.getDuplicatedTicketsStage = getDuplicatedTicketsStage;
-        this.checkDuplicatedTicketsStage = checkDuplicatedTicketsStage;
-        this.markTicketsStage = markTicketsStage;
-        this.addRequestStage = addRequestStage;
-        this.insertAutoVoidRequestQueueStage = insertAutoVoidRequestQueueStage;
-        this.loggingService = loggingService;
-    }
-
     public async Task Execute()
     {
         var logData = new List<string>();

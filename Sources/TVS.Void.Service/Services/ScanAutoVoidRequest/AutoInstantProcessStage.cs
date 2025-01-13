@@ -13,29 +13,16 @@ public interface AutoInstantProcessStage
     Task Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue, IList<string> logData);
 }
 
-public class AutoInstantProcessStageImp : AutoInstantProcessStage
+public class AutoInstantProcessStageImp(
+    CheckVoidInstantRequestQueueValidStage checkRequestQueueValidStage,
+    GetTicketsStage getTicketsStage,
+    CheckTicketValidationStage checkTicketValidationStage,
+    InsertPreVoidingDataStage insertPreVoidingDataStage,
+    AutoVoidRequestQueueService autoVoidRequestQueueService,
+    CreateVoidDataXmlStage createVoidDataXmlStage,
+    LoggingService loggingService)
+    : AutoInstantProcessStage
 {
-    private readonly CheckVoidInstantRequestQueueValidStage checkRequestQueueValidStage;
-    private readonly GetTicketsStage getTicketsStage;
-    private readonly CheckTicketValidationStage checkTicketValidationStage;
-    private readonly InsertPreVoidingDataStage insertPreVoidingDataStage;
-    private readonly AutoVoidRequestQueueService autoVoidRequestQueueService;
-    private readonly CreateVoidDataXmlStage createVoidDataXmlStage;
-    private readonly LoggingService loggingService;
-
-    public AutoInstantProcessStageImp(CheckVoidInstantRequestQueueValidStage checkRequestQueueValidStage, GetTicketsStage getTicketsStage,
-        CheckTicketValidationStage checkTicketValidationStage, InsertPreVoidingDataStage insertPreVoidingDataStage,
-        AutoVoidRequestQueueService autoVoidRequestQueueService, CreateVoidDataXmlStage createVoidDataXmlStage, LoggingService loggingService)
-    {
-        this.checkRequestQueueValidStage = checkRequestQueueValidStage;
-        this.getTicketsStage = getTicketsStage;
-        this.checkTicketValidationStage = checkTicketValidationStage;
-        this.insertPreVoidingDataStage = insertPreVoidingDataStage;
-        this.autoVoidRequestQueueService = autoVoidRequestQueueService;
-        this.createVoidDataXmlStage = createVoidDataXmlStage;
-        this.loggingService = loggingService;
-    }
-
     public async Task Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue, IList<string> logData)
     {
         var checkQueueResult = await checkRequestQueueValidStage.Execute(siteDbGroupId, queue);
@@ -52,7 +39,7 @@ public class AutoInstantProcessStageImp : AutoInstantProcessStage
         }
 
         CheckTicketValidationOutput validationResult;
-        //// Recheck for issue type have Cricket, Archive (some case ticket moved...), CancelCO and need some ticket info in bettrans
+        //// Recheck for issue type have Cricket, Archive (some case ticket moved...), CancelCO and need some ticket info in bet trans
         if (IsNeedToReCheckVoidValidation(checkQueueResult.IssueTypeId))
         {
             validationResult = await checkTicketValidationStage.ExecuteForVoid(siteDbGroupId, getTicketsResult.OutputData.SingleTickets,

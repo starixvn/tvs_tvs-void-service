@@ -5,6 +5,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using TicketVoidingSystem.Constants;
 using TicketVoidingSystem.Services;
+using TVS.Void.Service.Constants;
 using TVS.Void.Service.Models;
 
 namespace TVS.Void.Service.Services.Void;
@@ -14,26 +15,15 @@ public interface VoidService
     Task Execute(int siteDbGroupId);
 }
 
-public class VoidServiceImp : VoidService
+public class VoidServiceImp(
+    TicketVoidingQueueService ticketVoidingQueueService,
+    RequestDetailService requestDetailService,
+    ProcessVoidQueuesStage processVoidQueuesStage,
+    InsertAfterVoidDataStage insertAfterVoidDataStage,
+    NotificationService notificationService,
+    LoggingService loggingService)
+    : VoidService
 {
-    private readonly TicketVoidingQueueService ticketVoidingQueueService;
-    private readonly RequestDetailService requestDetailService;
-    private readonly ProcessVoidQueuesStage processVoidQueuesStage;
-    private readonly InsertAfterVoidDataStage insertAfterVoidDataStage;
-    private readonly NotificationService notificationService;
-    private readonly LoggingService loggingService;
-
-    public VoidServiceImp(TicketVoidingQueueService ticketVoidingQueueService, RequestDetailService requestDetailService, ProcessVoidQueuesStage processVoidQueuesStage,
-        InsertAfterVoidDataStage insertAfterVoidDataStage, NotificationService notificationService, NetPositionService netPositionService, LoggingService loggingService)
-    {
-        this.ticketVoidingQueueService = ticketVoidingQueueService;
-        this.requestDetailService = requestDetailService;
-        this.processVoidQueuesStage = processVoidQueuesStage;
-        this.insertAfterVoidDataStage = insertAfterVoidDataStage;
-        this.notificationService = notificationService;
-        this.loggingService = loggingService;
-    }
-
     public async Task Execute(int siteDbGroupId)
     {
         var voidingQueues = await ticketVoidingQueueService.GetQueues(siteDbGroupId, null);
@@ -64,6 +54,13 @@ public class VoidServiceImp : VoidService
         logData.Add($"{nameof(VoidService)}[{siteDbGroupId}]: {JsonSerializer.Serialize(voidingQueues)}");
         var processVoidQueuesResult = await processVoidQueuesStage.Execute(siteDbGroupId, voidingQueues);
         logData.Add($"{nameof(processVoidQueuesResult)}: {JsonSerializer.Serialize(processVoidQueuesResult)}");
+
+        if (processVoidQueuesResult.All(x => x.ErrCode is ErrorCodeVoidQueue.NoNeedInsertVoidBetAutomation))
+        {
+            await requestDetailService.UpdateTicketVoidingHistory(voidingQueues[0].VoidingHistoryId, ExecuteStatus.Done);
+            await loggingService.InfoAppendNewLineAsync(logData);
+            return;
+        }
 
         if (processVoidQueuesResult.Any(x => x.StatusId is ExecuteStatus.Failed or ExecuteStatus.New))
         {

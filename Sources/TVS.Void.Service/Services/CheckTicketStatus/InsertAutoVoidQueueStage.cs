@@ -17,15 +17,9 @@ public interface InsertAutoVoidQueueStage
         IDictionary<int, string> broadcastSessionIdCacheByRequestId, IList<string> logData);
 }
 
-public class InsertAutoVoidQueueStageImp : InsertAutoVoidQueueStage
+public class InsertAutoVoidQueueStageImp(AutoVoidRequestQueueService autoVoidRequestQueueService)
+    : InsertAutoVoidQueueStage
 {
-    private readonly AutoVoidRequestQueueService autoVoidRequestQueueService;
-
-    public InsertAutoVoidQueueStageImp(AutoVoidRequestQueueService autoVoidRequestQueueService)
-    {
-        this.autoVoidRequestQueueService = autoVoidRequestQueueService;
-    }
-
     public async Task ExecuteForAutoVoidWinning(int siteDbGroupId, IEnumerable<RequestModel> requests,
         IDictionary<int, string> broadcastSessionIdCacheByMatch, IList<string> logData)
     {

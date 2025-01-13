@@ -82,9 +82,9 @@ public class AutoVoidInstantProcessStageTests
         var outputData = new GroupTicketsInRequest
         {
             SingleTickets = new List<RequestDetailTicketModel> { new() },
-            ParlayTickets = Enumerable.Empty<RequestDetailTicketModel>(),
-            CricketTickets = Enumerable.Empty<RequestDetailTicketModel>(),
-            CancelCOTickets = Enumerable.Empty<RequestDetailTicketModel>()
+            ParlayTickets = [],
+            CricketTickets = [],
+            CancelCOTickets = []
         };
         var validationResult = new CheckTicketValidationOutput();
         checkRequestQueueValidStage.Execute(1, queue).ReturnsForAnyArgs((true, issueTypeId));
@@ -113,9 +113,9 @@ public class AutoVoidInstantProcessStageTests
         var getTicketsResult = new GroupTicketsInRequest
         {
             SingleTickets = new List<RequestDetailTicketModel> { new() },
-            ParlayTickets = Enumerable.Empty<RequestDetailTicketModel>(),
-            CricketTickets = Enumerable.Empty<RequestDetailTicketModel>(),
-            CancelCOTickets = Enumerable.Empty<RequestDetailTicketModel>()
+            ParlayTickets = [],
+            CricketTickets = [],
+            CancelCOTickets = []
         };
 
         var groupTickets = new List<RequestDetailTicketModel>();
@@ -144,9 +144,9 @@ public class AutoVoidInstantProcessStageTests
         var outputData = new GroupTicketsInRequest
         {
             SingleTickets = new List<RequestDetailTicketModel> { new() },
-            ParlayTickets = Enumerable.Empty<RequestDetailTicketModel>(),
-            CricketTickets = Enumerable.Empty<RequestDetailTicketModel>(),
-            CancelCOTickets = Enumerable.Empty<RequestDetailTicketModel>()
+            ParlayTickets = [],
+            CricketTickets = [],
+            CancelCOTickets = []
         };
         const string queueErrorMessage = "error";
         checkRequestQueueValidStage.Execute(1, queue).ReturnsForAnyArgs((true, IssueTypeConstant.DangerAccepted));
@@ -163,6 +163,7 @@ public class AutoVoidInstantProcessStageTests
             Arg.Any<IEnumerable<RequestDetailTicketModel>>(), Arg.Any<IEnumerable<RequestDetailTicketModel>>(), logData);
         insertPreVoidingDataStage.Received(1).MapVoidingTypeToTickets(Arg.Any<CheckTicketValidationOutput>());
         insertPreVoidingDataStage.Received(1).Execute(1, queue, Arg.Any<IEnumerable<RequestDetailTicketModel>>(), voidDataXml, logData);
+        loggingService.Received(1).InfoAppendNewLineAsync(Arg.Any<IList<string>>());
         autoVoidRequestQueueService.UpdateQueue(1, queue.QueueId, ExecuteStatus.Done, queueErrorMessage);
     }
 }

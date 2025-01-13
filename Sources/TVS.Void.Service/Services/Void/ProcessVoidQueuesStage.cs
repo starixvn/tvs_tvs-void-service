@@ -11,19 +11,12 @@ public interface ProcessVoidQueuesStage
     Task<IList<TicketVoidingQueueModel>> Execute(int siteDbGroupId, IEnumerable<TicketVoidingQueueModel> voidingQueues);
 }
 
-public class ProcessVoidQueuesStageImp : ProcessVoidQueuesStage
+public class ProcessVoidQueuesStageImp(
+    TicketVoidingQueueService ticketVoidingQueueService,
+    RequestTicketService requestTicketService,
+    NetPositionService netPositionService)
+    : ProcessVoidQueuesStage
 {
-    private readonly TicketVoidingQueueService ticketVoidingQueueService;
-    private readonly RequestTicketService requestTicketService;
-    private readonly NetPositionService netPositionService;
-
-    public ProcessVoidQueuesStageImp(TicketVoidingQueueService ticketVoidingQueueService, RequestTicketService requestTicketService, NetPositionService netPositionService)
-    {
-        this.ticketVoidingQueueService = ticketVoidingQueueService;
-        this.requestTicketService = requestTicketService;
-        this.netPositionService = netPositionService;
-    }
-
     public async Task<IList<TicketVoidingQueueModel>> Execute(int siteDbGroupId, IEnumerable<TicketVoidingQueueModel> voidingQueues)
     {
         var processResult = new List<TicketVoidingQueueModel>();

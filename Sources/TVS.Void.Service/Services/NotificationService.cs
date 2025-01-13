@@ -22,17 +22,9 @@ public interface NotificationService
     Task NotifyRequestFailedToAllUser(int requestId);
 }
 
-public class NotificationServiceImp : NotificationService
+public class NotificationServiceImp(IHubContext<NotificationHub, ClientEvent> hubContext, LoggingService loggingService)
+    : NotificationService
 {
-    private readonly IHubContext<NotificationHub, ClientEvent> hubContext;
-    private readonly LoggingService loggingService;
-
-    public NotificationServiceImp(IHubContext<NotificationHub, ClientEvent> hubContext, LoggingService loggingService)
-    {
-        this.hubContext = hubContext;
-        this.loggingService = loggingService;
-    }
-
     public async Task NotifyRequestRunningToAllUser(IEnumerable<VoidingHistoryModel> voidingHistoryList)
     {
         try

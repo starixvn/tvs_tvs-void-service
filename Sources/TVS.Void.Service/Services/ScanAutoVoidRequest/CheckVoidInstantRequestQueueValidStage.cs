@@ -12,17 +12,11 @@ public interface CheckVoidInstantRequestQueueValidStage
     Task<(bool IsValid, int IssueTypeId)> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue);
 }
 
-public class CheckVoidInstantRequestQueueValidStageImp : CheckVoidInstantRequestQueueValidStage
+public class CheckVoidInstantRequestQueueValidStageImp(
+    AutoVoidRequestQueueService autoVoidRequestQueueService,
+    RequestDetailService requestDetailService)
+    : CheckVoidInstantRequestQueueValidStage
 {
-    private readonly AutoVoidRequestQueueService autoVoidRequestQueueService;
-    private readonly RequestDetailService requestDetailService;
-
-    public CheckVoidInstantRequestQueueValidStageImp(AutoVoidRequestQueueService autoVoidRequestQueueService, RequestDetailService requestDetailService)
-    {
-        this.autoVoidRequestQueueService = autoVoidRequestQueueService;
-        this.requestDetailService = requestDetailService;
-    }
-
     public async Task<(bool IsValid, int IssueTypeId)> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue)
     {
         var requestIdList = queue.RequestIds.Split(",");
@@ -39,8 +33,8 @@ public class CheckVoidInstantRequestQueueValidStageImp : CheckVoidInstantRequest
             return (false, 0);
         }
 
-        var actionNameRequest = VoidActionTypeConstant.VoidActionList.ContainsKey(request.First().ActionId) ?
-            VoidActionTypeConstant.VoidActionList[request.First().ActionId] : string.Empty;
+        var actionNameRequest = VoidActionTypeConstant.VoidActionList.TryGetValue(request.First().ActionId, out var value) ?
+            value : string.Empty;
         if (!actionNameRequest.Equals(queue.Action, StringComparison.OrdinalIgnoreCase))
         {
             await autoVoidRequestQueueService.UpdateQueue(siteDbGroupId, queue.QueueId, ExecuteStatus.Done, "Request Action was edited.");

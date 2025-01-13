@@ -11,15 +11,8 @@ public interface GetTicketsStage
     Task<(bool IsContinueFlow, GroupTicketsInRequest OutputData)> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue, IList<string> logData);
 }
 
-public class GetTicketsStageImp : GetTicketsStage
+public class GetTicketsStageImp(RequestTicketService requestTicketService) : GetTicketsStage
 {
-    private readonly RequestTicketService requestTicketService;
-
-    public GetTicketsStageImp(RequestTicketService requestTicketService)
-    {
-        this.requestTicketService = requestTicketService;
-    }
-
     public async Task<(bool, GroupTicketsInRequest)> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue, IList<string> logData)
     {
         var getTicketsResult = await GetTicketsInRequest(siteDbGroupId, queue);

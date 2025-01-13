@@ -158,6 +158,6 @@ public class RequestTicketServiceImpTests
                 2, new List<RequestDetailTicketModel> {new() { TransId = 113 }},
                 new List<RequestDetailTicketModel>{new() { TransId = 222 } },
                 new List<RequestDetailTicketModel> {new() { TransId = 113 }}
-            },
+            }
         };
 }

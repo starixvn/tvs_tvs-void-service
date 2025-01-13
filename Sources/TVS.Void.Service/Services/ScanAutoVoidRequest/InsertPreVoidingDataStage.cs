@@ -14,22 +14,13 @@ public interface InsertPreVoidingDataStage
     IEnumerable<RequestDetailTicketModel> MapVoidingTypeToTickets(CheckTicketValidationOutput validation);
 }
 
-public class InsertPreVoidingDataStageImp : InsertPreVoidingDataStage
+public class InsertPreVoidingDataStageImp(
+    RequestDetailService requestDetailService,
+    TicketVoidingQueueService ticketVoidingQueueService,
+    RequestTicketService requestTicketService,
+    NotificationService notificationService)
+    : InsertPreVoidingDataStage
 {
-    private readonly RequestDetailService requestDetailService;
-    private readonly TicketVoidingQueueService ticketVoidingQueueService;
-    private readonly RequestTicketService requestTicketService;
-    private readonly NotificationService notificationService;
-
-    public InsertPreVoidingDataStageImp(RequestDetailService requestDetailService,
-        TicketVoidingQueueService ticketVoidingQueueService, RequestTicketService requestTicketService, NotificationService notificationService)
-    {
-        this.requestDetailService = requestDetailService;
-        this.ticketVoidingQueueService = ticketVoidingQueueService;
-        this.requestTicketService = requestTicketService;
-        this.notificationService = notificationService;
-    }
-
     public async Task<string> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue, IEnumerable<RequestDetailTicketModel> groupTickets, string voidDataXml, IList<string> logData)
     {
         if (!groupTickets.Any())

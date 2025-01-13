@@ -22,7 +22,7 @@ public class InsertAfterVoidDataPrivateServiceImp : InsertAfterVoidDataPrivateSe
         const int parlayMatchId = 29;
         if (issueTypeId == IssueTypeConstant.AbnormalAccount
             || (issueTypeId == IssueTypeConstant.AbnormalBet && distinctMatchIdInRequest.Any(x => x == parlayMatchId))
-            || (distinctMatchIdInVoidQueues.Count() > 1))
+            || distinctMatchIdInVoidQueues.Count() > 1)
 
         {
             return 0;

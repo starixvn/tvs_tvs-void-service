@@ -11,17 +11,11 @@ public interface AutoVoidWinningBeforeVoidService
     Task<(bool IsContinueFlow, GroupTicketsInRequest OutputData)> GetTickets(int siteDbGroupId, AutoVoidRequestQueueModel queue, IList<string> logData);
 }
 
-public class AutoVoidWinningBeforeVoidServiceImp : AutoVoidWinningBeforeVoidService
+public class AutoVoidWinningBeforeVoidServiceImp(
+    GetTicketsStage getTicketsStage,
+    CheckVoidWinningRequestQueueValidStage checkRequestQueueValidStage)
+    : AutoVoidWinningBeforeVoidService
 {
-    private readonly GetTicketsStage getTicketsStage;
-    private readonly CheckVoidWinningRequestQueueValidStage checkRequestQueueValidStage;
-
-    public AutoVoidWinningBeforeVoidServiceImp(GetTicketsStage getTicketsStage, CheckVoidWinningRequestQueueValidStage checkRequestQueueValidStage)
-    {
-        this.getTicketsStage = getTicketsStage;
-        this.checkRequestQueueValidStage = checkRequestQueueValidStage;
-    }
-
     public async Task<(bool IsValid, string RequestIdsChangedAction)> CheckVoidWinningRequestQueueValid(int siteDbGroupId, AutoVoidRequestQueueModel queue)
     {
         return await checkRequestQueueValidStage.Execute(siteDbGroupId, queue);

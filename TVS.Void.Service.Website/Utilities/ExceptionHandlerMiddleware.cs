@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Threading.Tasks;
 using Fanex.Logging.Extensions.AspNetCore;
@@ -8,17 +7,11 @@ using Microsoft.Extensions.Configuration;
 
 namespace TVS.Void.Service.Website.Utilities;
 
-[ExcludeFromCodeCoverage(Justification = "non-logic")]
-public class ExceptionHandlerMiddleware
+public class ExceptionHandlerMiddleware(RequestDelegate next, IConfiguration configuration)
 {
-    private readonly RequestDelegate next;
-    public IConfiguration Configuration { get; }
-
-    public ExceptionHandlerMiddleware(RequestDelegate next, IConfiguration configuration)
-    {
-        this.next = next;
-        Configuration = configuration;
-    }
+#pragma warning disable S3604
+    public IConfiguration Configuration { get; } = configuration;
+#pragma warning restore S3604
 
     public async Task InvokeAsync(HttpContext context)
     {

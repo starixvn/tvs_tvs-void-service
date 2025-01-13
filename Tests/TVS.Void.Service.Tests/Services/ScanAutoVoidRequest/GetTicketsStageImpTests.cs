@@ -63,7 +63,7 @@ public class GetTicketsStageImpTests
             SingleTickets = new List<RequestDetailTicketModel>(),
             ParlayTickets = new List<RequestDetailTicketModel>(),
             CricketTickets = new List<RequestDetailTicketModel>(),
-            CancelCOTickets = new List<RequestDetailTicketModel>(),
+            CancelCOTickets = new List<RequestDetailTicketModel>()
         };
         requestTicketService.GetTicketsByRequestsAndSiteDbGroupId(default, default)
             .ReturnsForAnyArgs(getTicketsResult);

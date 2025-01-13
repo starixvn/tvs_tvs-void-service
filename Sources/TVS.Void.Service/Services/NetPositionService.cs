@@ -14,17 +14,9 @@ public interface NetPositionService
     Task RollBackNetPosition(int siteDbGroupId, string transIds);
 }
 
-public class NetPositionServiceImp : NetPositionService
+public class NetPositionServiceImp(LoggingService loggingService, IDynamicRepository repository)
+    : NetPositionService
 {
-    private readonly LoggingService loggingService;
-    private readonly IDynamicRepository repository;
-
-    public NetPositionServiceImp(LoggingService loggingService, IDynamicRepository repository)
-    {
-        this.loggingService = loggingService;
-        this.repository = repository;
-    }
-
     public async Task<bool> UpdateNetPosition(int siteDbGroupId, string transIds, string action)
     {
         if (string.IsNullOrWhiteSpace(transIds))

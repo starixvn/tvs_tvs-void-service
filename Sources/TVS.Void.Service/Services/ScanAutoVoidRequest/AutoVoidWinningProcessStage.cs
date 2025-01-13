@@ -12,29 +12,16 @@ public interface AutoVoidWinningProcessStage
     Task Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue, IList<string> logData);
 }
 
-public class AutoVoidWinningProcessStageImp : AutoVoidWinningProcessStage
+public class AutoVoidWinningProcessStageImp(
+    CheckTicketValidationStage checkTicketAllowToVoidStage,
+    ReCalculateTicketsStage reCalculateTicketsStage,
+    InsertPreVoidingDataStage insertPreVoidingDataStage,
+    AutoVoidRequestQueueService autoVoidRequestQueueService,
+    CreateVoidDataXmlStage createVoidDataXmlStage,
+    LoggingService loggingService,
+    AutoVoidWinningBeforeVoidService autoVoidWinningBeforeVoidService)
+    : AutoVoidWinningProcessStage
 {
-    private readonly CheckTicketValidationStage checkTicketAllowToVoidStage;
-    private readonly ReCalculateTicketsStage reCalculateTicketsStage;
-    private readonly InsertPreVoidingDataStage insertPreVoidingDataStage;
-    private readonly AutoVoidRequestQueueService autoVoidRequestQueueService;
-    private readonly CreateVoidDataXmlStage createVoidDataXmlStage;
-    private readonly LoggingService loggingService;
-    private readonly AutoVoidWinningBeforeVoidService autoVoidWinningBeforeVoidService;
-
-    public AutoVoidWinningProcessStageImp(CheckTicketValidationStage checkTicketAllowToVoidStage, ReCalculateTicketsStage reCalculateTicketsStage,
-        InsertPreVoidingDataStage insertPreVoidingDataStage, AutoVoidRequestQueueService autoVoidRequestQueueService, CreateVoidDataXmlStage createVoidDataXmlStage,
-        LoggingService loggingService, AutoVoidWinningBeforeVoidService autoVoidWinningBeforeVoidService)
-    {
-        this.checkTicketAllowToVoidStage = checkTicketAllowToVoidStage;
-        this.reCalculateTicketsStage = reCalculateTicketsStage;
-        this.insertPreVoidingDataStage = insertPreVoidingDataStage;
-        this.autoVoidRequestQueueService = autoVoidRequestQueueService;
-        this.createVoidDataXmlStage = createVoidDataXmlStage;
-        this.loggingService = loggingService;
-        this.autoVoidWinningBeforeVoidService = autoVoidWinningBeforeVoidService;
-    }
-
     public async Task Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue, IList<string> logData)
     {
         var checkQueueResult = await autoVoidWinningBeforeVoidService.CheckVoidWinningRequestQueueValid(siteDbGroupId, queue);

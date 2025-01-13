@@ -33,7 +33,7 @@ public class ProcessVoidQueuesStageTests
         var actual = await service.Execute(1, fakeQueues);
 
         // Assert
-        Assert.Equal(fakeQueues.Count, actual.Count());
+        Assert.Equal(fakeQueues.Count, actual.Count);
         Assert.Equal(fakeQueues.First().StatusId, actual.First().StatusId);
     }
 

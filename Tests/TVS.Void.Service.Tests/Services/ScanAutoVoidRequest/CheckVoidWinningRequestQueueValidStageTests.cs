@@ -23,7 +23,7 @@ public class CheckVoidWinningRequestQueueValidStageTests
             Action = "CAL"
         };
         const int siteDbGroupId = 0;
-        string[] requestIdList = { "1", "2" };
+        string[] requestIdList = ["1", "2"];
         requestDetailService = Substitute.For<RequestDetailService>();
         autoVoidRequestQueueService = Substitute.For<AutoVoidRequestQueueService>();
         foreach (var requestId in requestIdList)
@@ -84,7 +84,7 @@ public class CheckVoidWinningRequestQueueValidStageTests
             Action = "CAL"
         };
         const int siteDbGroupId = 0;
-        string[] requestIdList = { "1", "2" };
+        string[] requestIdList = ["1", "2"];
         requestDetailService = Substitute.For<RequestDetailService>();
         autoVoidRequestQueueService = Substitute.For<AutoVoidRequestQueueService>();
         foreach (var requestId in requestIdList)
@@ -115,7 +115,7 @@ public class CheckVoidWinningRequestQueueValidStageTests
             Action = "CAL"
         };
         const int siteDbGroupId = 0;
-        string[] requestIdList = { "1", "2" };
+        string[] requestIdList = ["1", "2"];
         requestDetailService = Substitute.For<RequestDetailService>();
         autoVoidRequestQueueService = Substitute.For<AutoVoidRequestQueueService>();
         foreach (var requestId in requestIdList)

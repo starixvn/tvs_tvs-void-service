@@ -13,17 +13,11 @@ public interface CheckVoidWinningRequestQueueValidStage
     Task<(bool IsValid, string RequestIdsChangedAction)> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue);
 }
 
-public class CheckVoidWinningRequestQueueValidStageImp : CheckVoidWinningRequestQueueValidStage
+public class CheckVoidWinningRequestQueueValidStageImp(
+    RequestDetailService requestDetailService,
+    AutoVoidRequestQueueService autoVoidRequestQueueService)
+    : CheckVoidWinningRequestQueueValidStage
 {
-    private readonly RequestDetailService requestDetailService;
-    private readonly AutoVoidRequestQueueService autoVoidRequestQueueService;
-
-    public CheckVoidWinningRequestQueueValidStageImp(RequestDetailService requestDetailService, AutoVoidRequestQueueService autoVoidRequestQueueService)
-    {
-        this.requestDetailService = requestDetailService;
-        this.autoVoidRequestQueueService = autoVoidRequestQueueService;
-    }
-
     public async Task<(bool IsValid, string RequestIdsChangedAction)> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue)
     {
         var requestIdList = queue.RequestIds.Split(",");
@@ -50,8 +44,8 @@ public class CheckVoidWinningRequestQueueValidStageImp : CheckVoidWinningRequest
             var (request, _) = await requestDetailService.GetRequestById(int.Parse(requestId));
             if (request.Any())
             {
-                var actionNameRequest = VoidActionTypeConstant.VoidActionList.ContainsKey(request.First().ActionId) ?
-                    VoidActionTypeConstant.VoidActionList[request.First().ActionId] : string.Empty;
+                var actionNameRequest = VoidActionTypeConstant.VoidActionList.TryGetValue(request.First().ActionId, out var value) ?
+                    value : string.Empty;
                 if (!actionNameRequest.Equals(actionNameQueue, StringComparison.OrdinalIgnoreCase))
                 {
                     requestIdsChangedAction.Add(requestId);

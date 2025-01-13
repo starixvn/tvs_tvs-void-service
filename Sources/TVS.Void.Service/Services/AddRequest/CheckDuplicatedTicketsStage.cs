@@ -11,15 +11,8 @@ public interface CheckDuplicatedTicketsStage
     Task<IEnumerable<CheckDuplicatedTicketsResult>> Execute(string transInfoJson);
 }
 
-public class CheckDuplicatedTicketsStageImp : CheckDuplicatedTicketsStage
+public class CheckDuplicatedTicketsStageImp(IDynamicRepository repository) : CheckDuplicatedTicketsStage
 {
-    private readonly IDynamicRepository repository;
-
-    public CheckDuplicatedTicketsStageImp(IDynamicRepository repository)
-    {
-        this.repository = repository;
-    }
-
     public async Task<IEnumerable<CheckDuplicatedTicketsResult>> Execute(string transInfoJson)
     {
         var criteria = new CheckDuplicateTicketsCriteria

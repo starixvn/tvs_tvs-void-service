@@ -1,40 +1,49 @@
 ﻿using System;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Hosting;
 using ONEbook.UM.Services;
-using Quartz;
+using TicketVoidingSystem.Constants;
 using TicketVoidingSystem.Services;
 using TVS.Void.Service.Services.Void;
 
 namespace TVS.Void.Service.Website.Jobs;
 
-[DisallowConcurrentExecution]
-public class VoidJob : IJob
+public class VoidJob(IMaintenanceService maintenanceService, LoggingService loggingService, VoidService voidService)
+    : BackgroundService
 {
-    private readonly LoggingService loggingService;
-    private readonly IMaintenanceService maintenanceService;
-    private readonly VoidService voidService;
-
-    public VoidJob(IMaintenanceService maintenanceService, LoggingService loggingService, VoidService voidService)
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        this.maintenanceService = maintenanceService;
-        this.loggingService = loggingService;
-        this.voidService = voidService;
+        while (!stoppingToken.IsCancellationRequested)
+        {
+            await TryDoTask();
+            await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken);
+        }
     }
 
-    public async Task Execute(IJobExecutionContext context)
+    private async Task TryDoTask()
     {
-        var currentSiteDbGroupId = context.MergedJobDataMap.GetIntValue("siteDbGroupId");
-
         try
         {
-            if (!await maintenanceService.IsUnderMaintenanceAsync())
-            {
-                await voidService.Execute(currentSiteDbGroupId);
-            }
+            await DoTask();
         }
         catch (Exception ex)
         {
-            await loggingService.ErrorAsync($"VoidJob[{currentSiteDbGroupId}] execute failed!", ex);
+            await loggingService.ErrorAsync("VoidJob execute failed!", ex);
+        }
+    }
+
+    private async Task DoTask()
+    {
+        if (await maintenanceService.IsUnderMaintenanceAsync())
+        {
+            return;
+        }
+
+        foreach (var siteDbGroupId in SiteDbGroupConstant.ServerList.Select(x => x.Id))
+        {
+            await voidService.Execute(siteDbGroupId);
         }
     }
 }
