@@ -1,6 +1,8 @@
 ﻿using Fanex.Data.Repository;
 using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 using TicketVoidingSystem.Constants;
+using TicketVoidingSystem.Services;
 using TVS.Void.Service.Criteria;
 using TVS.Void.Service.Models;
 using TVS.Void.Service.Services;
@@ -10,19 +12,17 @@ namespace TVS.Void.Service.Tests.Services;
 public class RequestDetailServiceImpTests
 {
     [Theory]
-    [InlineData("2,3", 1, "123xyz", TicketStatus.WonId)]
-    [InlineData("2,3", 1, "123xyz", TicketStatus.RunningId)]
-    [InlineData("1", 0, "", TicketStatus.DrawId)]
-    [InlineData("1", 0, "", TicketStatus.LoseId)]
+    [InlineData("2,3", 1, "123xyz")]
+    [InlineData("1", 0, "")]
     public async Task InsertVoidingHistory_ShouldReturnExpectedData(string requestIds, int siteDbGroupId,
-        string broadcastSessionId, int statusId)
+        string broadcastSessionId)
     {
         // Arrange
         var fakeVoidingHistory = new List<VoidingHistoryModel> { new() { VoidingHistoryId = 112 } };
         var repository = Substitute.For<IDynamicRepository>();
         repository.FetchAsync<VoidingHistoryModel>(default).ReturnsForAnyArgs(fakeVoidingHistory);
         const string voidDataXml = "xml";
-        var service = new RequestDetailServiceImp(repository);
+        var service = new RequestDetailServiceImp(repository, null);
 
         // Act
         var actual = await service.InsertVoidingHistory(requestIds, siteDbGroupId, broadcastSessionId, voidDataXml);
@@ -35,23 +35,21 @@ public class RequestDetailServiceImpTests
     [Theory]
     [InlineData(true, 112)]
     [InlineData(false, 223)]
-    public async Task InsertAfterVoidServiceData_ShouldReturnExpectedData(bool isAutoVoid, int requestId)
+    public async Task InsertAfterVoidServiceData_ShouldCallFanexData(bool isAutoVoid, int requestId)
     {
         // Arrange
         var fakeAfterVoid = new AfterVoidServiceModel { VoidingHistoryId = 112 };
         var repository = Substitute.For<IDynamicRepository>();
         repository.GetAsync<AfterVoidServiceModel>(default).ReturnsForAnyArgs(fakeAfterVoid);
-        var service = new RequestDetailServiceImp(repository);
+        var service = new RequestDetailServiceImp(repository, null);
 
         // Act
-        var actual =
-            await service.InsertAfterVoidServiceData(isAutoVoid, new AfterVoidServiceModel { RequestId = requestId });
+        await service.InsertAfterVoidServiceData(isAutoVoid, new AfterVoidServiceModel { RequestId = requestId }, new List<string>());
 
         // Assert
         await repository.Received(1).GetAsync<AfterVoidServiceModel>
         (Arg.Is<InsertAfterVoidServiceDataCriteria>(x => x.IsAutoVoid == isAutoVoid &&
                                                          x.RequestId == requestId));
-        Assert.StrictEqual(fakeAfterVoid, actual);
     }
 
     [Theory]
@@ -66,7 +64,7 @@ public class RequestDetailServiceImpTests
         var counter = 0;
         repository.When(x => x.ExecuteAsync(Arg.Any<UpdateTicketVoidingHistoryCriteria>()))
             .Do(_ => counter++);
-        var service = new RequestDetailServiceImp(repository);
+        var service = new RequestDetailServiceImp(repository, null);
 
         // Act
         await service.UpdateTicketVoidingHistory(voidingHistoryId, statusId);
@@ -87,7 +85,7 @@ public class RequestDetailServiceImpTests
         var repository = Substitute.For<IDynamicRepository>();
         repository.FetchMultipleAsync<RequestModel, RequestDetail>(default)
             .ReturnsForAnyArgs((fakeRequests, fakeRequestsDetail));
-        var service = new RequestDetailServiceImp(repository);
+        var service = new RequestDetailServiceImp(repository, null);
 
         // Act
         var actual = await service.GetRequestById(requestId);
@@ -107,7 +105,7 @@ public class RequestDetailServiceImpTests
         var repository = Substitute.For<IDynamicRepository>();
         repository.FetchAsync<VoidDataXmlModel>(Arg.Any<GetVoidDataOfVoidingHistoryCriteria>())
             .ReturnsForAnyArgs(voidingHistories);
-        var service = new RequestDetailServiceImp(repository);
+        var service = new RequestDetailServiceImp(repository, null);
 
         // Act
         var actual = await service.GetVoidDataOfVoidingHistory(1);
@@ -115,5 +113,58 @@ public class RequestDetailServiceImpTests
         // Assert
         await repository.Received(1).FetchAsync<VoidDataXmlModel>(Arg.Any<GetVoidDataOfVoidingHistoryCriteria>());
         AssertExtension.Equal(voidingHistory, actual);
+    }
+
+    [Fact]
+    public async Task InsertLetstalk_IsArchivedTicket_ShouldReturn()
+    {
+        // Arrange
+        var repository = Substitute.For<IDynamicRepository>();
+        repository.ExecuteAsync(default).ReturnsForAnyArgs(1);
+        var service = new RequestDetailServiceImp(repository, null);
+
+        // Act
+        await service.InsertLetstalk(1, IssueTypeConstant.ArchivedTicket, "", 0, new List<string>());
+
+        // Assert
+        await repository.DidNotReceive().ExecuteAsync(Arg.Any<InsertLetstalkCommand>());
+    }
+
+    [Fact]
+    public async Task InsertLetstalk_IsDangerAccepted_ShouldCalledFanexData()
+    {
+        // Arrange
+        var logData = new List<string>();
+        var repository = Substitute.For<IDynamicRepository>();
+        repository.ExecuteAsync(default).ReturnsForAnyArgs(1);
+        var service = new RequestDetailServiceImp(repository, null);
+
+        // Act
+        await service.InsertLetstalk(1, IssueTypeConstant.DangerAccepted, "", 0, logData);
+
+        // Assert
+        await repository.Received(1).ExecuteAsync(Arg.Any<InsertLetstalkCommand>());
+        Assert.Contains("InsertLetstalk: Done", logData);
+    }
+
+    [Fact]
+    public async Task InsertLetstalk_HasException_ShouldCalledLoggingServiceErrorAsync()
+    {
+        // Arrange
+        var exception = new Exception("Test");
+        var logData = new List<string>();
+        var repository = Substitute.For<IDynamicRepository>();
+        var loggingService = Substitute.For<LoggingService>();
+        repository.ExecuteAsync(Arg.Any<InsertLetstalkCommand>())
+            .ThrowsAsync(exception);
+        var service = new RequestDetailServiceImp(repository, loggingService);
+
+        // Act
+        await service.InsertLetstalk(1, IssueTypeConstant.DangerAccepted, "", 0, logData);
+
+        // Assert
+        await repository.Received(1).ExecuteAsync(Arg.Any<InsertLetstalkCommand>());
+        await loggingService.Received(1).ErrorAsync(exception);
+        Assert.Contains("InsertLetstalk: Failed", logData);
     }
 }
