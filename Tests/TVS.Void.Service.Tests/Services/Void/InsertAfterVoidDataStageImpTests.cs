@@ -11,6 +11,7 @@ public class InsertAfterVoidDataStageImpTests
     public async Task Execute_ShouldExecuteSuccessful()
     {
         // Arrange
+        var logData = new List<string>();
         var fakeVoidQueueResults = new List<TicketVoidingQueueModel>
             { new() { RequestId = 1, VoidingHistoryId = 1 }, new() { RequestId = 22 } };
         var privateService = Substitute.For<InsertAfterVoidDataPrivateService>();
@@ -19,8 +20,6 @@ public class InsertAfterVoidDataStageImpTests
             .ReturnsForAnyArgs((new List<RequestModel> { new() { RequestId = 112 } }, new List<RequestDetail>()));
         requestDetailService.GetVoidDataOfVoidingHistory(default)
             .ReturnsForAnyArgs(new VoidDataXmlModel { IsRunAutoAfterVoid = true });
-        requestDetailService.InsertAfterVoidServiceData(default, Arg.Any<AfterVoidServiceModel>())
-            .ReturnsForAnyArgs(new AfterVoidServiceModel());
         privateService.GetMatchIdForAfterVoid(default, Arg.Any<IEnumerable<RequestDetail>>(),
                 Arg.Any<IEnumerable<TicketVoidingQueueModel>>())
             .ReturnsForAnyArgs(1);
@@ -30,12 +29,12 @@ public class InsertAfterVoidDataStageImpTests
         var processStage = new InsertAfterVoidDataStageImp(requestDetailService, privateService);
 
         // Act
-        await processStage.Execute(fakeVoidQueueResults, new List<string>());
+        await processStage.Execute(fakeVoidQueueResults, logData);
 
         // Assert
         await requestDetailService.Received(1).GetRequestById(1);
         await requestDetailService.Received(1).GetVoidDataOfVoidingHistory(1);
-        await requestDetailService.Received(1).InsertAfterVoidServiceData(true, Arg.Any<AfterVoidServiceModel>());
+        await requestDetailService.Received(1).InsertAfterVoidServiceData(true, Arg.Any<AfterVoidServiceModel>(), logData);
         privateService.Received(1).GetMatchIdForAfterVoid(default, Arg.Any<IEnumerable<RequestDetail>>(),
             Arg.Any<IEnumerable<TicketVoidingQueueModel>>());
         privateService.Received(1).CombineNegativeBalanceUsers(Arg.Any<IEnumerable<TicketVoidingQueueModel>>());
