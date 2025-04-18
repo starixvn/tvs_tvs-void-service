@@ -19,7 +19,7 @@ public class InsertPreVoidingDataStageImpTests
         var requestDetailService = Substitute.For<RequestDetailService>();
         var ticketVoidingQueueService = Substitute.For<TicketVoidingQueueService>();
         var requestTicketService = Substitute.For<RequestTicketService>();
-        var notificationService = Substitute.For<NotificationService>();
+        var notificationService = Substitute.For<SignalRService>();
         requestDetailService.InsertVoidingHistory(Arg.Any<string>(), default, Arg.Any<string>(), voidDataXml)
             .ReturnsForAnyArgs(new List<VoidingHistoryModel>());
 

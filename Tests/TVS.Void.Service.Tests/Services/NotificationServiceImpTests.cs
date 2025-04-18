@@ -24,10 +24,10 @@ public class NotificationServiceImpTests
         hubClient.All.ReturnsForAnyArgs(clientEvent);
         hubContext.Clients.ReturnsForAnyArgs(hubClient);
 
-        var service = new NotificationServiceImp(hubContext, default);
+        var service = new SignalRServiceImp(hubContext, default);
 
         // Act
-        await service.NotifyRequestRunningToAllUser(new List<VoidingHistoryModel> { new() { RequestId = requestId } });
+        await service.UpdateRequestRunningToAllUser(new List<VoidingHistoryModel> { new() { RequestId = requestId } });
 
         // Assert
         await clientEvent.Received(1)
@@ -41,10 +41,10 @@ public class NotificationServiceImpTests
     {
         // Arrange
         var loggingService = Substitute.For<LoggingService>();
-        var service = new NotificationServiceImp(default, loggingService);
+        var service = new SignalRServiceImp(default, loggingService);
 
         // Act
-        await service.NotifyRequestRunningToAllUser(new List<VoidingHistoryModel> { new() { RequestId = requestId } });
+        await service.UpdateRequestRunningToAllUser(new List<VoidingHistoryModel> { new() { RequestId = requestId } });
 
         // Assert
         await loggingService.Received(1).ErrorAsync(Arg.Any<Exception>());
@@ -65,10 +65,10 @@ public class NotificationServiceImpTests
         hubClient.User(Arg.Any<string>()).ReturnsForAnyArgs(clientEvent);
         hubContext.Clients.ReturnsForAnyArgs(hubClient);
 
-        var service = new NotificationServiceImp(hubContext, default);
+        var service = new SignalRServiceImp(hubContext, default);
 
         // Act
-        await service.NotifyVoidFailedToUser(requestId, voidQueueResults);
+        await service.UpdateVoidFailedToUser(requestId, voidQueueResults);
 
         // Assert
         hubClient.Received(1).User(Arg.Is<string>(x => x == "abc"));
@@ -82,10 +82,10 @@ public class NotificationServiceImpTests
     {
         // Arrange
         var loggingService = Substitute.For<LoggingService>();
-        var service = new NotificationServiceImp(default, loggingService);
+        var service = new SignalRServiceImp(default, loggingService);
 
         // Act
-        await service.NotifyVoidFailedToUser(requestId, voidQueueResults);
+        await service.UpdateVoidFailedToUser(requestId, voidQueueResults);
 
         // Assert
         await loggingService.Received(1).ErrorAsync(Arg.Any<Exception>());
@@ -103,10 +103,10 @@ public class NotificationServiceImpTests
         hubClient.All.ReturnsForAnyArgs(clientEvent);
         hubContext.Clients.ReturnsForAnyArgs(hubClient);
 
-        var service = new NotificationServiceImp(hubContext, default);
+        var service = new SignalRServiceImp(hubContext, default);
 
         // Act
-        await service.NotifyRequestFailedToAllUser(requestId);
+        await service.UpdateRequestFailedToAllUser(requestId);
 
         // Assert
         await clientEvent.Received(1)
@@ -120,10 +120,10 @@ public class NotificationServiceImpTests
     {
         // Arrange
         var loggingService = Substitute.For<LoggingService>();
-        var service = new NotificationServiceImp(default, loggingService);
+        var service = new SignalRServiceImp(default, loggingService);
 
         // Act
-        await service.NotifyRequestFailedToAllUser(requestId);
+        await service.UpdateRequestFailedToAllUser(requestId);
 
         // Assert
         await loggingService.Received(1).ErrorAsync(Arg.Any<Exception>());

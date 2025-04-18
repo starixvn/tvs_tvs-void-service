@@ -7,7 +7,7 @@ public class TicketVoidingQueueModel
     public int VoidingHistoryId { get; set; }
     public int RequestId { get; set; }
     public int MatchId { get; set; }
-    public int VoidingTypeId { get; set; }
+    public byte VoidingTypeId { get; set; }
 
     public int UserId { get; set; }
     public string UserName { get; set; }
