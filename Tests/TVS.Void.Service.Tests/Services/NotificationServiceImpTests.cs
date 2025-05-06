@@ -7,24 +7,28 @@ using TicketVoidingSystem.SignalR;
 using TVS.Void.Service.Constants;
 using TVS.Void.Service.Models;
 using TVS.Void.Service.Services;
+using TVS.Void.Service.Services.Notification;
 
 namespace TVS.Void.Service.Tests.Services;
 
 public class NotificationServiceImpTests
 {
+    private readonly IHubContext<NotificationHub, ClientEvent> hubContext = Substitute.For<IHubContext<NotificationHub, ClientEvent>>();
+    private readonly IHubClients<ClientEvent> hubClient = Substitute.For<IHubClients<ClientEvent>>();
+    private readonly ClientEvent clientEvent = Substitute.For<ClientEvent>();
+    private readonly LoggingService loggingService = Substitute.For<LoggingService>();
+    private readonly NotificationService notificationService = Substitute.For<NotificationService>();
+
     [Theory]
     [InlineData(123)]
     [InlineData(0)]
     public async Task NotifyRequestRunningToAllUser_ShouldExecuteSuccessful(int requestId)
     {
         // Arrange
-        var hubContext = Substitute.For<IHubContext<NotificationHub, ClientEvent>>();
-        var hubClient = Substitute.For<IHubClients<ClientEvent>>();
-        var clientEvent = Substitute.For<ClientEvent>();
         hubClient.All.ReturnsForAnyArgs(clientEvent);
         hubContext.Clients.ReturnsForAnyArgs(hubClient);
 
-        var service = new SignalRServiceImp(hubContext, default);
+        var service = new SignalRServiceImp(hubContext, loggingService, notificationService);
 
         // Act
         await service.UpdateRequestRunningToAllUser(new List<VoidingHistoryModel> { new() { RequestId = requestId } });
@@ -40,8 +44,9 @@ public class NotificationServiceImpTests
     public async Task NotifyRequestRunningToAllUser_ShouldExecuteCatchExceptionBlock(int requestId)
     {
         // Arrange
-        var loggingService = Substitute.For<LoggingService>();
-        var service = new SignalRServiceImp(default, loggingService);
+        hubContext.Clients.All.When(x => x.updateRequestStatus(Arg.Any<IEnumerable<RequestStatus>>()))
+            .Do(x => throw new Exception());
+        var service = new SignalRServiceImp(hubContext, loggingService, notificationService);
 
         // Act
         await service.UpdateRequestRunningToAllUser(new List<VoidingHistoryModel> { new() { RequestId = requestId } });
@@ -55,40 +60,20 @@ public class NotificationServiceImpTests
     [InlineData(123, VoidingTypeConstant.CancelCashOut, ExecuteStatus.Failed)]
     [InlineData(0, VoidingTypeConstant.Cricket, ExecuteStatus.Done)]
     [InlineData(0, VoidingTypeConstant.CancelCashOut, ExecuteStatus.Done)]
-    public async Task NotifyVoidFailedToUser_ShouldExecuteSuccessful(int requestId, int voidingTypeId, int statusId)
+    public void NotifyVoidFailedToUser_ShouldExecuteSuccessful(int requestId, byte voidingTypeId, int statusId)
     {
         // Arrange
         var voidQueueResults = new List<TicketVoidingQueueModel> { new() { UserName = "abc", VoidingTypeId = voidingTypeId, StatusId = statusId } };
-        var hubContext = Substitute.For<IHubContext<NotificationHub, ClientEvent>>();
-        var hubClient = Substitute.For<IHubClients<ClientEvent>>();
-        var clientEvent = Substitute.For<ClientEvent>();
         hubClient.User(Arg.Any<string>()).ReturnsForAnyArgs(clientEvent);
         hubContext.Clients.ReturnsForAnyArgs(hubClient);
 
-        var service = new SignalRServiceImp(hubContext, default);
+        var service = new SignalRServiceImp(hubContext, loggingService, notificationService);
 
         // Act
-        await service.UpdateVoidFailedToUser(requestId, voidQueueResults);
+        service.UpdateVoidFailedToUser(requestId, voidQueueResults);
 
         // Assert
-        hubClient.Received(1).User(Arg.Is<string>(x => x == "abc"));
-        await clientEvent.Received(1)
-            .showErrorMessage(Arg.Any<string>());
-    }
-
-    [Theory]
-    [MemberData(nameof(NotifyVoidFailedToUserThrowExceptionTestData))]
-    public async Task NotifyVoidFailedToUser_ShouldExecuteCatchExceptionBlock(int requestId, IList<TicketVoidingQueueModel> voidQueueResults)
-    {
-        // Arrange
-        var loggingService = Substitute.For<LoggingService>();
-        var service = new SignalRServiceImp(default, loggingService);
-
-        // Act
-        await service.UpdateVoidFailedToUser(requestId, voidQueueResults);
-
-        // Assert
-        await loggingService.Received(1).ErrorAsync(Arg.Any<Exception>());
+        notificationService.Received(1).ExecuteBackground(Arg.Any<Func<Task>>());
     }
 
     [Theory]
@@ -97,13 +82,10 @@ public class NotificationServiceImpTests
     public async Task NotifyRequestFailedToAllUser_ShouldExecuteSuccessful(int requestId)
     {
         // Arrange
-        var hubContext = Substitute.For<IHubContext<NotificationHub, ClientEvent>>();
-        var hubClient = Substitute.For<IHubClients<ClientEvent>>();
-        var clientEvent = Substitute.For<ClientEvent>();
         hubClient.All.ReturnsForAnyArgs(clientEvent);
         hubContext.Clients.ReturnsForAnyArgs(hubClient);
 
-        var service = new SignalRServiceImp(hubContext, default);
+        var service = new SignalRServiceImp(hubContext, loggingService, notificationService);
 
         // Act
         await service.UpdateRequestFailedToAllUser(requestId);
@@ -113,17 +95,16 @@ public class NotificationServiceImpTests
             .updateRequestStatus(Arg.Is<IEnumerable<RequestStatus>>(y => y.First().RequestId == requestId));
     }
 
-    [Theory]
-    [InlineData(123)]
-    [InlineData(0)]
-    public async Task NotifyRequestFailedToAllUser_ShouldExecuteCatchExceptionBlock(int requestId)
+    [Fact]
+    public async Task NotifyRequestFailedToAllUser_ShouldExecuteCatchExceptionBlock()
     {
         // Arrange
-        var loggingService = Substitute.For<LoggingService>();
-        var service = new SignalRServiceImp(default, loggingService);
+        hubContext.Clients.All.When(x => x.updateRequestStatus(Arg.Any<IEnumerable<RequestStatus>>()))
+            .Do(x => throw new Exception());
+        var service = new SignalRServiceImp(hubContext, loggingService, notificationService);
 
         // Act
-        await service.UpdateRequestFailedToAllUser(requestId);
+        await service.UpdateRequestFailedToAllUser(1);
 
         // Assert
         await loggingService.Received(1).ErrorAsync(Arg.Any<Exception>());

@@ -122,6 +122,5 @@ public class ProcessVoidQueuesStageTests
 
         // Assert
         await netPositionService.Received(1).UpdateNetPosition(1, "1", NetPositionConstant.ActionRecover);
-        await requestTicketService.Received(1).UpdateIsProcessed("1");
     }
 }

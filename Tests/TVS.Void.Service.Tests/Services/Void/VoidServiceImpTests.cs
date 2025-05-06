@@ -54,7 +54,7 @@ public class VoidServiceImpTests
         await ticketVoidingQueueService.Received(1).GetQueues(Arg.Is<int>(x => x == fakeSiteDbGroupId), Arg.Is<int?>(x => x == null));
         await processVoidQueuesStage.Received(1).Execute(Arg.Is<int>(x => x == fakeSiteDbGroupId), Arg.Is<IEnumerable<TicketVoidingQueueModel>>(x => x == fakeGetQueues));
         await requestDetailService.ReceivedWithAnyArgs(1).UpdateTicketVoidingHistory(default, default);
-        await notificationService.ReceivedWithAnyArgs(1).UpdateVoidFailedToUser(default, default);
+        notificationService.ReceivedWithAnyArgs(1).UpdateVoidFailedToUser(default, default);
         await notificationService.ReceivedWithAnyArgs(1).UpdateRequestFailedToAllUser(default);
         await loggingService.ReceivedWithAnyArgs(1).InfoAppendNewLineAsync(default);
     }
@@ -84,7 +84,7 @@ public class VoidServiceImpTests
         await ticketVoidingQueueService.Received(1).GetQueues(Arg.Is<int>(x => x == fakeSiteDbGroupId), Arg.Is<int?>(x => x == null));
         await processVoidQueuesStage.Received(1).Execute(Arg.Is<int>(x => x == fakeSiteDbGroupId), Arg.Is<IEnumerable<TicketVoidingQueueModel>>(x => x == fakeGetQueues));
         await requestDetailService.DidNotReceiveWithAnyArgs().UpdateTicketVoidingHistory(default, default);
-        await notificationService.DidNotReceiveWithAnyArgs().UpdateVoidFailedToUser(default, default);
+        notificationService.DidNotReceiveWithAnyArgs().UpdateVoidFailedToUser(default, default);
         await notificationService.DidNotReceiveWithAnyArgs().UpdateRequestFailedToAllUser(default);
         await loggingService.ReceivedWithAnyArgs(1).InfoAppendNewLineAsync(default);
     }
@@ -115,7 +115,7 @@ public class VoidServiceImpTests
         await ticketVoidingQueueService.Received(1).GetQueues(Arg.Is<int>(x => x == fakeSiteDbGroupId), Arg.Is<int?>(x => x == null));
         await processVoidQueuesStage.Received(1).Execute(Arg.Is<int>(x => x == fakeSiteDbGroupId), Arg.Is<IEnumerable<TicketVoidingQueueModel>>(x => x == fakeGetQueues));
         await requestDetailService.DidNotReceiveWithAnyArgs().UpdateTicketVoidingHistory(default, default);
-        await notificationService.DidNotReceiveWithAnyArgs().UpdateVoidFailedToUser(default, default);
+        notificationService.DidNotReceiveWithAnyArgs().UpdateVoidFailedToUser(default, default);
         await notificationService.DidNotReceiveWithAnyArgs().UpdateRequestFailedToAllUser(default);
         await insertAfterVoidDataStage.Received(1).Execute(Arg.Is<IEnumerable<TicketVoidingQueueModel>>(x => x == fakeProcessResults),
             Arg.Any<IList<string>>());
@@ -170,7 +170,7 @@ public class VoidServiceImpTests
         await ticketVoidingQueueService.Received(1).GetQueues(Arg.Is<int>(x => x == fakeSiteDbGroupId), Arg.Is<int?>(x => x == null));
         await processVoidQueuesStage.Received(1).Execute(Arg.Is<int>(x => x == fakeSiteDbGroupId), Arg.Is<IEnumerable<TicketVoidingQueueModel>>(x => x == fakeGetQueues));
         await requestDetailService.Received(1).UpdateTicketVoidingHistory(Arg.Is<int>(x => x == fakeVoidingHistoryId), Arg.Is<int>(x => x == ExecuteStatus.Done));
-        await notificationService.DidNotReceiveWithAnyArgs().UpdateVoidFailedToUser(default, default);
+        notificationService.DidNotReceiveWithAnyArgs().UpdateVoidFailedToUser(default, default);
         await notificationService.DidNotReceiveWithAnyArgs().UpdateRequestFailedToAllUser(default);
         await insertAfterVoidDataStage.DidNotReceiveWithAnyArgs().Execute(default, default);
         await loggingService.ReceivedWithAnyArgs(1).InfoAppendNewLineAsync(default);
