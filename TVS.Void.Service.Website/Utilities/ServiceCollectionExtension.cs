@@ -14,6 +14,7 @@ using TicketVoidingSystem.Services;
 using TVS.Void.Service.Services;
 using TVS.Void.Service.Services.AddRequest;
 using TVS.Void.Service.Services.CheckTicketStatus;
+using TVS.Void.Service.Services.Notification;
 using TVS.Void.Service.Services.ScanAutoVoidRequest;
 using TVS.Void.Service.Services.Void;
 using TVS.Void.Service.Website.Jobs;
@@ -71,7 +72,7 @@ public static class ServiceCollectionExtension
         services.AddSingleton<RequestDetailService, RequestDetailServiceImp>();
         services.AddSingleton<TicketVoidingQueueService, TicketVoidingQueueServiceImp>();
         services.AddSingleton<RequestTicketService, RequestTicketServiceImp>();
-        services.AddSingleton<NotificationService, NotificationServiceImp>();
+        services.AddSingleton<SignalRService, SignalRServiceImp>();
         services.AddSingleton<NetPositionService, NetPositionServiceImp>();
 
         services.AddSingleton<CheckTicketStatusService, CheckTicketStatusServiceImp>();
@@ -102,6 +103,7 @@ public static class ServiceCollectionExtension
         services.AddSingleton<InsertAutoVoidRequestQueueStage, InsertAutoVoidRequestQueueStageImp>();
         services.AddSingleton<MarkTicketsStage, MarkTicketsStageImp>();
         services.AddSingleton<AutoVoidWinningBeforeVoidService, AutoVoidWinningBeforeVoidServiceImp>();
+        services.AddSingleton<NotificationService, NotificationServiceImp>();
     }
 
     public static IServiceCollection AddBackgroundService(this IServiceCollection services)

@@ -135,20 +135,6 @@ public class RequestTicketServiceImpTests
         await repository.Received(1).ExecuteAsync(Arg.Any<UpdateIsProcessedForRequestTicketsCriteria>());
     }
 
-    [Fact]
-    public async Task UpdateIsProcessed_CallExpected()
-    {
-        // Arrange
-        var repository = Substitute.For<IDynamicRepository>();
-        var service = new RequestTicketServiceImp(repository);
-
-        // Act
-        await service.UpdateIsProcessed("1");
-
-        // Assert
-        await repository.ExecuteAsync(Arg.Any<UpdateIsProcessedForRequestTicketsCriteria>());
-    }
-
     public static IEnumerable<object?[]> CheckStatusTicketForInsertAutoVoidQueueTestData =>
         new List<object?[]>
         {

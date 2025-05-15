@@ -28,4 +28,12 @@ public static class VoidingTypeConstant
 
     //// for Main + Sub parlay 14
     public const byte RecoverParlay14 = 16;
+
+    public static readonly byte[] VoidingTypeRecover = [
+        RecoverSingle,
+        RecoverParlay,
+        RecoverCricket,
+        RecoverSingle14,
+        RecoverParlay14
+    ];
 }

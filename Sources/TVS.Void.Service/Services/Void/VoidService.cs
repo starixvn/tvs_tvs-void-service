@@ -20,7 +20,7 @@ public class VoidServiceImp(
     RequestDetailService requestDetailService,
     ProcessVoidQueuesStage processVoidQueuesStage,
     InsertAfterVoidDataStage insertAfterVoidDataStage,
-    NotificationService notificationService,
+    SignalRService notificationService,
     LoggingService loggingService)
     : VoidService
 {
@@ -66,8 +66,8 @@ public class VoidServiceImp(
         {
             var firstVoidingQueue = voidingQueues[0];
             await requestDetailService.UpdateTicketVoidingHistory(firstVoidingQueue.VoidingHistoryId, ExecuteStatus.Failed);
-            await notificationService.NotifyVoidFailedToUser(firstVoidingQueue.RequestId, processVoidQueuesResult);
-            await notificationService.NotifyRequestFailedToAllUser(firstVoidingQueue.RequestId);
+            notificationService.UpdateVoidFailedToUser(firstVoidingQueue.RequestId, processVoidQueuesResult);
+            await notificationService.UpdateRequestFailedToAllUser(firstVoidingQueue.RequestId);
             await loggingService.InfoAppendNewLineAsync(logData);
             return;
         }

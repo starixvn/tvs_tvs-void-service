@@ -24,8 +24,6 @@ public interface RequestTicketService
         IEnumerable<RequestDetailTicketModel> cricketTickets);
 
     Task UpdateIsProcessed(IEnumerable<RequestDetailTicketModel> groupTickets);
-
-    Task UpdateIsProcessed(string resettledTransId);
 }
 
 public class RequestTicketServiceImp(IDynamicRepository repository) : RequestTicketService
@@ -113,27 +111,24 @@ public class RequestTicketServiceImp(IDynamicRepository repository) : RequestTic
         await repository.ExecuteAsync(criteria);
     }
 
-    public async Task UpdateIsProcessed(string resettledTransId)
-    {
-        var criteria = new UpdateIsProcessedForRequestTicketsCriteria
-        {
-            ResettledTransIds = resettledTransId
-        };
-
-        await repository.ExecuteAsync(criteria);
-    }
-
     private static (IEnumerable<RequestDetailTicketModel> SingleTickets, IEnumerable<RequestDetailTicketModel> ParlayTickets)
         SplitTicketsForUpdateIsProcessed(IEnumerable<RequestDetailTicketModel> groupTickets)
     {
-#pragma warning disable S1067 // Expressions should not be too complex
-        var singleTickets = groupTickets.Where(x => x.VoidingTypeId
-            is VoidingTypeConstant.Single or VoidingTypeConstant.Cricket or VoidingTypeConstant.CancelCashOut or VoidingTypeConstant.Single14
-            or VoidingTypeConstant.RecoverSingle or VoidingTypeConstant.RecoverCricket or VoidingTypeConstant.RecoverSingle14);
-#pragma warning restore S1067 // Expressions should not be too complex
+        int[] combineSingleVoidingTypes =
+        [
+            VoidingTypeConstant.Single, VoidingTypeConstant.Cricket,
+            VoidingTypeConstant.CancelCashOut, VoidingTypeConstant.Single14, VoidingTypeConstant.RecoverSingle,
+            VoidingTypeConstant.RecoverCricket, VoidingTypeConstant.RecoverSingle14
+        ];
+        int[] combineParlayVoidingTypes =
+        [
+            VoidingTypeConstant.Parlay, VoidingTypeConstant.Parlay14,
+            VoidingTypeConstant.RecoverParlay, VoidingTypeConstant.RecoverParlay14
+        ];
 
-        var parlayTickets = groupTickets.Where(x => x.VoidingTypeId
-            is VoidingTypeConstant.Parlay or VoidingTypeConstant.Parlay14 or VoidingTypeConstant.RecoverParlay or VoidingTypeConstant.RecoverParlay14);
+        var singleTickets = groupTickets.Where(x => combineSingleVoidingTypes.Contains(x.VoidingTypeId));
+        var parlayTickets = groupTickets.Where(x => combineParlayVoidingTypes.Contains(x.VoidingTypeId));
+
         return (singleTickets, parlayTickets);
     }
 }

@@ -18,7 +18,7 @@ public class InsertPreVoidingDataStageImp(
     RequestDetailService requestDetailService,
     TicketVoidingQueueService ticketVoidingQueueService,
     RequestTicketService requestTicketService,
-    NotificationService notificationService)
+    SignalRService notificationService)
     : InsertPreVoidingDataStage
 {
     public async Task<string> Execute(int siteDbGroupId, AutoVoidRequestQueueModel queue, IEnumerable<RequestDetailTicketModel> groupTickets, string voidDataXml, IList<string> logData)
@@ -33,7 +33,7 @@ public class InsertPreVoidingDataStageImp(
         var voidingHistoryList = await requestDetailService.InsertVoidingHistory(requestsDistinctJson, siteDbGroupId, queue.BroadcastSessionId, voidDataXml);
         logData.Add($"{nameof(voidingHistoryList)}: {JsonSerializer.Serialize(voidingHistoryList)}");
 
-        await notificationService.NotifyRequestRunningToAllUser(voidingHistoryList);
+        await notificationService.UpdateRequestRunningToAllUser(voidingHistoryList);
         await ticketVoidingQueueService.InsertQueueForRequests(siteDbGroupId, voidingHistoryList, groupTickets);
         logData.Add($"InsertQueues-OK - {nameof(groupTickets)}Count: {groupTickets.Count()}");
 

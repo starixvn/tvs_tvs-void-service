@@ -29,7 +29,6 @@ public class ProcessVoidQueuesStageImp(
             }
 
             var voidResult = await ExecuteSingleQueue(siteDbGroupId, queue);
-            await UpdateIsProcessedForResettled(voidResult);
             processResult.Add(voidResult);
         }
 
@@ -57,13 +56,5 @@ public class ProcessVoidQueuesStageImp(
         }
 
         return voidResult;
-    }
-
-    private async Task UpdateIsProcessedForResettled(TicketVoidingQueueModel voidResult)
-    {
-        if (!string.IsNullOrWhiteSpace(voidResult.ResettledTransIds))
-        {
-            await requestTicketService.UpdateIsProcessed(voidResult.ResettledTransIds);
-        }
     }
 }
