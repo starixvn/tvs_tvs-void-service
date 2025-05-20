@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using ONEbook.UM.Services;
+using TicketVoidingSystem.Constants;
 using TicketVoidingSystem.Services;
 using TVS.Void.Service.Services.CheckTicketStatus;
 
@@ -37,7 +38,7 @@ public class CheckTicketStatusJob(
 
     private async Task DoTask()
     {
-        if (await maintenanceService.IsUnderMaintenanceAsync())
+        if (await maintenanceService.IsUnderMaintenanceAsync() || SiteDbGroupConstant.ServerList.Count == 0)
         {
             return;
         }

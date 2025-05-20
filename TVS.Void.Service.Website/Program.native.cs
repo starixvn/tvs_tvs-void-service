@@ -1,4 +1,5 @@
 using System;
+using Fanex.Caching.Redis;
 using Fanex.Data.SqlServer;
 using Fanex.Logging;
 using Microsoft.AspNetCore.Builder;
@@ -19,7 +20,9 @@ services.AddFanexSql(configuration);
 services.AddFanexExceptionHandler();
 services.AddSentry();
 services.AddOneBookUmForService(configuration);
+services.AddRedisCache(configuration.GetSection("FanexCachingRedis"));
 services.AddTvsSignalR();
+services.AddTvsSiteDbStatus();
 services.AddBusinessService();
 services.AddBackgroundService();
 

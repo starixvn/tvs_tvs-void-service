@@ -20,4 +20,5 @@ public class RedisConfig
     public string Password { get; init; }
     public int DefaultDatabase { get; init; }
     public string SignalRChannelPrefix { get; init; }
+    public string SiteDbChannelPrefix { get; init; }
 }

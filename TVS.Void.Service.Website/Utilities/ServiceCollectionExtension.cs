@@ -6,6 +6,7 @@ using Fanex.Logging.Extensions;
 using Fanex.Logging.Extensions.AspNetCore;
 using Fanex.Logging.Extensions.Database;
 using Fanex.Logging.Sentry;
+using Fanex.SiteDbConnectionManager.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Sentry;
@@ -18,6 +19,7 @@ using TVS.Void.Service.Services.Notification;
 using TVS.Void.Service.Services.ScanAutoVoidRequest;
 using TVS.Void.Service.Services.Void;
 using TVS.Void.Service.Website.Jobs;
+using TVS.Void.Service.Website.Utilities.CustomServices;
 
 namespace TVS.Void.Service.Website.Utilities;
 
@@ -60,6 +62,17 @@ public static class ServiceCollectionExtension
             options.Configuration.Password = redisConfig.Password;
             options.Configuration.DefaultDatabase = redisConfig.DefaultDatabase;
             options.Configuration.ChannelPrefix = RedisChannel.Literal(redisConfig.SignalRChannelPrefix);
+        });
+    }
+
+    public static void AddTvsSiteDbStatus(this IServiceCollection services)
+    {
+        services.AddSiteDbConnectionManagerServices();
+        services.AddSingleton<IConnectionMultiplexer>(sp =>
+        {
+            var config = LazyRedisMultiplexer.GetRedisConfig();
+            config.ChannelPrefix = RedisChannel.Literal(AppSettingService.AppSetting.RedisConfig.SiteDbChannelPrefix);
+            return ConnectionMultiplexer.Connect(config);
         });
     }
 
@@ -112,11 +125,13 @@ public static class ServiceCollectionExtension
         services.AddSingleton<CheckTicketStatusJob>();
         services.AddSingleton<ScanAutoVoidRequestJob>();
         services.AddSingleton<VoidJob>();
+        services.AddSingleton<CheckServerStatusJob>();
 
         services.AddHostedService<AddRequestDuplicatedTicketsJob>();
         services.AddHostedService<CheckTicketStatusJob>();
         services.AddHostedService<ScanAutoVoidRequestJob>();
         services.AddHostedService<VoidJob>();
+        services.AddHostedService<CheckServerStatusJob>();
 
         return services;
     }

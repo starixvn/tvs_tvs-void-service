@@ -39,7 +39,7 @@ public class ScanAutoVoidRequestJob(
 
     private async Task DoTask()
     {
-        if (await maintenanceService.IsUnderMaintenanceAsync())
+        if (await maintenanceService.IsUnderMaintenanceAsync() || SiteDbGroupConstant.ServerList.Count == 0)
         {
             return;
         }
