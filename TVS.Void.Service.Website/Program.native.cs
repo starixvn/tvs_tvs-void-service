@@ -18,7 +18,7 @@ services.AddMemoryCache();
 services.AddFanexSql(configuration);
 services.AddFanexExceptionHandler();
 services.AddSentry();
-services.AddOneBookUm(configuration);
+services.AddOneBookUmForService(configuration);
 services.AddTvsSignalR();
 services.AddBusinessService();
 services.AddBackgroundService();
