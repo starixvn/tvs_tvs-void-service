@@ -22,6 +22,8 @@ public static class VoidingTypeConstant
     //// for Main + Sub parlay
     public const byte RecoverParlay = 12;
 
+    public const byte RecoverSubParlay = 13;
+
     public const byte RecoverCricket = 14;
 
     public const byte RecoverSingle14 = 15;
@@ -32,6 +34,7 @@ public static class VoidingTypeConstant
     public static readonly byte[] VoidingTypeRecover = [
         RecoverSingle,
         RecoverParlay,
+        RecoverSubParlay,
         RecoverCricket,
         RecoverSingle14,
         RecoverParlay14

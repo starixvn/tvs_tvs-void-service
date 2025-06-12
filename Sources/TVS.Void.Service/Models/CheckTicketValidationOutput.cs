@@ -29,6 +29,8 @@ public class CheckTicketValidationOutput
 
     public IEnumerable<RequestDetailTicketModel> RecoverParlayTickets { get; set; }
 
+    public IEnumerable<RequestDetailTicketModel> RecoverSubParlayTickets { get; set; }
+
     public IEnumerable<RequestDetailTicketModel> RecoverCricketTickets { get; set; }
 
     public IEnumerable<RequestDetailTicketModel> RecoverSingleTickets14 { get; set; }

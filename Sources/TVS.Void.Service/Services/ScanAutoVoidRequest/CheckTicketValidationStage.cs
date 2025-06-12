@@ -76,19 +76,26 @@ public class CheckTicketValidationStageImp(IDynamicRepository repository) : Chec
             CricketTicketsJson = JsonSerializer.Serialize(cricketTickets)
         };
 
-        var (recoverSingleTickets, recoverParlayTickets, recoverCricketTickets, recoverSingleTickets14, recoverParlayTickets14) =
-            await repository.FetchMultipleAsync<RequestDetailTicketModel, RequestDetailTicketModel, RequestDetailTicketModel, RequestDetailTicketModel, RequestDetailTicketModel>(criteria);
+        var results = (await repository.FetchAsync<RequestDetailTicketModel>(criteria)).ToList();
+        var recoverSingleTickets = results.Where(x => x.ValidationType == 21);
+        var recoverParlayTickets = results.Where(x => x.ValidationType == 22);
+        var recoverSubParlayTickets = results.Where(x => x.ValidationType == 23);
+        var recoverCricketTickets = results.Where(x => x.ValidationType == 24);
+        var recoverSingleTickets14 = results.Where(x => x.ValidationType == 25);
+        var recoverParlayTickets14 = results.Where(x => x.ValidationType == 26);
+
         var output = new CheckTicketValidationOutput
         {
             RecoverSingleTickets = recoverSingleTickets,
             RecoverParlayTickets = recoverParlayTickets,
+            RecoverSubParlayTickets = recoverSubParlayTickets,
             RecoverCricketTickets = recoverCricketTickets,
             RecoverSingleTickets14 = recoverSingleTickets14,
             RecoverParlayTickets14 = recoverParlayTickets14
         };
 
         logData.Add($"{nameof(CheckTicketValidationStage)}.{nameof(ExecuteForRecover)} - rSingle: {output.RecoverSingleTickets.Count()} - rParlay: {output.RecoverParlayTickets.Count()}"
-                    + $" - rCricket: {output.RecoverCricketTickets.Count()}"
+                    + $" - rSubParlay: {output.RecoverSubParlayTickets.Count()} - rCricket: {output.RecoverCricketTickets.Count()}"
                     + $" - rSingle14: {output.RecoverSingleTickets14.Count()} - rParlay14: {output.RecoverParlayTickets14.Count()}");
 
         return output;
