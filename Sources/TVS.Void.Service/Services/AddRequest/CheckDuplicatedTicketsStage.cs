@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Fanex.Data.Repository;
+using TicketVoidingSystem.Constants;
 using TVS.Void.Service.Criteria;
 using TVS.Void.Service.Models;
 
@@ -17,7 +19,8 @@ public class CheckDuplicatedTicketsStageImp(IDynamicRepository repository) : Che
     {
         var criteria = new CheckDuplicateTicketsCriteria
         {
-            TransInfoJson = transInfoJson
+            TransInfoJson = transInfoJson,
+            OnlineServerId = string.Join(",", SiteDbGroupConstant.ServerList.Select(x => x.Id))
         };
 
         var (_, _, results) = await repository.FetchMultipleAsync<object, object, CheckDuplicatedTicketsResult>(criteria);

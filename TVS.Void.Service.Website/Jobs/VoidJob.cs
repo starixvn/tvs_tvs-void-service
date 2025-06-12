@@ -36,7 +36,7 @@ public class VoidJob(IMaintenanceService maintenanceService, LoggingService logg
 
     private async Task DoTask()
     {
-        if (await maintenanceService.IsUnderMaintenanceAsync())
+        if (await maintenanceService.IsUnderMaintenanceAsync() || SiteDbGroupConstant.ServerList.Count == 0)
         {
             return;
         }

@@ -6,8 +6,7 @@ namespace TVS.Void.Service.Website.Utilities.CustomServices;
 
 public class MemoryUMCacheService(IMemoryCache memoryCache) : IUMCacheService
 {
-    public T Get<T>(string key) => memoryCache.Get<T>(key)
-    ;
+    public T Get<T>(string key) => memoryCache.Get<T>(key);
 
     public void Set<T>(string key, T value, TimeSpan absoluteExpiration)
         => memoryCache.Set(key, value, new MemoryCacheEntryOptions().SetAbsoluteExpiration(absoluteExpiration));
