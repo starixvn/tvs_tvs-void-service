@@ -37,6 +37,6 @@ public static class Helper
 
     public static bool IsCanSendLetstalk(int issueTypeId)
     {
-        return issueTypeId != IssueTypeConstant.ArchivedTicket;
+        return issueTypeId is not (IssueTypeConstant.ArchivedTicket or IssueTypeConstant.RecoverTicket);
     }
 }
