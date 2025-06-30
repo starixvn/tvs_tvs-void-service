@@ -69,6 +69,9 @@
         <Setting Key="TicketVoiding_Request_Insert" SpName="TicketVoiding_Request_Insert" DbName="DBCTG.bodb02.wsv_nap" TimeOut="600" />
         <Setting Key="TicketVoiding_Request_CheckDuplicateTickets" SpName="TicketVoiding_Request_CheckDuplicateTickets" DbName="DBCTG.bodb02.wsv_nap" TimeOut="600" />
         <Setting Key="TicketVoiding_DuplicateTickets_Select" SpName="TicketVoiding_DuplicateTickets_Select" DbName="DBRPT.bodb_Report.wsv_nap" TimeOut="600" />
+
+        <Setting Key="TicketVoiding_PendingMarkTickets_Select" SpName="TicketVoiding_PendingMarkTickets_Select" DbName="DBCTG.bodb02.wsv_nap" TimeOut="600" />
+        <Setting Key="TicketVoiding_PendingMarkTickets_Update" SpName="TicketVoiding_PendingMarkTickets_Update" DbName="DBCTG.bodb02.wsv_nap" TimeOut="600" />
     </Function>
     <Function Name="NetPosition">
         <Setting Key="DBCTG.NAP_TicketVoiding_NetPosition" SpName="NAP_TicketVoiding_NetPosition" DbName="DBCTG.bodb02.wsv_nap" TimeOut="600" />
