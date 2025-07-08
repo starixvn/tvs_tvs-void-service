@@ -10,8 +10,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Fanex.Data.Repository" Version="4.3.3" />
-    <PackageReference Include="Fanex.Data.SqlServer" Version="4.3.3" />
+    <PackageReference Include="Fanex.Data.Repository" Version="4.3.4.3" />
+    <PackageReference Include="Fanex.Data.SqlServer" Version="4.3.4.3" />
   </ItemGroup>
 
   <ItemGroup>
