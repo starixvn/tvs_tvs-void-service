@@ -1,5 +1,6 @@
 ﻿using Fanex.Data.Repository;
 using NSubstitute;
+using TicketVoidingSystem.Constants;
 using TVS.Void.Service.Criteria.MultiSiteDb;
 using TVS.Void.Service.Models;
 using TVS.Void.Service.Services.ScanAutoVoidRequest;
@@ -52,23 +53,32 @@ public class CheckTicketValidationStageTests
     public async Task ExecuteForRecover_ReturnExpected()
     {
         const int siteDbGroupId = 0;
-        var requestDetailTickets = new List<RequestDetailTicketModel>();
+        var requestDetailTickets = new List<RequestDetailTicketModel>
+        {
+            new() { ValidationType = ValidationType.SingleTicketRecover },
+            new() { ValidationType = ValidationType.ParlayTicketRecover },
+            new() { ValidationType = ValidationType.SubParlayTicketRecover },
+            new() { ValidationType = ValidationType.CricketTicketRecover },
+            new() { ValidationType = ValidationType.SingleTickets14Recover },
+            new() { ValidationType = ValidationType.ParlayTickets14Recover }
+        };
         var expected = new CheckTicketValidationOutput
         {
-            RecoverSingleTickets = requestDetailTickets,
-            RecoverParlayTickets = requestDetailTickets,
-            RecoverCricketTickets = requestDetailTickets,
-            RecoverSingleTickets14 = requestDetailTickets,
-            RecoverParlayTickets14 = requestDetailTickets
+            RecoverSingleTickets = [new RequestDetailTicketModel { ValidationType = ValidationType.SingleTicketRecover }],
+            RecoverParlayTickets = [new RequestDetailTicketModel { ValidationType = ValidationType.ParlayTicketRecover }],
+            RecoverSubParlayTickets = [new RequestDetailTicketModel { ValidationType = ValidationType.SubParlayTicketRecover }],
+            RecoverCricketTickets = [new RequestDetailTicketModel { ValidationType = ValidationType.CricketTicketRecover }],
+            RecoverSingleTickets14 = [new RequestDetailTicketModel { ValidationType = ValidationType.SingleTickets14Recover }],
+            RecoverParlayTickets14 = [new RequestDetailTicketModel { ValidationType = ValidationType.ParlayTickets14Recover }]
         };
         var repository = Substitute.For<IDynamicRepository>();
-        repository.FetchMultipleAsync<RequestDetailTicketModel, RequestDetailTicketModel, RequestDetailTicketModel, RequestDetailTicketModel, RequestDetailTicketModel>(Arg.Any<CheckTicketsAllowToRecoverCriteria>())
-            .ReturnsForAnyArgs((requestDetailTickets, requestDetailTickets, requestDetailTickets, requestDetailTickets, requestDetailTickets));
+        repository.FetchAsync<RequestDetailTicketModel>(Arg.Any<CheckTicketsAllowToRecoverCriteria>())
+            .ReturnsForAnyArgs(requestDetailTickets);
         var service = new CheckTicketValidationStageImp(repository);
 
         var actual = await service.ExecuteForRecover(siteDbGroupId, requestDetailTickets, requestDetailTickets, requestDetailTickets, new List<string>());
 
-        await repository.Received(1).FetchMultipleAsync<RequestDetailTicketModel, RequestDetailTicketModel, RequestDetailTicketModel, RequestDetailTicketModel, RequestDetailTicketModel>(Arg.Any<CheckTicketsAllowToRecoverCriteria>());
+        await repository.Received(1).FetchAsync<RequestDetailTicketModel>(Arg.Any<CheckTicketsAllowToRecoverCriteria>());
         AssertExtension.Equal(expected, actual);
     }
 }

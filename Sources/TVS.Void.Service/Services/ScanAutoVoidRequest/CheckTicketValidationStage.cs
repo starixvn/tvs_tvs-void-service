@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Fanex.Data.Repository;
+using TicketVoidingSystem.Constants;
 using TVS.Void.Service.Criteria.MultiSiteDb;
 using TVS.Void.Service.Models;
 
@@ -76,19 +77,26 @@ public class CheckTicketValidationStageImp(IDynamicRepository repository) : Chec
             CricketTicketsJson = JsonSerializer.Serialize(cricketTickets)
         };
 
-        var (recoverSingleTickets, recoverParlayTickets, recoverCricketTickets, recoverSingleTickets14, recoverParlayTickets14) =
-            await repository.FetchMultipleAsync<RequestDetailTicketModel, RequestDetailTicketModel, RequestDetailTicketModel, RequestDetailTicketModel, RequestDetailTicketModel>(criteria);
+        var results = (await repository.FetchAsync<RequestDetailTicketModel>(criteria)).ToList();
+        var recoverSingleTickets = results.Where(x => x.ValidationType is ValidationType.SingleTicketRecover or ValidationType.SingleTicketResettle);
+        var recoverParlayTickets = results.Where(x => x.ValidationType is ValidationType.ParlayTicketRecover or ValidationType.ParlayTicketResettle);
+        var recoverSubParlayTickets = results.Where(x => x.ValidationType is ValidationType.SubParlayTicketRecover or ValidationType.SubParlayTicketResettle);
+        var recoverCricketTickets = results.Where(x => x.ValidationType is ValidationType.CricketTicketRecover or ValidationType.CricketTicketResettle);
+        var recoverSingleTickets14 = results.Where(x => x.ValidationType is ValidationType.SingleTickets14Recover);
+        var recoverParlayTickets14 = results.Where(x => x.ValidationType is ValidationType.ParlayTickets14Recover);
+
         var output = new CheckTicketValidationOutput
         {
             RecoverSingleTickets = recoverSingleTickets,
             RecoverParlayTickets = recoverParlayTickets,
+            RecoverSubParlayTickets = recoverSubParlayTickets,
             RecoverCricketTickets = recoverCricketTickets,
             RecoverSingleTickets14 = recoverSingleTickets14,
             RecoverParlayTickets14 = recoverParlayTickets14
         };
 
         logData.Add($"{nameof(CheckTicketValidationStage)}.{nameof(ExecuteForRecover)} - rSingle: {output.RecoverSingleTickets.Count()} - rParlay: {output.RecoverParlayTickets.Count()}"
-                    + $" - rCricket: {output.RecoverCricketTickets.Count()}"
+                    + $" - rSubParlay: {output.RecoverSubParlayTickets.Count()} - rCricket: {output.RecoverCricketTickets.Count()}"
                     + $" - rSingle14: {output.RecoverSingleTickets14.Count()} - rParlay14: {output.RecoverParlayTickets14.Count()}");
 
         return output;
