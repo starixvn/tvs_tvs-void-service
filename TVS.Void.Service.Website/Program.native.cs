@@ -20,6 +20,7 @@ services.AddFanexSql(configuration);
 services.AddFanexExceptionHandler();
 services.AddSentry();
 services.AddOneBookUmForService(configuration);
+services.AddHealthChecks();
 services.AddRedisCache(configuration.GetSection("FanexCachingRedis"));
 services.AddTvsSignalR();
 services.AddTvsSiteDbStatus();
@@ -31,6 +32,7 @@ var app = builder.Build();
 app.UseDeveloperExceptionPage();
 app.UseHttpsRedirection();
 app.UseMiddleware<ExceptionHandlerMiddleware>();
+app.MapHealthChecks("/healthz");
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
