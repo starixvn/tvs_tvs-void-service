@@ -14,6 +14,7 @@ using StackExchange.Redis;
 using TicketVoidingSystem.Services;
 using TVS.Void.Service.Services;
 using TVS.Void.Service.Services.AddRequest;
+using TVS.Void.Service.Services.AutoMarkTicket;
 using TVS.Void.Service.Services.CheckTicketStatus;
 using TVS.Void.Service.Services.Notification;
 using TVS.Void.Service.Services.ScanAutoVoidRequest;
@@ -88,6 +89,8 @@ public static class ServiceCollectionExtension
         services.AddSingleton<SignalRService, SignalRServiceImp>();
         services.AddSingleton<NetPositionService, NetPositionServiceImp>();
 
+        services.AddSingleton<AutoMarkTicketService, AutoMarkTicketServiceImp>();
+
         services.AddSingleton<CheckTicketStatusService, CheckTicketStatusServiceImp>();
         services.AddSingleton<CheckTicketsForAutoVoidWinningStage, CheckTicketsForAutoVoidWinningStageImp>();
         services.AddSingleton<CheckTicketsForAutoVoidAllResultKeyedStage, CheckTicketsForAutoVoidAllResultKeyedStageImp>();
@@ -125,12 +128,14 @@ public static class ServiceCollectionExtension
         services.AddSingleton<CheckTicketStatusJob>();
         services.AddSingleton<ScanAutoVoidRequestJob>();
         services.AddSingleton<VoidJob>();
+        services.AddSingleton<AutoMarkTicketJob>();
         services.AddSingleton<CheckServerStatusJob>();
 
         services.AddHostedService<AddRequestDuplicatedTicketsJob>();
         services.AddHostedService<CheckTicketStatusJob>();
         services.AddHostedService<ScanAutoVoidRequestJob>();
         services.AddHostedService<VoidJob>();
+        services.AddHostedService<AutoMarkTicketJob>();
         services.AddHostedService<CheckServerStatusJob>();
 
         return services;
