@@ -69,7 +69,7 @@ public static class ServiceCollectionExtension
     public static void AddTvsSiteDbStatus(this IServiceCollection services)
     {
         services.AddSiteDbConnectionManagerServices();
-        services.AddSingleton<IConnectionMultiplexer>(sp =>
+        services.AddSingleton<IConnectionMultiplexer>(_ =>
         {
             var config = LazyRedisMultiplexer.GetRedisConfig();
             config.ChannelPrefix = RedisChannel.Literal(AppSettingService.AppSetting.RedisConfig.SiteDbChannelPrefix);

@@ -53,6 +53,11 @@ public class NotificationServiceImp(
     {
         var (notifications, targetUsers) = await repository.FetchMultipleAsync<NotificationModel, string>(criteria);
 
+        if (!notifications.Any() || !targetUsers.Any())
+        {
+            return;
+        }
+
         var tasks = targetUsers.Select(username =>
             hubContext.Clients.User(username).pushNotification(notifications.First()));
         _ = Task.WhenAll(tasks);

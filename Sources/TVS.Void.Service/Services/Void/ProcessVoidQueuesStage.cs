@@ -13,7 +13,6 @@ public interface ProcessVoidQueuesStage
 
 public class ProcessVoidQueuesStageImp(
     TicketVoidingQueueService ticketVoidingQueueService,
-    RequestTicketService requestTicketService,
     NetPositionService netPositionService)
     : ProcessVoidQueuesStage
 {
