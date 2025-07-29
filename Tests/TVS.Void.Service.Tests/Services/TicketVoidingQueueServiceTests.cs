@@ -6,7 +6,7 @@ using TVS.Void.Service.Services;
 
 namespace TVS.Void.Service.Tests.Services;
 
-public class TicketVoidingQueueServiceImpTests
+public class TicketVoidingQueueServiceTests
 {
     [Fact]
     public async Task GetQueues_ShouldReturnExpectedData()
@@ -27,28 +27,6 @@ public class TicketVoidingQueueServiceImpTests
         (Arg.Is<GetTicketVoidingQueueCriteria>(x =>
             x.SiteDbGroupId == fakeSiteDbGroupId && x.VoidingHistoryId == fakeVoidingHistoryId));
         Assert.True(actual.Any());
-    }
-
-    [Fact]
-    public async Task InsertQueue_ShouldExecuteRepositorySuccessful()
-    {
-        // Arrange
-        const int fakeSiteDbGroupId = 1;
-        const int fakeVoidingHistoryId = 2;
-        const int fakeRequestId = 3;
-        var counter = 0;
-        var repository = Substitute.For<IDynamicRepository>();
-        repository.When(x => x.ExecuteAsync(Arg.Any<InsertTicketVoidingQueueCriteria>()))
-            .Do(_ => counter++);
-        var service = new TicketVoidingQueueServiceImp(repository);
-
-        // Act
-        await service.InsertQueue(fakeSiteDbGroupId, fakeRequestId, fakeVoidingHistoryId, null);
-
-        // Assert
-        await repository.Received(1).ExecuteAsync(Arg.Is<InsertTicketVoidingQueueCriteria>(x =>
-            x.SiteDbGroupId == fakeSiteDbGroupId && x.RequestId == fakeRequestId && x.VoidingHistoryId == fakeVoidingHistoryId));
-        Assert.Equal(1, counter);
     }
 
     [Fact]

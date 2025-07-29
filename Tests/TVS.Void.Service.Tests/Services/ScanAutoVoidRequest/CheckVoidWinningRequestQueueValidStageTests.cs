@@ -8,9 +8,9 @@ namespace TVS.Void.Service.Tests.Services.ScanAutoVoidRequest;
 
 public class CheckVoidWinningRequestQueueValidStageTests
 {
-    public RequestDetailService requestDetailService;
-    public AutoVoidRequestQueueService autoVoidRequestQueueService;
-    public CheckVoidWinningRequestQueueValidStageImp service;
+    private RequestDetailService requestDetailService = null!;
+    private AutoVoidRequestQueueService autoVoidRequestQueueService = null!;
+    private CheckVoidWinningRequestQueueValidStageImp service = null!;
 
     [Fact]
     public async Task Execute_QueueHasRequestsAllChangeAction_ReturnExpected()

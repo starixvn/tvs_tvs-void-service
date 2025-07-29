@@ -35,9 +35,9 @@ public class CheckTicketStatusServiceImpTests
         { VoidActionId = VoidActionTypeConstant.AutoVoidAllResultKeyedId };
         var getTicketsResult = new GroupTicketsInRequest
         {
-            SingleTickets = new List<RequestDetailTicketModel> { ticketAutoVoidWinning, ticketAutoVoidAllResultKeyed },
-            ParlayTickets = new List<RequestDetailTicketModel> { ticketAutoVoidWinning, ticketAutoVoidAllResultKeyed },
-            CricketTickets = new List<RequestDetailTicketModel> { ticketAutoVoidWinning, ticketAutoVoidAllResultKeyed }
+            SingleTickets = [ticketAutoVoidWinning, ticketAutoVoidAllResultKeyed],
+            ParlayTickets = [ticketAutoVoidWinning, ticketAutoVoidAllResultKeyed],
+            CricketTickets = [ticketAutoVoidWinning, ticketAutoVoidAllResultKeyed]
         };
         requestTicketService.GetTicketInAllRequests().ReturnsForAnyArgs(getTicketsResult);
 

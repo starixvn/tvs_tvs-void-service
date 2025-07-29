@@ -24,14 +24,14 @@ public class GetTicketsStageImpTests
         var singleTickets = new List<RequestDetailTicketModel> { new() { MatchId = 1, RequestId = 1 }, new() { MatchId = 2, RequestId = 1 } };
         var parlayTickets = new List<RequestDetailTicketModel> { new() { MatchId = 1, RequestId = 1 }, new() { MatchId = 2, RequestId = 1 } };
         var cricketTickets = new List<RequestDetailTicketModel> { new() { MatchId = 1, RequestId = 1 }, new() { MatchId = 2, RequestId = 1 } };
-        var cancelCOTickets = new List<RequestDetailTicketModel> { new() { MatchId = 1, RequestId = 1 }, new() { MatchId = 2, RequestId = 1 } };
+        var cancelCoTickets = new List<RequestDetailTicketModel> { new() { MatchId = 1, RequestId = 1 }, new() { MatchId = 2, RequestId = 1 } };
 
         var getTicketsResult = new GroupTicketsInRequest
         {
             SingleTickets = singleTickets,
             ParlayTickets = parlayTickets,
             CricketTickets = cricketTickets,
-            CancelCOTickets = cancelCOTickets
+            CancelCOTickets = cancelCoTickets
         };
         var singleTicketsExpected = new List<RequestDetailTicketModel> { new() { MatchId = 1, RequestId = 1 } };
         var parlayTicketsExpected = new List<RequestDetailTicketModel> { new() { MatchId = 1, RequestId = 1 } };

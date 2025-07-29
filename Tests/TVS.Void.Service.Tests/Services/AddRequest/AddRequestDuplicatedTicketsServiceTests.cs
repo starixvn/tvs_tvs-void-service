@@ -79,8 +79,7 @@ public class AddRequestDuplicatedTicketsServiceTests
         // Arrange
         var tickets = new DuplicatedTickets { TransInfoJson = "123" };
         getDuplicatedTicketsStage.Execute().ReturnsForAnyArgs(tickets);
-        var validations = new List<CheckDuplicatedTicketsResult>();
-        checkDuplicatedTicketsStage.Execute(tickets.TransInfoJson).ReturnsForAnyArgs(validations);
+        checkDuplicatedTicketsStage.Execute(tickets.TransInfoJson).ReturnsForAnyArgs([]);
 
         // Act
         await service.Execute();

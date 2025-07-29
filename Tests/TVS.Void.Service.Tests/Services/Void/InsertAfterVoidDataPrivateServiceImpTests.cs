@@ -22,7 +22,7 @@ public class InsertAfterVoidDataPrivateServiceImpTests
 
     [Theory]
     [MemberData(nameof(GetMatchIdForAfterVoidShouldReturnValidMatchIdTestData))]
-    public void GetMatchIdForAfterVoid_ShouldReturnValidMatchId(int issueTypeId, IEnumerable<RequestDetail> requestDetails, IEnumerable<TicketVoidingQueueModel> voidQueueResults)
+    public void GetMatchIdForAfterVoid_ShouldReturnValidMatchId(int issueTypeId, IEnumerable<RequestDetail> requestDetails, IList<TicketVoidingQueueModel> voidQueueResults)
     {
         // Arrange
         var service = new InsertAfterVoidDataPrivateServiceImp();

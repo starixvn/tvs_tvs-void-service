@@ -118,12 +118,11 @@ public class AutoVoidInstantProcessStageTests
             CancelCOTickets = []
         };
 
-        var groupTickets = new List<RequestDetailTicketModel>();
         checkRequestQueueValidStage.Execute(1, queue).ReturnsForAnyArgs((true, IssueTypeConstant.DangerAccepted));
-        insertPreVoidingDataStage.MapVoidingTypeToTickets(Arg.Any<CheckTicketValidationOutput>()).Returns(groupTickets);
+        insertPreVoidingDataStage.MapVoidingTypeToTickets(Arg.Any<CheckTicketValidationOutput>()).Returns([]);
         getTicketsStage.Execute(1, queue, logData).ReturnsForAnyArgs((true, getTicketsResult));
         createVoidDataXmlStage.Execute(true, Arg.Any<CheckTicketValidationOutput>()).Returns(voidDataXml);
-        insertPreVoidingDataStage.Execute(1, queue, groupTickets, voidDataXml, logData).Returns(string.Empty);
+        insertPreVoidingDataStage.Execute(1, queue, [], voidDataXml, logData).Returns(string.Empty);
 
         // Act
         _ = service.Execute(1, queue, logData);

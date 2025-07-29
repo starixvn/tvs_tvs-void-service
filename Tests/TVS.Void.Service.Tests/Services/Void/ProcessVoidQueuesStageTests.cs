@@ -27,7 +27,7 @@ public class ProcessVoidQueuesStageTests
         // Arrange
         var fakeQueues = new List<TicketVoidingQueueModel> { new() { StatusId = executeStatus } };
         InItService();
-        service = new ProcessVoidQueuesStageImp(ticketVoidingQueueService, null, netPositionService);
+        service = new ProcessVoidQueuesStageImp(ticketVoidingQueueService, netPositionService);
 
         // Act
         var actual = await service.Execute(1, fakeQueues);
@@ -58,7 +58,7 @@ public class ProcessVoidQueuesStageTests
             .ReturnsForAnyArgs(fakeProcessQueuesResult);
         netPositionService.UpdateNetPosition(default, Arg.Any<string>(), "")
             .ReturnsForAnyArgs(isCalledNetPosition);
-        service = new ProcessVoidQueuesStageImp(ticketVoidingQueueService, null, netPositionService);
+        service = new ProcessVoidQueuesStageImp(ticketVoidingQueueService, netPositionService);
 
         // Act
         var actual = await service.Execute(1, fakeQueues);
@@ -86,7 +86,7 @@ public class ProcessVoidQueuesStageTests
         InItService();
         ticketVoidingQueueService.ProcessVoidQueue(default, default, default)
             .ReturnsForAnyArgs(fakeProcessQueuesResult);
-        service = new ProcessVoidQueuesStageImp(ticketVoidingQueueService, null, netPositionService);
+        service = new ProcessVoidQueuesStageImp(ticketVoidingQueueService, netPositionService);
         netPositionService.UpdateNetPosition(default, Arg.Any<string>(), "").ReturnsForAnyArgs(true);
 
         // Act
@@ -108,13 +108,12 @@ public class ProcessVoidQueuesStageTests
                 VoidingTypeId = VoidingTypeConstant.RecoverCricket
             }
         };
-        var requestTicketService = Substitute.For<RequestTicketService>();
 
         var fakeProcessQueuesResult = new TicketVoidingQueueModel { VoidingHistoryId = 113, StatusId = ExecuteStatus.Running, ResettledTransIds = "1" };
         InItService();
         ticketVoidingQueueService.ProcessVoidQueue(default, default, default)
             .ReturnsForAnyArgs(fakeProcessQueuesResult);
-        service = new ProcessVoidQueuesStageImp(ticketVoidingQueueService, requestTicketService, netPositionService);
+        service = new ProcessVoidQueuesStageImp(ticketVoidingQueueService, netPositionService);
         netPositionService.UpdateNetPosition(default, Arg.Any<string>(), "").ReturnsForAnyArgs(true);
 
         // Act
