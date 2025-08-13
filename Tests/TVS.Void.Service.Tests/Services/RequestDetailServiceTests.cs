@@ -9,7 +9,7 @@ using TVS.Void.Service.Services;
 
 namespace TVS.Void.Service.Tests.Services;
 
-public class RequestDetailServiceImpTests
+public class RequestDetailServiceTests
 {
     [Theory]
     [InlineData("2,3", 1, "123xyz")]
@@ -124,7 +124,7 @@ public class RequestDetailServiceImpTests
         var service = new RequestDetailServiceImp(repository, null);
 
         // Act
-        await service.InsertLetstalk(1, IssueTypeConstant.ArchivedTicket, "", 0, new List<string>());
+        await service.InsertLetsTalk(1, IssueTypeConstant.ArchivedTicket, "", 0, new List<string>());
 
         // Assert
         await repository.DidNotReceive().ExecuteAsync(Arg.Any<InsertLetstalkCommand>());
@@ -140,11 +140,11 @@ public class RequestDetailServiceImpTests
         var service = new RequestDetailServiceImp(repository, null);
 
         // Act
-        await service.InsertLetstalk(1, IssueTypeConstant.DangerAccepted, "", 0, logData);
+        await service.InsertLetsTalk(1, IssueTypeConstant.DangerAccepted, "", 0, logData);
 
         // Assert
         await repository.Received(1).ExecuteAsync(Arg.Any<InsertLetstalkCommand>());
-        Assert.Contains("InsertLetstalk: Done", logData);
+        Assert.Contains("InsertLetsTalk: Done", logData);
     }
 
     [Fact]
@@ -160,11 +160,11 @@ public class RequestDetailServiceImpTests
         var service = new RequestDetailServiceImp(repository, loggingService);
 
         // Act
-        await service.InsertLetstalk(1, IssueTypeConstant.DangerAccepted, "", 0, logData);
+        await service.InsertLetsTalk(1, IssueTypeConstant.DangerAccepted, "", 0, logData);
 
         // Assert
         await repository.Received(1).ExecuteAsync(Arg.Any<InsertLetstalkCommand>());
         await loggingService.Received(1).ErrorAsync(exception);
-        Assert.Contains("InsertLetstalk: Failed", logData);
+        Assert.Contains("InsertLetsTalk: Failed", logData);
     }
 }

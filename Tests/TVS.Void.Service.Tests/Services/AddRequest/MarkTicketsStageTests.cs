@@ -28,7 +28,7 @@ public class MarkTicketsStageTests : IClassFixture<AppSettingFixture>
         const string markTransIds = "123";
         var logData = new List<string> { "123" };
 
-        repository.FetchAsync<Result>(Arg.Any<MarkTicketsCriteria>()).ReturnsForAnyArgs(new List<Result>());
+        repository.FetchAsync<Result>(Arg.Any<MarkTicketsCriteria>()).ReturnsForAnyArgs([]);
 
         // Act
         await service.Execute(markTransIds, logData);

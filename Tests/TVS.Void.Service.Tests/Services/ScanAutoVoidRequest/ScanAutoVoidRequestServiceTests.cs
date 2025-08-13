@@ -8,7 +8,7 @@ using TVS.Void.Service.Services.ScanAutoVoidRequest;
 
 namespace TVS.Void.Service.Tests.Services.ScanAutoVoidRequest;
 
-public class ScanAutoVoidRequestServiceImpTests
+public class ScanAutoVoidRequestServiceTests
 {
     private readonly AutoVoidWinningProcessStage autoVoidWinningProcessStage;
     private readonly AutoInstantProcessStage autoVoidInstantProcessStage;
@@ -16,7 +16,7 @@ public class ScanAutoVoidRequestServiceImpTests
     private readonly LoggingService loggingService;
     private ScanAutoVoidRequestServiceImp service;
 
-    public ScanAutoVoidRequestServiceImpTests()
+    public ScanAutoVoidRequestServiceTests()
     {
         autoVoidWinningProcessStage = Substitute.For<AutoVoidWinningProcessStage>();
         autoVoidInstantProcessStage = Substitute.For<AutoInstantProcessStage>();

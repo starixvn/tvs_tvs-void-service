@@ -7,7 +7,7 @@ using TVS.Void.Service.Services;
 
 namespace TVS.Void.Service.Tests.Services;
 
-public class AutoVoidRequestQueueServiceImpTests
+public class AutoVoidRequestQueueServiceTests
 {
     [Fact]
     public async Task GetQueue_ShouldReturnNullData()

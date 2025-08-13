@@ -24,7 +24,7 @@ public interface RequestDetailService
 
     Task<VoidDataXmlModel> GetVoidDataOfVoidingHistory(int voidingHistoryId);
 
-    Task InsertLetstalk(int requestId, int issueTypeId, string broadcastSessionId, int statusId, IList<string> logData);
+    Task InsertLetsTalk(int requestId, int issueTypeId, string broadcastSessionId, int statusId, IList<string> logData);
 }
 
 public class RequestDetailServiceImp(IDynamicRepository repository, LoggingService loggingService) : RequestDetailService
@@ -97,11 +97,11 @@ public class RequestDetailServiceImp(IDynamicRepository repository, LoggingServi
         return await repository.FetchAsync<VoidDataXmlModel>(criteria);
     }
 
-    public async Task InsertLetstalk(int requestId, int issueTypeId, string broadcastSessionId, int statusId, IList<string> logData)
+    public async Task InsertLetsTalk(int requestId, int issueTypeId, string broadcastSessionId, int statusId, IList<string> logData)
     {
         try
         {
-            if (!Helper.IsCanSendLetstalk(issueTypeId))
+            if (!Helper.IsCanSendLetsTalk(issueTypeId))
             {
                 return;
             }
@@ -114,12 +114,12 @@ public class RequestDetailServiceImp(IDynamicRepository repository, LoggingServi
             };
 
             await repository.ExecuteAsync(command);
-            logData.Add($"{nameof(RequestDetailService.InsertLetstalk)}: Done");
+            logData.Add($"{nameof(RequestDetailService.InsertLetsTalk)}: Done");
         }
         catch (Exception e)
         {
             await loggingService.ErrorAsync(e);
-            logData.Add($"{nameof(RequestDetailService.InsertLetstalk)}: Failed");
+            logData.Add($"{nameof(RequestDetailService.InsertLetsTalk)}: Failed");
         }
     }
 }

@@ -17,13 +17,12 @@ public class ReCalculateTicketsStageImpTests
         {
             new()
         };
-        var parlayTickets = new List<RequestDetailTicketModel>();
         var requestTicketService = Substitute.For<RequestTicketService>();
         var repository = Substitute.For<IDynamicRepository>();
 
         var service = new ReCalculateTicketsStageImp(repository, requestTicketService);
 
-        await service.Execute(siteDbGroupId, singleTickets, parlayTickets, new List<RequestDetailTicketModel>(), new List<string>());
+        await service.Execute(siteDbGroupId, singleTickets, [], new List<RequestDetailTicketModel>(), new List<string>());
 
         await repository.Received(1)
             .FetchAsync<UnMarkReCalculateResult>(Arg.Is<UnMarkAndReCalculateTicketsCriteria>(x => x.SiteDbGroupId == siteDbGroupId));
@@ -37,13 +36,12 @@ public class ReCalculateTicketsStageImpTests
         {
             new()
         };
-        var singleTickets = new List<RequestDetailTicketModel>();
         var requestTicketService = Substitute.For<RequestTicketService>();
         var repository = Substitute.For<IDynamicRepository>();
 
         var service = new ReCalculateTicketsStageImp(repository, requestTicketService);
 
-        await service.Execute(siteDbGroupId, singleTickets, parlayTickets, new List<RequestDetailTicketModel>(), new List<string>());
+        await service.Execute(siteDbGroupId, [], parlayTickets, new List<RequestDetailTicketModel>(), new List<string>());
 
         await repository.Received(1)
            .FetchAsync<UnMarkReCalculateResult>(Arg.Is<UnMarkAndReCalculateTicketsCriteria>(x => x.SiteDbGroupId == siteDbGroupId));

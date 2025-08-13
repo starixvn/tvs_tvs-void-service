@@ -8,7 +8,7 @@ using TVS.Void.Service.Services;
 
 namespace TVS.Void.Service.Tests.Services;
 
-public class RequestTicketServiceImpTests
+public class RequestTicketServiceTests
 {
     [Theory]
     [InlineData(1, "2,3")]

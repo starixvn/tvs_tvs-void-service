@@ -13,8 +13,6 @@ public interface TicketVoidingQueueService
 {
     Task<IList<TicketVoidingQueueModel>> GetQueues(int siteDbGroupId, int? voidingHistoryId);
 
-    Task InsertQueue(int siteDbGroupId, int requestId, int voidingHistoryId, IEnumerable<RequestDetailTicketModel> groupTickets);
-
     Task InsertQueueForRequests(int siteDbGroupId, IEnumerable<VoidingHistoryModel> voidingHistoryList, IEnumerable<RequestDetailTicketModel> groupTickets);
 
     Task<TicketVoidingQueueModel> ProcessVoidQueue(int siteDbGroupId, int queueId, bool? isCalledNetPosition);
@@ -35,7 +33,7 @@ public class TicketVoidingQueueServiceImp(IDynamicRepository repository) : Ticke
         return voidingQueues.ToList();
     }
 
-    public async Task InsertQueue(int siteDbGroupId, int requestId, int voidingHistoryId, IEnumerable<RequestDetailTicketModel> groupTickets)
+    private async Task InsertQueue(int siteDbGroupId, int requestId, int voidingHistoryId, IEnumerable<RequestDetailTicketModel> groupTickets)
     {
         var criteria = new InsertTicketVoidingQueueCriteria
         {

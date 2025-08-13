@@ -36,11 +36,10 @@ public class InsertPreVoidingDataStageImpTests
     public async Task Execute_HasNotSingleOrParlayTickets_ReturnMessage()
     {
         const string expected = "No ticket found.";
-        var singleTickets = new List<RequestDetailTicketModel>();
 
         var service = new InsertPreVoidingDataStageImp(default, default, default, default);
 
-        var actual = await service.Execute(default, default, singleTickets, default, default);
+        var actual = await service.Execute(default, default, [], default, default);
 
         Assert.Equal(expected, actual);
     }

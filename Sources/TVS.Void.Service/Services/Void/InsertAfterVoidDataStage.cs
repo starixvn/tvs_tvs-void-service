@@ -18,6 +18,11 @@ public class InsertAfterVoidDataStageImp(
 {
     public async Task Execute(IEnumerable<TicketVoidingQueueModel> voidQueueResults, IList<string> logData)
     {
+        if (!voidQueueResults.Any())
+        {
+            return;
+        }
+
         var firstVoidQueue = voidQueueResults.First();
         var (request, requestDetails) = await requestDetailService.GetRequestById(firstVoidQueue.RequestId);
         var firstRequest = request.First();
@@ -31,6 +36,6 @@ public class InsertAfterVoidDataStageImp(
 
         var voidDataXmlModel = await requestDetailService.GetVoidDataOfVoidingHistory(firstVoidQueue.VoidingHistoryId);
         await requestDetailService.InsertAfterVoidServiceData(voidDataXmlModel.IsRunAutoAfterVoid, afterVoidData, logData);
-        await requestDetailService.InsertLetstalk(firstVoidQueue.RequestId, voidDataXmlModel.IssueTypeId, voidDataXmlModel.BroadcastSessionId, ExecuteStatus.Running, logData);
+        await requestDetailService.InsertLetsTalk(firstVoidQueue.RequestId, voidDataXmlModel.IssueTypeId, voidDataXmlModel.BroadcastSessionId, ExecuteStatus.Running, logData);
     }
 }

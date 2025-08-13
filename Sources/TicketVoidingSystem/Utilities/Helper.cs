@@ -35,7 +35,7 @@ public static class Helper
         return await JsonSerializer.DeserializeAsync<T>(responseStream, options);
     }
 
-    public static bool IsCanSendLetstalk(int issueTypeId)
+    public static bool IsCanSendLetsTalk(int issueTypeId)
     {
         return issueTypeId is not (IssueTypeConstant.ArchivedTicket or IssueTypeConstant.RecoverTicket);
     }
