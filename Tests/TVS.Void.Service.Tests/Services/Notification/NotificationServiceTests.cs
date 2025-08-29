@@ -249,7 +249,7 @@ public class NotificationServiceTests
         service.ExecuteBackground(Action);
 
         // Assert
-        Task.Delay(200)?.Wait();
+        Task.Delay(200).Wait();
         Assert.Equal(1, executionCount);
         return;
 
