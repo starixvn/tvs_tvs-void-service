@@ -128,14 +128,12 @@ public static class ServiceCollectionExtension
         services.AddSingleton<CheckTicketStatusJob>();
         services.AddSingleton<ScanAutoVoidRequestJob>();
         services.AddSingleton<VoidJob>();
-        services.AddSingleton<AutoMarkTicketJob>();
         services.AddSingleton<CheckServerStatusJob>();
 
         services.AddHostedService<AddRequestDuplicatedTicketsJob>();
         services.AddHostedService<CheckTicketStatusJob>();
         services.AddHostedService<ScanAutoVoidRequestJob>();
         services.AddHostedService<VoidJob>();
-        services.AddHostedService<AutoMarkTicketJob>();
         services.AddHostedService<CheckServerStatusJob>();
 
         return services;

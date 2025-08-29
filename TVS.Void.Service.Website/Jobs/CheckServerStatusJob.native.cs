@@ -10,11 +10,12 @@ using ONEbook.UM.Services;
 using TicketVoidingSystem.Constants;
 using TicketVoidingSystem.Models;
 using TicketVoidingSystem.Services;
+using TVS.Void.Service.Services.AutoMarkTicket;
 
 namespace TVS.Void.Service.Website.Jobs;
 
 public class CheckServerStatusJob(IMaintenanceService maintenanceService, LoggingService loggingService,
-    SiteDbClientService siteDbClientService) : BackgroundService
+    SiteDbClientService siteDbClientService, AutoMarkTicketService autoMarkTicketService) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -47,7 +48,7 @@ public class CheckServerStatusJob(IMaintenanceService maintenanceService, Loggin
         var onlineServer = await GetOnlineServer();
         var currentOnlineServerId = onlineServer.Select(x => x.Id).ToList();
         var previousOnlineServer = SiteDbGroupConstant.ServerList;
-        var previousOnlineServerId = previousOnlineServer.Select(x => x.Id);
+        var previousOnlineServerId = previousOnlineServer.Select(x => x.Id).ToList();
         var isSameSet = new HashSet<int>(currentOnlineServerId).SetEquals(previousOnlineServerId);
 
         if (!isSameSet)
@@ -56,6 +57,8 @@ public class CheckServerStatusJob(IMaintenanceService maintenanceService, Loggin
             await loggingService.InfoAsync($"change-sitedb-status" +
                                            $"{Environment.NewLine}Current: {JsonSerializer.Serialize(onlineServer)}" +
                                            $"{Environment.NewLine}Previous: {JsonSerializer.Serialize(previousOnlineServer)}");
+
+            await ExecuteAutoMarkTicket(previousOnlineServerId, currentOnlineServerId);
         }
     }
 
@@ -68,5 +71,14 @@ public class CheckServerStatusJob(IMaintenanceService maintenanceService, Loggin
             IsOnline = x.Status,
             ServerName = SiteDbGroupConstant.AllSiteDb.Find(y => y.Id == x.SiteDbGroupId)?.ServerName
         }).ToList();
+    }
+
+    private async Task ExecuteAutoMarkTicket(List<int> previousOnlineServerId, List<int> currentOnlineServerId)
+    {
+        var isHasNewOnlineServer = currentOnlineServerId.Except(previousOnlineServerId).Any();
+        if (isHasNewOnlineServer)
+        {
+            await autoMarkTicketService.Execute();
+        }
     }
 }
