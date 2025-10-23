@@ -33,6 +33,7 @@ public class RequestDetailTicketModel
     public int VoidActionId { get; set; }
     public int VoidingTypeId { get; set; }
     public int ValidationType { get; set; }
+    public int BetdaqId { get; set; }
 }
 
 public class RequestDetailTicketModelEqualityComparer : IEqualityComparer<RequestDetailTicketModel>

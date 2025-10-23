@@ -40,7 +40,7 @@ public class CreateVoidDataXmlStageImp : CreateVoidDataXmlStage
         voidTickets.AddRange(validation.VoidParlayTickets14 ?? new List<RequestDetailTicketModel>());
         var cancelCashOutTickets = validation.CancelCOTickets ?? new List<RequestDetailTicketModel>();
         var totalTickets = voidTickets.Union(cancelCashOutTickets);
-        var isHasSettledTicket = voidTickets.Exists(x => x.StatusId is TicketStatus.WonId or TicketStatus.DrawId or TicketStatus.LoseId);
+        var isHasSettledTicket = voidTickets.Exists(x => x.StatusId.IsSettled() && !x.BetdaqId.IsCashOut());
 
         var combineTransTime = voidTickets.Select(x => x.TransDate).Union(cancelCashOutTickets.Select(x => x.CheckTimeCancelCashOut)).DefaultIfEmpty();
         var combineWinLostDate = voidTickets.Select(x => x.WinLostDate).Union(cancelCashOutTickets.Select(x => x.CheckTimeCancelCashOut)).DefaultIfEmpty();
