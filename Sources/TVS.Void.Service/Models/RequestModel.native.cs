@@ -34,6 +34,7 @@ public class RequestDetailTicketModel
     public int VoidingTypeId { get; set; }
     public int ValidationType { get; set; }
     public int BetdaqId { get; set; }
+    public bool IsHybrid { get; set; }
 }
 
 public class RequestDetailTicketModelEqualityComparer : IEqualityComparer<RequestDetailTicketModel>

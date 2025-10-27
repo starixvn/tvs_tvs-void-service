@@ -40,6 +40,8 @@ public class ProcessVoidQueuesStageImp(
         {
             VoidingTypeConstant.Cricket => await ExecuteQueueForCricketTickets(siteDbGroupId, queue, NetPositionConstant.ActionVoid),
             VoidingTypeConstant.RecoverCricket => await ExecuteQueueForCricketTickets(siteDbGroupId, queue, NetPositionConstant.ActionRecover),
+            VoidingTypeConstant.VoidHybridParlay => await ExecuteQueueForHybridParlayTickets(siteDbGroupId, queue),
+            VoidingTypeConstant.RecoverHybridParlay => await ExecuteQueueForHybridParlayTickets(siteDbGroupId, queue),
             _ => await ticketVoidingQueueService.ProcessVoidQueue(siteDbGroupId, queue.QueueId, null)
         };
     }
@@ -55,5 +57,17 @@ public class ProcessVoidQueuesStageImp(
         }
 
         return voidResult;
+    }
+
+    private async Task<TicketVoidingQueueModel> ExecuteQueueForHybridParlayTickets(int siteDbGroupId, TicketVoidingQueueModel queue)
+    {
+        // call jt api & update new leg odds
+        var isSuccess = true;
+        if (!isSuccess)
+        {
+            return new TicketVoidingQueueModel { StatusId = ExecuteStatus.Failed };
+        }
+
+        return await ticketVoidingQueueService.ProcessVoidQueue(siteDbGroupId, queue.QueueId, null);
     }
 }

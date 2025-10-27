@@ -69,6 +69,9 @@ public class InsertPreVoidingDataStageImp(
         AddTicketsToGroup(groupTickets, validation.RecoverSingleTickets14, VoidingTypeConstant.RecoverSingle14);
         AddTicketsToGroup(groupTickets, validation.RecoverParlayTickets14, VoidingTypeConstant.RecoverParlay14);
 
+        AddTicketsToGroup(groupTickets, validation.VoidHybridParlayTickets, VoidingTypeConstant.VoidHybridParlay);
+        AddTicketsToGroup(groupTickets, validation.RecoverCricketTickets, VoidingTypeConstant.RecoverHybridParlay);
+
         return groupTickets;
     }
 

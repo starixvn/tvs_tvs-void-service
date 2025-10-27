@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Fanex.Data.Repository;
 using TicketVoidingSystem.Constants;
+using TVS.Void.Service.Constants;
 using TVS.Void.Service.Criteria.MultiSiteDb;
 using TVS.Void.Service.Models;
 
@@ -43,6 +44,7 @@ public class CheckTicketValidationStageImp(IDynamicRepository repository) : Chec
         var outputCancelCashOutTickets = results.Where(x => x.ValidationType == 7); // user for auto void instant
         var voidSingleTickets14 = results.Where(x => x.ValidationType == 8);
         var voidParlayTickets14 = results.Where(x => x.ValidationType == 9);
+        var voidHybridParlayTickets = results.Where(x => x.VoidingTypeId == VoidingTypeConstant.VoidHybridParlay);
 
         var output = new CheckTicketValidationOutput
         {
@@ -54,14 +56,15 @@ public class CheckTicketValidationStageImp(IDynamicRepository repository) : Chec
             CricketTicketsResettle = cricketTicketsResettle,
             CancelCOTickets = outputCancelCashOutTickets,
             VoidSingleTickets14 = voidSingleTickets14,
-            VoidParlayTickets14 = voidParlayTickets14
+            VoidParlayTickets14 = voidParlayTickets14,
+            VoidHybridParlayTickets = voidHybridParlayTickets
         };
 
         logData.Add($"{nameof(CheckTicketValidationStage)}.{nameof(ExecuteForVoid)} - vSingle: {output.VoidSingleTickets.Count()} - vParlay: {output.VoidParlayTickets.Count()}"
                         + $" - SingleResettle: {output.SingleTicketsResettle.Count()} - ParlayResettle: {output.ParlayTicketsResettle.Count()}"
                         + $" - vCricketTickets: {output.VoidCricketTickets.Count()} - CricketTicketsResettle: {output.CricketTicketsResettle.Count()}"
-                        + $" - vCancelCOTickets: {output.CancelCOTickets.Count()}"
-                        + $" - vSingle14: {output.VoidSingleTickets14.Count()} - vParlay14: {output.VoidParlayTickets14.Count()}");
+                        + $" - vCancelCOTickets: {output.CancelCOTickets.Count()} - vSingle14: {output.VoidSingleTickets14.Count()} "
+                        + $" - vParlay14: {output.VoidParlayTickets14.Count()} - vHybridParlay: {output.VoidHybridParlayTickets.Count()}");
 
         return output;
     }
@@ -84,6 +87,7 @@ public class CheckTicketValidationStageImp(IDynamicRepository repository) : Chec
         var recoverCricketTickets = results.Where(x => x.ValidationType is ValidationType.CricketTicketRecover or ValidationType.CricketTicketResettle);
         var recoverSingleTickets14 = results.Where(x => x.ValidationType is ValidationType.SingleTickets14Recover);
         var recoverParlayTickets14 = results.Where(x => x.ValidationType is ValidationType.ParlayTickets14Recover);
+        var recoverHybridParlayTickets = results.Where(x => x.VoidingTypeId == VoidingTypeConstant.RecoverHybridParlay);
 
         var output = new CheckTicketValidationOutput
         {
@@ -92,12 +96,14 @@ public class CheckTicketValidationStageImp(IDynamicRepository repository) : Chec
             RecoverSubParlayTickets = recoverSubParlayTickets,
             RecoverCricketTickets = recoverCricketTickets,
             RecoverSingleTickets14 = recoverSingleTickets14,
-            RecoverParlayTickets14 = recoverParlayTickets14
+            RecoverParlayTickets14 = recoverParlayTickets14,
+            RecoverHybridParlayTickets = recoverHybridParlayTickets
         };
 
         logData.Add($"{nameof(CheckTicketValidationStage)}.{nameof(ExecuteForRecover)} - rSingle: {output.RecoverSingleTickets.Count()} - rParlay: {output.RecoverParlayTickets.Count()}"
                     + $" - rSubParlay: {output.RecoverSubParlayTickets.Count()} - rCricket: {output.RecoverCricketTickets.Count()}"
-                    + $" - rSingle14: {output.RecoverSingleTickets14.Count()} - rParlay14: {output.RecoverParlayTickets14.Count()}");
+                    + $" - rSingle14: {output.RecoverSingleTickets14.Count()} - rParlay14: {output.RecoverParlayTickets14.Count()}"
+                    + $" - rHybridParlay: {output.RecoverHybridParlayTickets.Count()}");
 
         return output;
     }
