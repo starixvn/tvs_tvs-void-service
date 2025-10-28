@@ -13,7 +13,9 @@ public interface ProcessVoidQueuesStage
 
 public class ProcessVoidQueuesStageImp(
     TicketVoidingQueueService ticketVoidingQueueService,
-    NetPositionService netPositionService)
+    NetPositionService netPositionService,
+    RequestTicketService requestTicketService,
+    HybridParlayTicketService hybridParlayTicketService)
     : ProcessVoidQueuesStage
 {
     public async Task<IList<TicketVoidingQueueModel>> Execute(int siteDbGroupId, IEnumerable<TicketVoidingQueueModel> voidingQueues)
@@ -40,16 +42,16 @@ public class ProcessVoidQueuesStageImp(
         {
             VoidingTypeConstant.Cricket => await ExecuteQueueForCricketTickets(siteDbGroupId, queue, NetPositionConstant.ActionVoid),
             VoidingTypeConstant.RecoverCricket => await ExecuteQueueForCricketTickets(siteDbGroupId, queue, NetPositionConstant.ActionRecover),
-            VoidingTypeConstant.VoidHybridParlay => await ExecuteQueueForHybridParlayTickets(siteDbGroupId, queue),
-            VoidingTypeConstant.RecoverHybridParlay => await ExecuteQueueForHybridParlayTickets(siteDbGroupId, queue),
-            _ => await ticketVoidingQueueService.ProcessVoidQueue(siteDbGroupId, queue.QueueId, null)
+            VoidingTypeConstant.HybridParlay => await ExecuteQueueForHybridParlayTickets(siteDbGroupId, queue, true),
+            VoidingTypeConstant.RecoverHybridParlay => await ExecuteQueueForHybridParlayTickets(siteDbGroupId, queue, false),
+            _ => await ticketVoidingQueueService.ProcessVoidQueue(siteDbGroupId, queue.QueueId, null, null)
         };
     }
 
     private async Task<TicketVoidingQueueModel> ExecuteQueueForCricketTickets(int siteDbGroupId, TicketVoidingQueueModel queue, string actionName)
     {
         var isCalledNetPosition = await netPositionService.UpdateNetPosition(siteDbGroupId, queue.TransIds, actionName);
-        var voidResult = await ticketVoidingQueueService.ProcessVoidQueue(siteDbGroupId, queue.QueueId, isCalledNetPosition);
+        var voidResult = await ticketVoidingQueueService.ProcessVoidQueue(siteDbGroupId, queue.QueueId, isCalledNetPosition, null);
 
         if (voidResult.StatusId == ExecuteStatus.Failed && isCalledNetPosition)
         {
@@ -59,15 +61,10 @@ public class ProcessVoidQueuesStageImp(
         return voidResult;
     }
 
-    private async Task<TicketVoidingQueueModel> ExecuteQueueForHybridParlayTickets(int siteDbGroupId, TicketVoidingQueueModel queue)
+    private async Task<TicketVoidingQueueModel> ExecuteQueueForHybridParlayTickets(int siteDbGroupId, TicketVoidingQueueModel queue, bool isVoid)
     {
-        // call jt api & update new leg odds
-        var isSuccess = true;
-        if (!isSuccess)
-        {
-            return new TicketVoidingQueueModel { StatusId = ExecuteStatus.Failed };
-        }
-
-        return await ticketVoidingQueueService.ProcessVoidQueue(siteDbGroupId, queue.QueueId, null);
+        var ticketsDetail = await requestTicketService.GetTicketsDetail(siteDbGroupId, queue.TransIds);
+        var isCalledJackTimeHybridParlay = await hybridParlayTicketService.CallApi(ticketsDetail, isVoid);
+        return await ticketVoidingQueueService.ProcessVoidQueue(siteDbGroupId, queue.QueueId, null, isCalledJackTimeHybridParlay);
     }
 }

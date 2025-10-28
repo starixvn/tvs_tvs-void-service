@@ -15,7 +15,7 @@ public interface TicketVoidingQueueService
 
     Task InsertQueueForRequests(int siteDbGroupId, IEnumerable<VoidingHistoryModel> voidingHistoryList, IEnumerable<RequestDetailTicketModel> groupTickets);
 
-    Task<TicketVoidingQueueModel> ProcessVoidQueue(int siteDbGroupId, int queueId, bool? isCalledNetPosition);
+    Task<TicketVoidingQueueModel> ProcessVoidQueue(int siteDbGroupId, int queueId, bool? isCalledNetPosition, bool? isCalledJackTimeHybridParlay);
 }
 
 public class TicketVoidingQueueServiceImp(IDynamicRepository repository) : TicketVoidingQueueService
@@ -56,13 +56,14 @@ public class TicketVoidingQueueServiceImp(IDynamicRepository repository) : Ticke
         }
     }
 
-    public async Task<TicketVoidingQueueModel> ProcessVoidQueue(int siteDbGroupId, int queueId, bool? isCalledNetPosition)
+    public async Task<TicketVoidingQueueModel> ProcessVoidQueue(int siteDbGroupId, int queueId, bool? isCalledNetPosition, bool? isCalledJackTimeHybridParlay)
     {
         var criteria = new ProcessVoidQueueCriteria
         {
             SiteDbGroupId = siteDbGroupId,
             QueueId = queueId,
-            IsCalledNetPosition = isCalledNetPosition
+            IsCalledNetPosition = isCalledNetPosition,
+            IsCalledJackTimeHybridParlay = isCalledJackTimeHybridParlay
         };
 
         var result = await repository.GetAsync<TicketVoidingQueueModel>(criteria);

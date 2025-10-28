@@ -4,7 +4,6 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Fanex.Data.Repository;
 using TicketVoidingSystem.Constants;
-using TVS.Void.Service.Constants;
 using TVS.Void.Service.Criteria.MultiSiteDb;
 using TVS.Void.Service.Models;
 
@@ -44,7 +43,7 @@ public class CheckTicketValidationStageImp(IDynamicRepository repository) : Chec
         var outputCancelCashOutTickets = results.Where(x => x.ValidationType == 7); // user for auto void instant
         var voidSingleTickets14 = results.Where(x => x.ValidationType == 8);
         var voidParlayTickets14 = results.Where(x => x.ValidationType == 9);
-        var voidHybridParlayTickets = results.Where(x => x.VoidingTypeId == VoidingTypeConstant.VoidHybridParlay);
+        var voidHybridParlayTickets = results.Where(x => x.ValidationType == 10);
 
         var output = new CheckTicketValidationOutput
         {
@@ -87,7 +86,7 @@ public class CheckTicketValidationStageImp(IDynamicRepository repository) : Chec
         var recoverCricketTickets = results.Where(x => x.ValidationType is ValidationType.CricketTicketRecover or ValidationType.CricketTicketResettle);
         var recoverSingleTickets14 = results.Where(x => x.ValidationType is ValidationType.SingleTickets14Recover);
         var recoverParlayTickets14 = results.Where(x => x.ValidationType is ValidationType.ParlayTickets14Recover);
-        var recoverHybridParlayTickets = results.Where(x => x.VoidingTypeId == VoidingTypeConstant.RecoverHybridParlay);
+        var recoverHybridParlayTickets = results.Where(x => x.ValidationType is ValidationType.HybridParlayTicketRecover or ValidationType.HybridParlayResettle);
 
         var output = new CheckTicketValidationOutput
         {

@@ -16,4 +16,6 @@ public static class ValidationType
     public const int CricketTicketResettle = 28;
     public const int SingleTickets14Recover = 29;
     public const int ParlayTickets14Recover = 30;
+    public const int HybridParlayTicketRecover = 31;
+    public const int HybridParlayResettle = 32;
 }

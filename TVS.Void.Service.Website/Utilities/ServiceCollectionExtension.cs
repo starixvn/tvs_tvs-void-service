@@ -80,12 +80,13 @@ public static class ServiceCollectionExtension
     public static void AddBusinessService(this IServiceCollection services)
     {
         services.AddSingleton<IDynamicRepository, DynamicRepository>();
-
+        services.AddSingleton<JackTimeHybridParlayService, JackTimeHybridParlayServiceImp>();
         services.AddSingleton<LoggingService, LoggingServiceImp>();
         services.AddSingleton<AutoVoidRequestQueueService, AutoVoidRequestQueueServiceImp>();
         services.AddSingleton<RequestDetailService, RequestDetailServiceImp>();
         services.AddSingleton<TicketVoidingQueueService, TicketVoidingQueueServiceImp>();
         services.AddSingleton<RequestTicketService, RequestTicketServiceImp>();
+        services.AddSingleton<HybridParlayTicketService, HybridParlayTicketServiceImp>();
         services.AddSingleton<SignalRService, SignalRServiceImp>();
         services.AddSingleton<NetPositionService, NetPositionServiceImp>();
 

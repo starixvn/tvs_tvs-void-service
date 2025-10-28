@@ -24,6 +24,8 @@ public interface RequestTicketService
         IEnumerable<RequestDetailTicketModel> cricketTickets);
 
     Task UpdateIsProcessed(IEnumerable<RequestDetailTicketModel> groupTickets);
+
+    Task<IEnumerable<TicketDetailModel>> GetTicketsDetail(int siteDbGroupId, string transIds);
 }
 
 public class RequestTicketServiceImp(IDynamicRepository repository) : RequestTicketService
@@ -56,6 +58,17 @@ public class RequestTicketServiceImp(IDynamicRepository repository) : RequestTic
             CricketTickets = cricketTickets,
             CancelCOTickets = cancelCashOutTickets
         };
+    }
+
+    public async Task<IEnumerable<TicketDetailModel>> GetTicketsDetail(int siteDbGroupId, string transIds)
+    {
+        var criteria = new GetTicketsDetailCriteria
+        {
+            SiteDbGroupId = siteDbGroupId,
+            TransIds = transIds
+        };
+
+        return await repository.FetchAsync<TicketDetailModel>(criteria);
     }
 
     public async Task<CheckStatusTicketInsertAutoVoidQueueOutput> CheckStatusTicketForInsertAutoVoidQueue(int siteDbGroupId,

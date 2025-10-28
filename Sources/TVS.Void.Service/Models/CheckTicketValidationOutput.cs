@@ -17,6 +17,8 @@ public class CheckTicketValidationOutput
 
     public IEnumerable<RequestDetailTicketModel> VoidParlayTickets14 { get; set; }
 
+    public IEnumerable<RequestDetailTicketModel> VoidHybridParlayTickets { get; set; }
+
     //// re settle
     public IEnumerable<RequestDetailTicketModel> SingleTicketsResettle { get; set; }
 
@@ -36,8 +38,6 @@ public class CheckTicketValidationOutput
     public IEnumerable<RequestDetailTicketModel> RecoverSingleTickets14 { get; set; }
 
     public IEnumerable<RequestDetailTicketModel> RecoverParlayTickets14 { get; set; }
-
-    public IEnumerable<RequestDetailTicketModel> VoidHybridParlayTickets { get; set; }
 
     public IEnumerable<RequestDetailTicketModel> RecoverHybridParlayTickets { get; set; }
 }

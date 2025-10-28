@@ -8,6 +8,7 @@ public class ProcessVoidQueueCriteria : CriteriaBase
 {
     public int QueueId { get; set; }
     public bool? IsCalledNetPosition { get; set; }
+    public bool? IsCalledJackTimeHybridParlay { get; set; }
 
     [SpParam(Ignored = true)]
     public int SiteDbGroupId { get; set; }

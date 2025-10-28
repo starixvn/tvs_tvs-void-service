@@ -22,7 +22,8 @@ public static class AppSettingService
             CategorySentryLog = configuration.GetValue<string>(nameof(AppSettingModel.CategorySentryLog)),
             SentryClientKey = configuration.GetValue<string>(nameof(AppSettingModel.SentryClientKey)),
             IgnoreSiteDb = configuration.GetValue<string>(nameof(AppSettingModel.IgnoreSiteDb)),
-            IsPRODEnvironment = configuration.GetValue<bool>(nameof(AppSettingModel.IsPRODEnvironment))
+            IsPRODEnvironment = configuration.GetValue<bool>(nameof(AppSettingModel.IsPRODEnvironment)),
+            JackTimeHybridParlayUrl = configuration.GetValue<string>(nameof(AppSettingModel.JackTimeHybridParlayUrl))
         };
 
         AppSetting = setting;

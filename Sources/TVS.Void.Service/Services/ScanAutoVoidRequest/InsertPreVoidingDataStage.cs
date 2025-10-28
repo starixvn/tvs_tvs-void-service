@@ -61,6 +61,7 @@ public class InsertPreVoidingDataStageImp(
         AddTicketsToGroup(groupTickets, validation.VoidCricketTickets, VoidingTypeConstant.Cricket);
         AddTicketsToGroup(groupTickets, validation.VoidSingleTickets14, VoidingTypeConstant.Single14);
         AddTicketsToGroup(groupTickets, validation.VoidParlayTickets14, VoidingTypeConstant.Parlay14);
+        AddTicketsToGroup(groupTickets, validation.VoidHybridParlayTickets, VoidingTypeConstant.HybridParlay);
 
         AddTicketsToGroup(groupTickets, validation.RecoverSingleTickets, VoidingTypeConstant.RecoverSingle);
         AddTicketsToGroup(groupTickets, validation.RecoverParlayTickets, VoidingTypeConstant.RecoverParlay);
@@ -68,9 +69,7 @@ public class InsertPreVoidingDataStageImp(
         AddTicketsToGroup(groupTickets, validation.RecoverCricketTickets, VoidingTypeConstant.RecoverCricket);
         AddTicketsToGroup(groupTickets, validation.RecoverSingleTickets14, VoidingTypeConstant.RecoverSingle14);
         AddTicketsToGroup(groupTickets, validation.RecoverParlayTickets14, VoidingTypeConstant.RecoverParlay14);
-
-        AddTicketsToGroup(groupTickets, validation.VoidHybridParlayTickets, VoidingTypeConstant.VoidHybridParlay);
-        AddTicketsToGroup(groupTickets, validation.RecoverCricketTickets, VoidingTypeConstant.RecoverHybridParlay);
+        AddTicketsToGroup(groupTickets, validation.RecoverHybridParlayTickets, VoidingTypeConstant.RecoverHybridParlay);
 
         return groupTickets;
     }
