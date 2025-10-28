@@ -2,35 +2,49 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Fanex.Data.Repository;
 using TicketVoidingSystem.Models;
 using TicketVoidingSystem.Services;
+using TVS.Void.Service.Criteria.MultiSiteDb;
 using TVS.Void.Service.Models;
 
 namespace TVS.Void.Service.Services;
 
 public interface HybridParlayTicketService
 {
-    Task<bool> CallApi(IEnumerable<TicketDetailModel> ticketsDetail, bool isVoid);
+    Task<bool> Execute(string hybridParlayTransIds, int siteDbGroupId, bool isVoid);
 }
 
-public class HybridParlayTicketServiceImp(JackTimeHybridParlayService jackTimeHybridParlayService, LoggingService loggingService)
+public class HybridParlayTicketServiceImp(JackTimeHybridParlayService jackTimeHybridParlayService, DynamicRepository repository, LoggingService loggingService)
     : HybridParlayTicketService
 {
-    public async Task<bool> CallApi(IEnumerable<TicketDetailModel> ticketsDetail, bool isVoid)
+    public async Task<bool> Execute(string hybridParlayTransIds, int siteDbGroupId, bool isVoid)
     {
         try
         {
+            var ticketsDetail = await GetTicketsDetail(siteDbGroupId, hybridParlayTransIds);
             var request = CreateRequest(ticketsDetail);
             return await jackTimeHybridParlayService.Execute(request, isVoid);
         }
         catch (Exception e)
         {
-            await loggingService.ErrorAsync($"{nameof(HybridParlayTicketService)}.{nameof(CallApi)} Error", e);
+            await loggingService.ErrorAsync($"{nameof(HybridParlayTicketService)}.{nameof(Execute)} Error", e);
             return false;
         }
     }
 
-    private static HybridParlayApiModel CreateRequest(IEnumerable<TicketDetailModel> ticketsDetail)
+    private async Task<IEnumerable<HybridParlayTicketModel>> GetTicketsDetail(int siteDbGroupId, string transIds)
+    {
+        var criteria = new GetTicketsDetailCriteria
+        {
+            SiteDbGroupId = siteDbGroupId,
+            TransIds = transIds
+        };
+
+        return await repository.FetchAsync<HybridParlayTicketModel>(criteria);
+    }
+
+    private static HybridParlayApiModel CreateRequest(IEnumerable<HybridParlayTicketModel> ticketsDetail)
     {
         var voidBetInfos = ticketsDetail.GroupBy(ticket => ticket.MainTransId).Select(group => new VoidBetInfo
         {

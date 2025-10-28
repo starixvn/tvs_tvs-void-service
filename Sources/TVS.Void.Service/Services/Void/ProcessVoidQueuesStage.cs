@@ -63,8 +63,7 @@ public class ProcessVoidQueuesStageImp(
 
     private async Task<TicketVoidingQueueModel> ExecuteQueueForHybridParlayTickets(int siteDbGroupId, TicketVoidingQueueModel queue, bool isVoid)
     {
-        var ticketsDetail = await requestTicketService.GetTicketsDetail(siteDbGroupId, queue.TransIds);
-        var isCalledJackTimeHybridParlay = await hybridParlayTicketService.CallApi(ticketsDetail, isVoid);
+        var isCalledJackTimeHybridParlay = await hybridParlayTicketService.Execute(queue.TransIds, siteDbGroupId, isVoid);
         return await ticketVoidingQueueService.ProcessVoidQueue(siteDbGroupId, queue.QueueId, null, isCalledJackTimeHybridParlay);
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace TVS.Void.Service.Models;
 
-public class TicketDetailModel
+public class HybridParlayTicketModel
 {
     public string MainTransId { get; set; }
     public string CustId { get; set; }
