@@ -19,12 +19,16 @@ public class CheckTicketValidationOutput
 
     public IEnumerable<RequestDetailTicketModel> VoidHybridParlayTickets { get; set; }
 
+    public IEnumerable<RequestDetailTicketModel> VoidSubHybridParlayTickets { get; set; }
+
     //// re settle
     public IEnumerable<RequestDetailTicketModel> SingleTicketsResettle { get; set; }
 
     public IEnumerable<RequestDetailTicketModel> ParlayTicketsResettle { get; set; }
 
     public IEnumerable<RequestDetailTicketModel> CricketTicketsResettle { get; set; }
+
+    public IEnumerable<RequestDetailTicketModel> HybridParlayTicketsResettle { get; set; }
 
     //// Recover
     public IEnumerable<RequestDetailTicketModel> RecoverSingleTickets { get; set; }

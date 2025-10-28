@@ -44,6 +44,8 @@ public class CheckTicketValidationStageImp(IDynamicRepository repository) : Chec
         var voidSingleTickets14 = results.Where(x => x.ValidationType == 8);
         var voidParlayTickets14 = results.Where(x => x.ValidationType == 9);
         var voidHybridParlayTickets = results.Where(x => x.ValidationType == 10);
+        var voidSubHybridParlayTickets = results.Where(x => x.ValidationType == 11);
+        var hybridParlayTicketsResettle = results.Where(x => x.ValidationType == 12);
 
         var output = new CheckTicketValidationOutput
         {
