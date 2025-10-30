@@ -59,9 +59,9 @@ public class CreateVoidDataXmlStageImpTests
         {
             VoidSingleTickets = new List<RequestDetailTicketModel>
             {
-                new() { StatusId = TicketStatus.WonId },
-                new() { StatusId = TicketStatus.LoseId },
-                new() { StatusId = TicketStatus.DrawId }
+                new() { StatusId = TicketStatus.WonId, BetdaqId = 0 },
+                new() { StatusId = TicketStatus.LoseId, BetdaqId = 0  },
+                new() { StatusId = TicketStatus.DrawId, BetdaqId = 0  }
             }
         };
 
