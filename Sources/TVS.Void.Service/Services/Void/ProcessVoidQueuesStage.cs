@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using TicketVoidingSystem.Constants;
+using TicketVoidingSystem.Services.JackTimeHybridParlay;
 using TVS.Void.Service.Constants;
 using TVS.Void.Service.Models;
 
@@ -14,7 +15,6 @@ public interface ProcessVoidQueuesStage
 public class ProcessVoidQueuesStageImp(
     TicketVoidingQueueService ticketVoidingQueueService,
     NetPositionService netPositionService,
-    RequestTicketService requestTicketService,
     HybridParlayTicketService hybridParlayTicketService)
     : ProcessVoidQueuesStage
 {
@@ -63,7 +63,7 @@ public class ProcessVoidQueuesStageImp(
 
     private async Task<TicketVoidingQueueModel> ExecuteQueueForHybridParlayTickets(int siteDbGroupId, TicketVoidingQueueModel queue, bool isVoid)
     {
-        var isCalledJackTimeHybridParlay = await hybridParlayTicketService.Execute(queue.TransIds, siteDbGroupId, isVoid);
+        var isCalledJackTimeHybridParlay = await hybridParlayTicketService.Execute(queue.TransIds, siteDbGroupId, queue.VoidingTypeId);
         return await ticketVoidingQueueService.ProcessVoidQueue(siteDbGroupId, queue.QueueId, null, isCalledJackTimeHybridParlay);
     }
 }

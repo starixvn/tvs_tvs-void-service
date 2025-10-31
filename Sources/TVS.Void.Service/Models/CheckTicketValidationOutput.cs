@@ -17,9 +17,11 @@ public class CheckTicketValidationOutput
 
     public IEnumerable<RequestDetailTicketModel> VoidParlayTickets14 { get; set; }
 
-    public IEnumerable<RequestDetailTicketModel> VoidHybridParlayTickets { get; set; }
+    public IEnumerable<RequestDetailTicketModel> VoidHybridParlayMainTickets { get; set; }
 
-    public IEnumerable<RequestDetailTicketModel> VoidSubHybridParlayTickets { get; set; }
+    public IEnumerable<RequestDetailTicketModel> VoidHybridParlaySubTickets { get; set; }
+
+    public IEnumerable<RequestDetailTicketModel> VoidHybridParlayMainTickets14 { get; set; }
 
     //// re settle
     public IEnumerable<RequestDetailTicketModel> SingleTicketsResettle { get; set; }
@@ -28,7 +30,9 @@ public class CheckTicketValidationOutput
 
     public IEnumerable<RequestDetailTicketModel> CricketTicketsResettle { get; set; }
 
-    public IEnumerable<RequestDetailTicketModel> HybridParlayTicketsResettle { get; set; }
+    public IEnumerable<RequestDetailTicketModel> HybridParlayMainTicketsResettle { get; set; }
+
+    public IEnumerable<RequestDetailTicketModel> HybridParlayMainTickets14 { get; set; }
 
     //// Recover
     public IEnumerable<RequestDetailTicketModel> RecoverSingleTickets { get; set; }
@@ -43,5 +47,9 @@ public class CheckTicketValidationOutput
 
     public IEnumerable<RequestDetailTicketModel> RecoverParlayTickets14 { get; set; }
 
-    public IEnumerable<RequestDetailTicketModel> RecoverHybridParlayTickets { get; set; }
+    public IEnumerable<RequestDetailTicketModel> RecoverHybridParlayMainTickets { get; set; }
+
+    public IEnumerable<RequestDetailTicketModel> RecoverHybridParlaySubTickets { get; set; }
+
+    public IEnumerable<RequestDetailTicketModel> RecoverHybridParlayMainTickets14 { get; set; }
 }

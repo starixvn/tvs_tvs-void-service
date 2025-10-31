@@ -58,7 +58,7 @@ public class AutoInstantProcessStageImp(
                 VoidSingleTickets = getTicketsResult.OutputData.SingleTickets,
                 VoidParlayTickets = getTicketsResult.OutputData.ParlayTickets.Where(x => !x.IsHybrid),
                 VoidCricketTickets = getTicketsResult.OutputData.CricketTickets,
-                VoidHybridParlayTickets = getTicketsResult.OutputData.ParlayTickets.Where(x => x.IsHybrid)
+                VoidHybridParlayMainTickets = getTicketsResult.OutputData.ParlayTickets.Where(x => x.IsHybrid)
             };
         }
 

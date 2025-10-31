@@ -26,7 +26,7 @@ public class CreateVoidDataXmlStageImp : CreateVoidDataXmlStage
         recoverTickets.AddRange(validation.RecoverCricketTickets ?? new List<RequestDetailTicketModel>());
         recoverTickets.AddRange(validation.RecoverSingleTickets14 ?? new List<RequestDetailTicketModel>());
         recoverTickets.AddRange(validation.RecoverParlayTickets14 ?? new List<RequestDetailTicketModel>());
-        recoverTickets.AddRange(validation.RecoverHybridParlayTickets ?? new List<RequestDetailTicketModel>());
+        recoverTickets.AddRange(validation.RecoverHybridParlayMainTickets ?? new List<RequestDetailTicketModel>());
 
         return $"<VoidData CreatorName='starixIT' IsRunAutoAfterVoid='{true}' TotalTicket='{recoverTickets.Count}' />";
     }
@@ -39,7 +39,7 @@ public class CreateVoidDataXmlStageImp : CreateVoidDataXmlStage
         voidTickets.AddRange(validation.VoidCricketTickets ?? new List<RequestDetailTicketModel>());
         voidTickets.AddRange(validation.VoidSingleTickets14 ?? new List<RequestDetailTicketModel>());
         voidTickets.AddRange(validation.VoidParlayTickets14 ?? new List<RequestDetailTicketModel>());
-        voidTickets.AddRange(validation.VoidHybridParlayTickets ?? new List<RequestDetailTicketModel>());
+        voidTickets.AddRange(validation.VoidHybridParlayMainTickets ?? new List<RequestDetailTicketModel>());
         var cancelCashOutTickets = validation.CancelCOTickets ?? new List<RequestDetailTicketModel>();
         var totalTickets = voidTickets.Union(cancelCashOutTickets);
         var isHasSettledTicket = voidTickets.Exists(x => x.StatusId.IsSettled() && !x.BetdaqId.IsCashOut());

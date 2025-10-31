@@ -43,9 +43,10 @@ public class CheckTicketValidationStageImp(IDynamicRepository repository) : Chec
         var outputCancelCashOutTickets = results.Where(x => x.ValidationType == 7); // user for auto void instant
         var voidSingleTickets14 = results.Where(x => x.ValidationType == 8);
         var voidParlayTickets14 = results.Where(x => x.ValidationType == 9);
-        var voidHybridParlayTickets = results.Where(x => x.ValidationType == 10);
-        var voidSubHybridParlayTickets = results.Where(x => x.ValidationType == 11);
-        var hybridParlayTicketsResettle = results.Where(x => x.ValidationType == 12);
+        var hybridParlayMainTickets = results.Where(x => x.ValidationType == 10);
+        var hybridParlayMainTicketsResettle = results.Where(x => x.ValidationType == 11);
+        var hybridParlaySubTickets = results.Where(x => x.ValidationType == 12);
+        var hybridParlayMainTickets14 = results.Where(x => x.ValidationType == 13);
 
         var output = new CheckTicketValidationOutput
         {
@@ -58,14 +59,17 @@ public class CheckTicketValidationStageImp(IDynamicRepository repository) : Chec
             CancelCOTickets = outputCancelCashOutTickets,
             VoidSingleTickets14 = voidSingleTickets14,
             VoidParlayTickets14 = voidParlayTickets14,
-            VoidHybridParlayTickets = voidHybridParlayTickets
+            VoidHybridParlayMainTickets = hybridParlayMainTickets,
+            VoidHybridParlaySubTickets = hybridParlayMainTicketsResettle,
+            HybridParlayMainTicketsResettle = hybridParlaySubTickets,
+            HybridParlayMainTickets14 = hybridParlayMainTickets14,
         };
 
         logData.Add($"{nameof(CheckTicketValidationStage)}.{nameof(ExecuteForVoid)} - vSingle: {output.VoidSingleTickets.Count()} - vParlay: {output.VoidParlayTickets.Count()}"
                         + $" - SingleResettle: {output.SingleTicketsResettle.Count()} - ParlayResettle: {output.ParlayTicketsResettle.Count()}"
                         + $" - vCricketTickets: {output.VoidCricketTickets.Count()} - CricketTicketsResettle: {output.CricketTicketsResettle.Count()}"
                         + $" - vCancelCOTickets: {output.CancelCOTickets.Count()} - vSingle14: {output.VoidSingleTickets14.Count()} "
-                        + $" - vParlay14: {output.VoidParlayTickets14.Count()} - vHybridParlay: {output.VoidHybridParlayTickets.Count()}");
+                        + $" - vParlay14: {output.VoidParlayTickets14.Count()} - vHybridParlay: {output.VoidHybridParlayMainTickets.Count()}");
 
         return output;
     }
@@ -88,7 +92,8 @@ public class CheckTicketValidationStageImp(IDynamicRepository repository) : Chec
         var recoverCricketTickets = results.Where(x => x.ValidationType is ValidationType.CricketTicketRecover or ValidationType.CricketTicketResettle);
         var recoverSingleTickets14 = results.Where(x => x.ValidationType is ValidationType.SingleTickets14Recover);
         var recoverParlayTickets14 = results.Where(x => x.ValidationType is ValidationType.ParlayTickets14Recover);
-        var recoverHybridParlayTickets = results.Where(x => x.ValidationType is ValidationType.HybridParlayTicketRecover or ValidationType.HybridParlayResettle);
+        var recoverHybridParlayMainTickets = results.Where(x => x.ValidationType is ValidationType.HybridParlayMainTicketRecover or ValidationType.HybridParlayMainTicketResettle);
+        var recoverHybridParlaySubTickets = results.Where(x => x.ValidationType is ValidationType.HybridParlaySubTicketRecover or ValidationType.HybridParlaySubTicketResettle);
 
         var output = new CheckTicketValidationOutput
         {
@@ -98,13 +103,14 @@ public class CheckTicketValidationStageImp(IDynamicRepository repository) : Chec
             RecoverCricketTickets = recoverCricketTickets,
             RecoverSingleTickets14 = recoverSingleTickets14,
             RecoverParlayTickets14 = recoverParlayTickets14,
-            RecoverHybridParlayTickets = recoverHybridParlayTickets
+            RecoverHybridParlayMainTickets = recoverHybridParlayMainTickets,
+            RecoverHybridParlaySubTickets = recoverHybridParlaySubTickets
         };
 
         logData.Add($"{nameof(CheckTicketValidationStage)}.{nameof(ExecuteForRecover)} - rSingle: {output.RecoverSingleTickets.Count()} - rParlay: {output.RecoverParlayTickets.Count()}"
                     + $" - rSubParlay: {output.RecoverSubParlayTickets.Count()} - rCricket: {output.RecoverCricketTickets.Count()}"
                     + $" - rSingle14: {output.RecoverSingleTickets14.Count()} - rParlay14: {output.RecoverParlayTickets14.Count()}"
-                    + $" - rHybridParlay: {output.RecoverHybridParlayTickets.Count()}");
+                    + $" - rHybridParlay: {output.RecoverHybridParlayMainTickets.Count()}");
 
         return output;
     }

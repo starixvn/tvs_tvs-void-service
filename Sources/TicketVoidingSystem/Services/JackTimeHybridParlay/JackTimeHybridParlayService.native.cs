@@ -5,14 +5,14 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Fanex.Logging;
-using Microsoft.Extensions.Configuration;
-using TicketVoidingSystem.Models;
+using TicketVoidingSystem.Constants;
+using TicketVoidingSystem.Models.JackTimeHybridParlay;
 
-namespace TicketVoidingSystem.Services;
+namespace TicketVoidingSystem.Services.JackTimeHybridParlay;
 
 public interface JackTimeHybridParlayService
 {
-    Task<bool> Execute(HybridParlayApiModel requestModel, bool isVoid);
+    Task<bool> Execute(HybridParlayApiModel requestModel, HybridParlayType type);
 }
 
 public class JackTimeHybridParlayServiceImp : JackTimeHybridParlayService
@@ -20,7 +20,7 @@ public class JackTimeHybridParlayServiceImp : JackTimeHybridParlayService
     private readonly HttpClient httpClient;
     private readonly string jackTimeHybridParlayUrl;
 
-    public JackTimeHybridParlayServiceImp(HttpClient client, IConfiguration configuration)
+    public JackTimeHybridParlayServiceImp(HttpClient client)
     {
         jackTimeHybridParlayUrl = AppSettingService.AppSetting.JackTimeHybridParlayUrl ?? string.Empty;
         httpClient = client;
@@ -40,9 +40,14 @@ public class JackTimeHybridParlayServiceImp : JackTimeHybridParlayService
         return dataJson;
     }
 
-    public async Task<bool> Execute(HybridParlayApiModel requestModel, bool isVoid)
+    public async Task<bool> Execute(HybridParlayApiModel requestModel, HybridParlayType type)
     {
-        var actionName = isVoid ? "VoidLegs" : "UndoVoidLegs";
+        var actionName = GetAction(type);
+        if (string.IsNullOrWhiteSpace(actionName))
+        {
+            return false;
+        }
+
         using var response = await httpClient.PostAsync(actionName, CreateRequestStringContent(requestModel));
         if (response.IsSuccessStatusCode)
         {
@@ -63,5 +68,15 @@ public class JackTimeHybridParlayServiceImp : JackTimeHybridParlayService
                $"{Environment.NewLine}RequestContent:{Environment.NewLine}{requestContent}" +
                $"{Environment.NewLine}Response:{Environment.NewLine}{response}" +
                $"{Environment.NewLine}ResponseContent:{Environment.NewLine}{responseContent}";
+    }
+
+    private static string GetAction(HybridParlayType type)
+    {
+        return type switch
+        {
+            HybridParlayType.VoidSub => "api/jacktime-cash-out/void-legs",
+            HybridParlayType.RecoverSub => "api/jacktime-cash-out/unvoid-legs",
+            _ => string.Empty
+        };
     }
 }

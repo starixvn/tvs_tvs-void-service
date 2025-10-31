@@ -1,4 +1,4 @@
-﻿namespace TVS.Void.Service.Constants;
+﻿namespace TicketVoidingSystem.Constants;
 
 public static class VoidingTypeConstant
 {
@@ -16,6 +16,14 @@ public static class VoidingTypeConstant
 
     public const byte HybridParlay = 18;
 
+    public const byte SubHybridParlay = 20;
+
+    public const byte MainHybridParlay14 = 22;
+
+    /// <summary>
+    /// RECOVER
+    /// </summary>
+
     public const byte RecoverSingle = 11;
 
     public const byte RecoverParlay = 12;
@@ -30,6 +38,10 @@ public static class VoidingTypeConstant
 
     public const byte RecoverHybridParlay = 19;
 
+    public const byte RecoverSubHybridParlay = 21;
+
+    public const byte RecoverMainHybridParlay14 = 23;
+
     public static readonly byte[] VoidingTypeRecover = [
         RecoverSingle,
         RecoverParlay,
@@ -37,6 +49,7 @@ public static class VoidingTypeConstant
         RecoverCricket,
         RecoverSingle14,
         RecoverParlay14,
-        RecoverHybridParlay
+        RecoverHybridParlay,
+        RecoverSubHybridParlay
     ];
 }
