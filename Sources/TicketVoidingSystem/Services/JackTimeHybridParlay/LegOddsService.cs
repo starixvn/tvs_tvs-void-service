@@ -19,11 +19,11 @@ public interface LegOddsService
 public class LegOddsServiceImp(IDynamicRepository repository, LoggingService loggingService)
     : LegOddsService
 {
-    public async Task<Result> Execute(int matchId, string transIds, DateTime LogDate)
+    public async Task<Result> Execute(int matchId, string transIds, DateTime logDate)
     {
         try
         {
-            var legOdds = await RetryForGetLegOdds(matchId, transIds, LogDate);
+            var legOdds = await RetryForGetLegOdds(matchId, transIds, logDate);
             if (legOdds.Any())
             {
                 return await UpdateLegOdds(legOdds);
@@ -39,31 +39,31 @@ public class LegOddsServiceImp(IDynamicRepository repository, LoggingService log
         }
     }
 
-    public async Task<IEnumerable<LegOddsModel>> RetryForGetLegOdds(int matchId, string transIds, DateTime LogDate)
+    public async Task<IEnumerable<LegOddsModel>> RetryForGetLegOdds(int matchId, string transIds, DateTime logDate)
     {
-        const byte retryCount = 12;
-        const byte retryTimes = 10;
+        const byte retryCount = 10;
+        const byte retryTimes = 5;
+        var legOdds = Enumerable.Empty<LegOddsModel>();
         await Policy
             .HandleResult<bool>(c => !c)
             .WaitAndRetryAsync(retryCount,
                 _ => TimeSpan.FromSeconds(retryTimes))
             .ExecuteAsync(async () =>
             {
-                var legOdds = await GetLegOdds(matchId, transIds, LogDate);
-
+                legOdds = await GetLegOdds(matchId, transIds, logDate);
                 return legOdds.Any();
             });
 
-        return [];
+        return legOdds;
     }
 
-    public async Task<IEnumerable<LegOddsModel>> GetLegOdds(int matchId, string transIds, DateTime LogDate)
+    public async Task<IEnumerable<LegOddsModel>> GetLegOdds(int matchId, string transIds, DateTime logDate)
     {
         var criteria = new HybridParlayGetLegOddsCriteria
         {
             MatchId = matchId,
             TransIds = transIds,
-            LogDate = LogDate
+            LogDate = logDate
         };
 
         return await repository.FetchAsync<LegOddsModel>(criteria);
