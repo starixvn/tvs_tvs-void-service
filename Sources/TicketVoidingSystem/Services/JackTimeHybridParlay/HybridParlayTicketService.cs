@@ -35,9 +35,16 @@ public class HybridParlayTicketServiceImp(
         var type = GetHybridParlayType(voidingTypeId);
         try
         {
+            //:: TODO: Remove this clearly Recover main ticket flow JackTime
+            if (type is HybridParlayType.RecoverMain)
+            {
+                return true;
+            }
+            //:: TODO: Remove this clearly Recover main ticket flow JackTime
+
             if (string.IsNullOrWhiteSpace(hybridParlayTransIds))
             {
-                return false;
+                return true;
             }
 
             var ticketType = voidingTypeMainTicket.Contains(voidingTypeId) ? HybridParlayTicketType.Main : HybridParlayTicketType.Sub;
