@@ -8,6 +8,8 @@ public class HybridParlayTicketCriteria : CriteriaBase
 {
     public string TransIds { get; set; }
 
+    public int TicketType { get; set; }
+
     [SpParam(Ignored = true)]
     public int SiteDbGroupId { get; set; }
 

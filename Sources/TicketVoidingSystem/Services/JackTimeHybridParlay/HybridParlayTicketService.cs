@@ -22,6 +22,14 @@ public class HybridParlayTicketServiceImp(
     LegOddsService legOddsService)
     : HybridParlayTicketService
 {
+    private readonly List<int> voidingTypeMainTicket =
+    [
+        VoidingTypeConstant.HybridParlay,
+        VoidingTypeConstant.MainHybridParlay14,
+        VoidingTypeConstant.RecoverHybridParlay,
+        VoidingTypeConstant.RecoverMainHybridParlay14
+    ];
+
     public async Task<bool> Execute(string hybridParlayTransIds, int siteDbGroupId, int voidingTypeId)
     {
         var type = GetHybridParlayType(voidingTypeId);
@@ -32,8 +40,9 @@ public class HybridParlayTicketServiceImp(
                 return false;
             }
 
-            var ticketsDetail = await GetTicketsDetail(hybridParlayTransIds);
-            var request = CreateRequest(ticketsDetail);
+            var ticketType = voidingTypeMainTicket.Contains(voidingTypeId) ? HybridParlayTicketType.Main : HybridParlayTicketType.Sub;
+            var ticketsDetail = await GetTicketsDetail(hybridParlayTransIds, ticketType);
+            var request = CreateRequest(ticketsDetail, ticketType);
             var logDate = DateTimeOffset.Now.DateTime;
             var isCalled = await jackTimeHybridParlayService.Execute(request, type);
             if (IsNotUpdateLegOdds(type))
@@ -58,22 +67,44 @@ public class HybridParlayTicketServiceImp(
         }
     }
 
-    public async Task<IEnumerable<HybridParlayTicketModel>> GetTicketsDetail(string transIds)
+    public async Task<IEnumerable<HybridParlayTicketModel>> GetTicketsDetail(string transIds, int ticketType)
     {
         var criteria = new HybridParlayTicketCriteria
         {
-            TransIds = transIds
+            TransIds = transIds,
+            TicketType = ticketType
         };
 
         return await repository.FetchAsync<HybridParlayTicketModel>(criteria);
     }
 
-    private static HybridParlayApiModel CreateRequest(IEnumerable<HybridParlayTicketModel> ticketsDetail)
+    private static HybridParlayApiModel CreateRequest(IEnumerable<HybridParlayTicketModel> ticketsDetail, int ticketType)
+    {
+        return ticketType is HybridParlayTicketType.Main
+            ? CreateRequestMainTicket(ticketsDetail)
+            : CreateRequestSubTicket(ticketsDetail);
+    }
+
+    private static HybridParlayApiModel CreateRequestMainTicket(IEnumerable<HybridParlayTicketModel> ticketsDetail)
+    {
+        var voidBetInfos = ticketsDetail.Select(ticket => new HybridParlayVoidBetInfo
+        {
+            TransactionId = GetTransactionId(ticket.Transdesc),
+            TransId = ticket.MainTransId,
+            CustId = ticket.CustId,
+        });
+
+        return new HybridParlayApiModel
+        {
+            VoidBetInfos = voidBetInfos
+        };
+    }
+
+    private static HybridParlayApiModel CreateRequestSubTicket(IEnumerable<HybridParlayTicketModel> ticketsDetail)
     {
         var groups = ticketsDetail.GroupBy(ticket => ticket.MainTransId);
         var voidBetInfos = groups.Select(group =>
         {
-            var mainTransId = group.Key;
             var firstItem = group.First();
             return new HybridParlayVoidBetInfo
             {
