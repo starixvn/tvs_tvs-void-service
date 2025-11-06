@@ -13,7 +13,7 @@ namespace TicketVoidingSystem.Services.JackTimeHybridParlay;
 
 public interface LegOddsService
 {
-    Task<Result> Execute(int matchId, string mainTransId, DateTime triggerTime);
+    Task<Result> Execute(int matchId, string transIds, DateTime logDate);
 }
 
 public class LegOddsServiceImp(IDynamicRepository repository, LoggingService loggingService)

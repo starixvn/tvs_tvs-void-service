@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using TicketVoidingSystem.Constants;
 using TicketVoidingSystem.Services.JackTimeHybridParlay;
-using TVS.Void.Service.Constants;
 using TVS.Void.Service.Models;
 
 namespace TVS.Void.Service.Services.Void;
@@ -42,8 +41,8 @@ public class ProcessVoidQueuesStageImp(
         {
             VoidingTypeConstant.Cricket => await ExecuteQueueForCricketTickets(siteDbGroupId, queue, NetPositionConstant.ActionVoid),
             VoidingTypeConstant.RecoverCricket => await ExecuteQueueForCricketTickets(siteDbGroupId, queue, NetPositionConstant.ActionRecover),
-            VoidingTypeConstant.HybridParlay => await ExecuteQueueForHybridParlayTickets(siteDbGroupId, queue, true),
-            VoidingTypeConstant.RecoverHybridParlay => await ExecuteQueueForHybridParlayTickets(siteDbGroupId, queue, false),
+            VoidingTypeConstant.HybridParlay => await ExecuteQueueForHybridParlayTickets(siteDbGroupId, queue),
+            VoidingTypeConstant.RecoverHybridParlay => await ExecuteQueueForHybridParlayTickets(siteDbGroupId, queue),
             _ => await ticketVoidingQueueService.ProcessVoidQueue(siteDbGroupId, queue.QueueId, null, null)
         };
     }
@@ -61,7 +60,7 @@ public class ProcessVoidQueuesStageImp(
         return voidResult;
     }
 
-    private async Task<TicketVoidingQueueModel> ExecuteQueueForHybridParlayTickets(int siteDbGroupId, TicketVoidingQueueModel queue, bool isVoid)
+    private async Task<TicketVoidingQueueModel> ExecuteQueueForHybridParlayTickets(int siteDbGroupId, TicketVoidingQueueModel queue)
     {
         var isCalledJackTimeHybridParlay = await hybridParlayTicketService.Execute(queue.TransIds, siteDbGroupId, queue.VoidingTypeId);
         return await ticketVoidingQueueService.ProcessVoidQueue(siteDbGroupId, queue.QueueId, null, isCalledJackTimeHybridParlay);

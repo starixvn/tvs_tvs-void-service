@@ -35,7 +35,11 @@ public class CheckTicketValidationStageTests
             CricketTicketsResettle = new List<RequestDetailTicketModel> { new() { ValidationType = 6 } },
             VoidSingleTickets14 = new List<RequestDetailTicketModel> { new() { ValidationType = 8 } },
             VoidParlayTickets14 = new List<RequestDetailTicketModel> { new() { ValidationType = 9 } },
-            CancelCOTickets = new List<RequestDetailTicketModel> { new() { ValidationType = 7 } }
+            CancelCOTickets = new List<RequestDetailTicketModel> { new() { ValidationType = 7 } },
+            VoidHybridParlayMainTickets = new List<RequestDetailTicketModel>(),
+            VoidHybridParlaySubTickets = new List<RequestDetailTicketModel>(),
+            HybridParlayMainTicketsResettle = new List<RequestDetailTicketModel>(),
+            HybridParlayMainTickets14 = new List<RequestDetailTicketModel>()
         };
 
         var repository = Substitute.For<IDynamicRepository>();
@@ -69,7 +73,9 @@ public class CheckTicketValidationStageTests
             RecoverSubParlayTickets = [new RequestDetailTicketModel { ValidationType = ValidationType.SubParlayTicketRecover }],
             RecoverCricketTickets = [new RequestDetailTicketModel { ValidationType = ValidationType.CricketTicketRecover }],
             RecoverSingleTickets14 = [new RequestDetailTicketModel { ValidationType = ValidationType.SingleTickets14Recover }],
-            RecoverParlayTickets14 = [new RequestDetailTicketModel { ValidationType = ValidationType.ParlayTickets14Recover }]
+            RecoverParlayTickets14 = [new RequestDetailTicketModel { ValidationType = ValidationType.ParlayTickets14Recover }],
+            RecoverHybridParlayMainTickets = new List<RequestDetailTicketModel>(),
+            RecoverHybridParlaySubTickets = new List<RequestDetailTicketModel>()
         };
         var repository = Substitute.For<IDynamicRepository>();
         repository.FetchAsync<RequestDetailTicketModel>(Arg.Any<CheckTicketsAllowToRecoverCriteria>())

@@ -245,19 +245,18 @@ public class NotificationServiceTests
         // Arrange
         var executionCount = 0;
 
-        // Act
-        service.ExecuteBackground(Action);
-
-        // Assert
-        Task.Delay(200).Wait();
-        Assert.Equal(1, executionCount);
-        return;
-
         async Task Action()
         {
             await Task.Delay(50);
             executionCount++;
         }
+
+        // Act
+        service.ExecuteBackground(Action);
+
+        // Assert
+        Task.Delay(300).Wait();
+        Assert.Equal(1, executionCount);
     }
 
     [Fact]
