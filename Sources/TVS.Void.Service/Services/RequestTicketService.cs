@@ -123,7 +123,10 @@ public class RequestTicketServiceImp(IDynamicRepository repository) : RequestTic
         int[] combineParlayVoidingTypes =
         [
             VoidingTypeConstant.Parlay, VoidingTypeConstant.Parlay14,
-            VoidingTypeConstant.RecoverParlay, VoidingTypeConstant.RecoverParlay14, VoidingTypeConstant.RecoverSubParlay
+            VoidingTypeConstant.RecoverParlay, VoidingTypeConstant.RecoverParlay14, VoidingTypeConstant.RecoverSubParlay,
+            VoidingTypeConstant.HybridParlay, VoidingTypeConstant.SubHybridParlay, VoidingTypeConstant.MainHybridParlay14,
+            VoidingTypeConstant.RecoverHybridParlay, VoidingTypeConstant.RecoverSubHybridParlay, VoidingTypeConstant.RecoverMainHybridParlay14
+
         ];
 
         var singleTickets = groupTickets.Where(x => combineSingleVoidingTypes.Contains(x.VoidingTypeId));

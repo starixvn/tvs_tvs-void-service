@@ -22,17 +22,18 @@ public class HybridParlayTicketServiceTests
     {
         // Arrange
         const int fakeSiteDbGroupId = 1;
+        const int fakeUserId = 1;
         const string fakeTransIds = "123,456";
         const int recoverMainTypeId = VoidingTypeConstant.RecoverHybridParlay;
         var service = new HybridParlayTicketServiceImp(null, null, null, null);
 
         // Act
-        var actual = await service.Execute(fakeTransIds, fakeSiteDbGroupId, recoverMainTypeId);
+        var actual = await service.Execute(fakeTransIds, fakeSiteDbGroupId, recoverMainTypeId, fakeUserId);
 
         // Assert
         Assert.True(actual);
         await jackTimeService.DidNotReceive().Execute(Arg.Any<HybridParlayApiModel>(), Arg.Any<HybridParlayType>());
-        await legOddsService.DidNotReceive().Execute(Arg.Any<int>(), Arg.Any<string>(), Arg.Any<DateTime>());
+        await legOddsService.DidNotReceive().Execute(Arg.Any<int>(), Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<int>(), Arg.Any<int>());
     }
 
     [Fact]
@@ -40,12 +41,13 @@ public class HybridParlayTicketServiceTests
     {
         // Arrange
         const int fakeSiteDbGroupId = 1;
+        const int fakeUserId = 1;
         const string emptyTransIds = "";
         const int voidMainTypeId = VoidingTypeConstant.HybridParlay;
         var service = new HybridParlayTicketServiceImp(jackTimeService, repository, loggingService, legOddsService);
 
         // Act
-        var actual = await service.Execute(emptyTransIds, fakeSiteDbGroupId, voidMainTypeId);
+        var actual = await service.Execute(emptyTransIds, fakeSiteDbGroupId, voidMainTypeId, fakeUserId);
 
         // Assert
         Assert.True(actual);
@@ -57,12 +59,13 @@ public class HybridParlayTicketServiceTests
     {
         // Arrange
         const int fakeSiteDbGroupId = 1;
+        const int fakeUserId = 1;
         const string? nullTransIds = null;
         const int voidMainTypeId = VoidingTypeConstant.HybridParlay;
         var service = new HybridParlayTicketServiceImp(jackTimeService, repository, loggingService, legOddsService);
 
         // Act
-        var actual = await service.Execute(nullTransIds, fakeSiteDbGroupId, voidMainTypeId);
+        var actual = await service.Execute(nullTransIds, fakeSiteDbGroupId, voidMainTypeId, fakeUserId);
 
         // Assert
         Assert.True(actual);
@@ -91,15 +94,16 @@ public class HybridParlayTicketServiceTests
             .Returns(true);
         repository.FetchAsync<HybridParlayTicketModel>(Arg.Any<HybridParlayTicketCriteria>())
             .ReturnsForAnyArgs(fakeTickets);
+        const int fakeUserId = 1;
         var service = new HybridParlayTicketServiceImp(jackTimeService, repository, loggingService, legOddsService);
 
         // Act
-        var actual = await service.Execute(fakeTransIds, fakeSiteDbGroupId, voidMainTypeId);
+        var actual = await service.Execute(fakeTransIds, fakeSiteDbGroupId, voidMainTypeId, fakeUserId);
 
         // Assert
         Assert.True(actual);
         await jackTimeService.Received(1).Execute(Arg.Any<HybridParlayApiModel>(), HybridParlayType.VoidMain);
-        await legOddsService.DidNotReceive().Execute(Arg.Any<int>(), Arg.Any<string>(), Arg.Any<DateTime>());
+        await legOddsService.DidNotReceive().Execute(Arg.Any<int>(), Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<int>(), Arg.Any<int>());
     }
 
     [Fact]
@@ -127,18 +131,19 @@ public class HybridParlayTicketServiceTests
             .Returns(true);
         repository.FetchAsync<HybridParlayTicketModel>(Arg.Any<HybridParlayTicketCriteria>())
             .ReturnsForAnyArgs(fakeTickets);
+        const int fakeUserId = 1;
         var successResult = new Result { ErrorCode = 0, ErrorMsg = string.Empty };
-        legOddsService.Execute(Arg.Any<int>(), Arg.Any<string>(), Arg.Any<DateTime>())
+        legOddsService.Execute(Arg.Any<int>(), Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<int>(), Arg.Any<int>())
             .Returns(successResult);
         var service = new HybridParlayTicketServiceImp(jackTimeService, repository, loggingService, legOddsService);
 
         // Act
-        var actual = await service.Execute(fakeTransIds, fakeSiteDbGroupId, voidSubTypeId);
+        var actual = await service.Execute(fakeTransIds, fakeSiteDbGroupId, voidSubTypeId, fakeUserId);
 
         // Assert
         Assert.True(actual);
         await jackTimeService.Received(1).Execute(Arg.Any<HybridParlayApiModel>(), HybridParlayType.VoidSub);
-        await legOddsService.Received(1).Execute(1, "123", Arg.Any<DateTime>());
+        await legOddsService.Received(1).Execute(1, "123", Arg.Any<DateTime>(), fakeSiteDbGroupId, fakeUserId);
     }
 
     [Fact]
@@ -164,15 +169,16 @@ public class HybridParlayTicketServiceTests
         var repository = Substitute.For<IDynamicRepository>();
         repository.FetchAsync<HybridParlayTicketModel>(Arg.Any<HybridParlayTicketCriteria>())
             .ReturnsForAnyArgs(fakeTickets);
+        const int fakeUserId = 1;
         var service = new HybridParlayTicketServiceImp(jackTimeService, repository, loggingService, legOddsService);
 
         // Act
-        var actual = await service.Execute(fakeTransIds, fakeSiteDbGroupId, voidSubTypeId);
+        var actual = await service.Execute(fakeTransIds, fakeSiteDbGroupId, voidSubTypeId, fakeUserId);
 
         // Assert
         Assert.False(actual);
         await jackTimeService.Received(1).Execute(Arg.Any<HybridParlayApiModel>(), HybridParlayType.VoidSub);
-        await legOddsService.DidNotReceive().Execute(Arg.Any<int>(), Arg.Any<string>(), Arg.Any<DateTime>());
+        await legOddsService.DidNotReceive().Execute(Arg.Any<int>(), Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<int>(), Arg.Any<int>());
     }
 
     [Fact]
@@ -182,13 +188,14 @@ public class HybridParlayTicketServiceTests
         const int fakeSiteDbGroupId = 1;
         const string fakeTransIds = "123,456";
         const int voidMainTypeId = VoidingTypeConstant.HybridParlay;
+        const int fakeUserId = 1;
         var exception = new Exception("Test exception");
         repository.FetchAsync<HybridParlayTicketModel>(Arg.Any<HybridParlayTicketCriteria>())
             .Returns(Task.FromException<IEnumerable<HybridParlayTicketModel>>(exception));
         var service = new HybridParlayTicketServiceImp(jackTimeService, repository, loggingService, legOddsService);
 
         // Act
-        var actual = await service.Execute(fakeTransIds, fakeSiteDbGroupId, voidMainTypeId);
+        var actual = await service.Execute(fakeTransIds, fakeSiteDbGroupId, voidMainTypeId, fakeUserId);
 
         // Assert
         Assert.True(actual); // IsNotUpdateLegOdds returns true for VoidMain

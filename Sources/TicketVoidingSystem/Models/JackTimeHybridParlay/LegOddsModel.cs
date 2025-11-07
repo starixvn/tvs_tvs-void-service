@@ -3,6 +3,6 @@
 public class LegOddsModel
 {
     public int MatchId { get; set; }
-    public long TransIds { get; set; }
+    public long TransId { get; set; }
     public decimal Odds { get; set; }
 }
