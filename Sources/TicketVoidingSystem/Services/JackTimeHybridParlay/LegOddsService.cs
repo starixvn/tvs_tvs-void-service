@@ -13,20 +13,20 @@ namespace TicketVoidingSystem.Services.JackTimeHybridParlay;
 
 public interface LegOddsService
 {
-    Task<Result> Execute(int matchId, string transIds, DateTime logDate);
+    Task<Result> Execute(int matchId, string transIds, DateTime logDate, int siteDbGroupId, int userId);
 }
 
 public class LegOddsServiceImp(IDynamicRepository repository, LoggingService loggingService)
     : LegOddsService
 {
-    public async Task<Result> Execute(int matchId, string transIds, DateTime logDate)
+    public async Task<Result> Execute(int matchId, string transIds, DateTime logDate, int siteDbGroupId, int userId)
     {
         try
         {
             var legOdds = await RetryForGetLegOdds(matchId, transIds, logDate);
             if (legOdds.Any())
             {
-                return await UpdateLegOdds(legOdds);
+                return await UpdateLegOdds(legOdds, matchId, siteDbGroupId, userId);
             }
 
             return BuildErrorResult("Cannot get legOdds. Please try again!");
@@ -69,11 +69,14 @@ public class LegOddsServiceImp(IDynamicRepository repository, LoggingService log
         return await repository.FetchAsync<LegOddsModel>(criteria);
     }
 
-    public async Task<Result> UpdateLegOdds(IEnumerable<LegOddsModel> legOdds)
+    public async Task<Result> UpdateLegOdds(IEnumerable<LegOddsModel> legOdds, int matchId, int siteDbGroupId, int userId)
     {
         var criteria = new HybridParlayUpdateLegOddsCriteria
         {
-            LegOddsJson = JsonSerializer.Serialize(legOdds)
+            LegOddsJson = JsonSerializer.Serialize(legOdds),
+            MatchId = matchId,
+            Creator = userId,
+            SiteDbGroupId = siteDbGroupId
         };
 
         return await repository.GetAsync<Result>(criteria);

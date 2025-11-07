@@ -79,4 +79,21 @@
         <Setting Key="DBCTG.NAP_TicketVoiding_NetPosition" SpName="NAP_TicketVoiding_NetPosition" DbName="DBCTG.bodb02.wsv_nap" TimeOut="600" />
         <Setting Key="DBSITE03.NAP_TicketVoiding_NetPosition" SpName="NAP_TicketVoiding_NetPosition" DbName="DBSITE03.bodb02.wsv_nap" TimeOut="600" />
     </Function>
+
+    <Setting Key="DBCTG.NAP_Admin_HybridParlay_LegOddsUpd" SpName="NAP_Admin_HybridParlay_LegOddsUpd" DbName="DBCTG.bodb02.wsv_nap" TimeOut="600">
+        <Mapping DataField="ErrCode" ObjectProperty="ErrorCode" />
+        <Mapping DataField="ErrMsg" ObjectProperty="ErrorMsg" />
+    </Setting>
+    <Setting Key="DBSITE01.NAP_Admin_HybridParlay_LegOddsUpd" SpName="NAP_Admin_HybridParlay_LegOddsUpd" DbName="DBSITE01.bodb02.wsv_nap" TimeOut="600">
+        <Mapping DataField="ErrCode" ObjectProperty="ErrorCode" />
+        <Mapping DataField="ErrMsg" ObjectProperty="ErrorMsg" />
+    </Setting>
+    <Setting Key="DBSITE02.NAP_Admin_HybridParlay_LegOddsUpd" SpName="NAP_Admin_HybridParlay_LegOddsUpd" DbName="DBSITE02.bodb02.wsv_nap" TimeOut="600">
+        <Mapping DataField="ErrCode" ObjectProperty="ErrorCode" />
+        <Mapping DataField="ErrMsg" ObjectProperty="ErrorMsg" />
+    </Setting>
+    <Setting Key="DBSITE03.NAP_Admin_HybridParlay_LegOddsUpd" SpName="NAP_Admin_HybridParlay_LegOddsUpd" DbName="DBSITE03.bodb02.wsv_nap" TimeOut="600">
+        <Mapping DataField="ErrCode" ObjectProperty="ErrorCode" />
+        <Mapping DataField="ErrMsg" ObjectProperty="ErrorMsg" />
+    </Setting>
 </Functions>

@@ -12,7 +12,7 @@ namespace TicketVoidingSystem.Services.JackTimeHybridParlay;
 
 public interface HybridParlayTicketService
 {
-    Task<bool> Execute(string hybridParlayTransIds, int siteDbGroupId, int voidingTypeId);
+    Task<bool> Execute(string hybridParlayTransIds, int siteDbGroupId, int voidingTypeId, int userId);
 }
 
 public class HybridParlayTicketServiceImp(
@@ -30,7 +30,7 @@ public class HybridParlayTicketServiceImp(
         VoidingTypeConstant.RecoverMainHybridParlay14
     ];
 
-    public async Task<bool> Execute(string hybridParlayTransIds, int siteDbGroupId, int voidingTypeId)
+    public async Task<bool> Execute(string hybridParlayTransIds, int siteDbGroupId, int voidingTypeId, int userId)
     {
         var type = GetHybridParlayType(voidingTypeId);
         try
@@ -60,7 +60,7 @@ public class HybridParlayTicketServiceImp(
             if (isCalled)
             {
                 var mainTransIds = string.Join(",", ticketsDetail.Select(x => x.MainTransId));
-                var result = await legOddsService.Execute(ticketsDetail.First().SubMatchId, mainTransIds, logDate);
+                var result = await legOddsService.Execute(ticketsDetail.First().SubMatchId, mainTransIds, logDate, siteDbGroupId, userId);
 
                 return result.IsSuccessful;
             }
