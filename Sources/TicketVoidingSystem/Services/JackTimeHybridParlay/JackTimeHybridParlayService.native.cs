@@ -74,9 +74,9 @@ public class JackTimeHybridParlayServiceImp : JackTimeHybridParlayService
     {
         return type switch
         {
-            HybridParlayType.VoidMain => "api/jacktime-cash-out/void-bet",
-            HybridParlayType.VoidSub => "api/jacktime-cash-out/void-legs",
-            HybridParlayType.RecoverSub => "api/jacktime-cash-out/unvoid-legs",
+            HybridParlayType.VoidMain => "jacktime-cash-out/void-bet",
+            HybridParlayType.VoidSub => "jacktime-cash-out/void-legs",
+            HybridParlayType.RecoverSub => "jacktime-cash-out/unvoid-legs",
             _ => string.Empty
         };
     }
