@@ -41,8 +41,13 @@ public class ProcessVoidQueuesStageImp(
         {
             VoidingTypeConstant.Cricket => await ExecuteQueueForCricketTickets(siteDbGroupId, queue, NetPositionConstant.ActionVoid),
             VoidingTypeConstant.RecoverCricket => await ExecuteQueueForCricketTickets(siteDbGroupId, queue, NetPositionConstant.ActionRecover),
-            VoidingTypeConstant.HybridParlay => await ExecuteQueueForHybridParlayTickets(siteDbGroupId, queue),
-            VoidingTypeConstant.RecoverHybridParlay => await ExecuteQueueForHybridParlayTickets(siteDbGroupId, queue),
+            VoidingTypeConstant.HybridParlay
+                or VoidingTypeConstant.MainHybridParlay14
+                or VoidingTypeConstant.SubHybridParlay
+                or VoidingTypeConstant.RecoverHybridParlay
+                or VoidingTypeConstant.RecoverMainHybridParlay14
+                or VoidingTypeConstant.RecoverSubHybridParlay
+                => await ExecuteQueueForHybridParlayTickets(siteDbGroupId, queue),
             _ => await ticketVoidingQueueService.ProcessVoidQueue(siteDbGroupId, queue.QueueId, null, null)
         };
     }

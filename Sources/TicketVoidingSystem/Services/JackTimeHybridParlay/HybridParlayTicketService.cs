@@ -76,13 +76,20 @@ public class HybridParlayTicketServiceImp(
 
     public async Task<IEnumerable<HybridParlayTicketModel>> GetTicketsDetail(string transIds, int ticketType)
     {
-        var criteria = new HybridParlayTicketCriteria
+        var tasks = SiteDbGroupConstant.ServerList.Select(x =>
         {
-            TransIds = transIds,
-            TicketType = ticketType
-        };
+            var criteria = new HybridParlayTicketCriteria
+            {
+                TransIds = transIds,
+                TicketType = ticketType,
+                SiteDbGroupId = x.Id
+            };
 
-        return await repository.FetchAsync<HybridParlayTicketModel>(criteria);
+            return repository.FetchAsync<HybridParlayTicketModel>(criteria);
+        });
+
+        var tasksResults = await Task.WhenAll(tasks);
+        return tasksResults.SelectMany(data => data);
     }
 
     private static HybridParlayApiModel CreateRequest(IEnumerable<HybridParlayTicketModel> ticketsDetail, int ticketType)
