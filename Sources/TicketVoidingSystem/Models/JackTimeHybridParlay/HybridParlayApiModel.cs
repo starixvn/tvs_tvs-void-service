@@ -12,7 +12,8 @@ public class HybridParlayVoidBetInfo
     public string TransactionId { get; set; }
     public string TransId { get; set; }
     public int CustId { get; set; }
-    public IEnumerable<LegModel> Legs { get; set; }
+    public string MatchId { get; set; }
+    public IEnumerable<LegModel> Selections { get; set; }
 }
 
 public class LegModel

@@ -120,23 +120,33 @@ public class HybridParlayTicketServiceImp(
         var voidBetInfos = groups.Select(group =>
         {
             var firstItem = group.First();
+            var isVoidAllSelectInLeg = group.ToList().Count == firstItem.SelectionCount;
+
             return new HybridParlayVoidBetInfo
             {
                 TransactionId = GetTransactionId(firstItem.Transdesc),
                 TransId = firstItem.MainTransId,
                 CustId = firstItem.CustId,
-                Legs = group.Select(item => new LegModel
-                {
-                    WayId = item.SubBetTeam,
-                    MatchId = item.SubMatchId,
-                    MarketId = $"{item.SubMatchId}_{item.SubBetTypeId}_{item.SubHdp1}"
-                })
+                MatchId = isVoidAllSelectInLeg ? firstItem.SubMatchId.ToString() : "",
+                Selections = isVoidAllSelectInLeg ? [] : group.Select(CreateLegModel)
             };
         });
 
         return new HybridParlayApiModel
         {
             VoidBetInfos = voidBetInfos
+        };
+    }
+
+    private static LegModel CreateLegModel(HybridParlayTicketModel item)
+    {
+        var quarter = GetQuarter(item.SubBetCheck);
+        var hdp = GetHdp(item.SubHdp1, item.SubHdp2, item.SubBetTypeId);
+        return new LegModel
+        {
+            WayId = GetWayId(item.SubBetTeam),
+            MatchId = item.SubMatchId,
+            MarketId = $"{item.SubMatchId}_{item.SubBetTypeId}_{quarter}_{hdp}"
         };
     }
 
@@ -149,6 +159,27 @@ public class HybridParlayTicketServiceImp(
     {
         using var doc = JsonDocument.Parse(transdesc);
         return doc.RootElement.GetProperty("id").GetString();
+    }
+
+    private static decimal GetHdp(decimal hdp1, decimal hdp2, int betType)
+    {
+        List<int> betTypesHandicap = [1, 7, 20, 21, 609, 612];
+        return betTypesHandicap.Contains(betType) ? hdp2 - hdp1 : hdp1;
+    }
+
+    private static string GetWayId(string betTeam)
+    {
+        List<string> betTeamsWay1 = ["h", "a"];
+        return betTeamsWay1.Contains(betTeam.ToLower()) ? "way1" : "way2";
+    }
+
+    private static string GetQuarter(string betCheck)
+    {
+        if (string.IsNullOrWhiteSpace(betCheck) || betCheck.Length < 2)
+        {
+            return "0";
+        }
+        return betCheck[^2..];
     }
 
     private static HybridParlayType GetHybridParlayType(int voidingTypeId)
