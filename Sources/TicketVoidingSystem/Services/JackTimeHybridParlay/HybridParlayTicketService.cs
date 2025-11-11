@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -51,20 +52,19 @@ public class HybridParlayTicketServiceImp(
             var ticketsDetail = await GetTicketsDetail(hybridParlayTransIds, ticketType);
             var request = CreateRequest(ticketsDetail, ticketType);
             var logDate = DateTimeOffset.Now.DateTime;
+
             var isCalled = await jackTimeHybridParlayService.Execute(request, type);
             if (IsNotUpdateLegOdds(type))
             {
                 return true; // No need to call leg odds service for voiding or recovering main bets & don't care status call JackTime
             }
 
-            return true;
-
             if (isCalled)
             {
                 var mainTransIds = string.Join(",", ticketsDetail.Select(x => x.MainTransId));
                 var result = await legOddsService.Execute(ticketsDetail.First().SubMatchId, mainTransIds, logDate, siteDbGroupId, userId);
 
-                return result.IsSuccessful;
+                return result;
             }
 
             return false;
@@ -122,7 +122,9 @@ public class HybridParlayTicketServiceImp(
         var voidBetInfos = groups.Select(group =>
         {
             var firstItem = group.First();
-            var isVoidAllSelectInLeg = group.ToList().Count == firstItem.SelectionCount;
+            //::TODO : Fix isVoidAllSelectInLeg logic
+            //var isVoidAllSelectInLeg = group.ToList().Count == firstItem.SelectionCount;
+            var isVoidAllSelectInLeg = false;
 
             return new HybridParlayVoidBetInfo
             {
@@ -163,10 +165,12 @@ public class HybridParlayTicketServiceImp(
         return doc.RootElement.GetProperty("id").GetString();
     }
 
-    private static decimal GetHdp(decimal hdp1, decimal hdp2, int betType)
+    private static string GetHdp(decimal hdp1, decimal hdp2, int betType)
     {
         List<int> betTypesHandicap = [1, 7, 20, 21, 609, 612];
-        return betTypesHandicap.Contains(betType) ? hdp2 - hdp1 : hdp1;
+        var value = betTypesHandicap.Contains(betType) ? hdp2 - hdp1 : hdp1;
+
+        return value.ToString("G29", CultureInfo.InvariantCulture);
     }
 
     private static string GetWayId(string betTeam)

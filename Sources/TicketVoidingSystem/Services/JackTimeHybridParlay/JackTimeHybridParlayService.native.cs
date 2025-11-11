@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net.Http;
+using System.Net.Http.Json;
 using System.Net.Mime;
 using System.Text;
 using System.Text.Json;
@@ -19,6 +20,7 @@ public class JackTimeHybridParlayServiceImp : JackTimeHybridParlayService
 {
     private readonly HttpClient httpClient;
     private readonly string jackTimeHybridParlayUrl;
+    public record ApiResponse(string ErrMsg, bool IsSuccessful, object Data);
 
     public JackTimeHybridParlayServiceImp(HttpClient client)
     {
@@ -52,7 +54,9 @@ public class JackTimeHybridParlayServiceImp : JackTimeHybridParlayService
         if (response.IsSuccessStatusCode)
         {
             await LogService.InfoAsync(await CreateLogResponse(actionName, response));
-            return true;
+            var responseContent = await response.Content.ReadFromJsonAsync<ApiResponse>();
+
+            return responseContent.IsSuccessful;
         }
 
         await LogService.ErrorAsync(await CreateLogResponse(actionName, response));

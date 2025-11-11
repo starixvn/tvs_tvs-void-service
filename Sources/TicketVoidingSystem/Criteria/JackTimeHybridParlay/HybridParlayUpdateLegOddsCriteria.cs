@@ -4,13 +4,17 @@ using TicketVoidingSystem.Utilities;
 
 namespace TicketVoidingSystem.Criteria.JackTimeHybridParlay;
 
-public class HybridParlayUpdateLegOddsCriteria : CriteriaBase
+public class HybridParlayUpdateLegOddsCriteria : NonQueryCommand
 {
     public string LegOddsJson { get; set; }
 
     public int MatchId { get; set; }
 
     public int Creator { get; set; }
+
+    public int ErrCode { get; set; }
+
+    public string ErrMsg { get; set; }
 
     [SpParam(Ignored = true)]
     public int SiteDbGroupId { get; set; }
