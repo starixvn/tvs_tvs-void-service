@@ -57,6 +57,8 @@ public class HybridParlayTicketServiceImp(
                 return true; // No need to call leg odds service for voiding or recovering main bets & don't care status call JackTime
             }
 
+            return true;
+
             if (isCalled)
             {
                 var mainTransIds = string.Join(",", ticketsDetail.Select(x => x.MainTransId));
