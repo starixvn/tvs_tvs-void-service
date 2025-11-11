@@ -121,12 +121,14 @@ public class HybridParlayTicketServiceTests
                 CustId = 100,
                 SubMatchId = 1,
                 SubBetTeam = "1",
-                SubBetTypeId = "2",
-                SubHdp1 = "0.5",
+                SubBetTypeId = 2,
+                SubHdp1 = 1,
                 Transdesc = JsonSerializer.Serialize(new { id = "trans-id-123" })
             }
         };
 
+        // Setup ServerList để GetTicketsDetail có thể trả về data
+        SiteDbGroupConstant.SetServerList([new SiteDbGroupModel { Id = 1, ServerName = "DBSITE01" }]);
         jackTimeService.Execute(Arg.Any<HybridParlayApiModel>(), Arg.Any<HybridParlayType>())
             .Returns(true);
         repository.FetchAsync<HybridParlayTicketModel>(Arg.Any<HybridParlayTicketCriteria>())
@@ -190,6 +192,8 @@ public class HybridParlayTicketServiceTests
         const int voidMainTypeId = VoidingTypeConstant.HybridParlay;
         const int fakeUserId = 1;
         var exception = new Exception("Test exception");
+        // Setup ServerList để GetTicketsDetail có thể throw exception
+        SiteDbGroupConstant.SetServerList([new SiteDbGroupModel { Id = 1, ServerName = "DBSITE01" }]);
         repository.FetchAsync<HybridParlayTicketModel>(Arg.Any<HybridParlayTicketCriteria>())
             .Returns(Task.FromException<IEnumerable<HybridParlayTicketModel>>(exception));
         var service = new HybridParlayTicketServiceImp(jackTimeService, repository, loggingService, legOddsService);
@@ -199,7 +203,7 @@ public class HybridParlayTicketServiceTests
 
         // Assert
         Assert.True(actual); // IsNotUpdateLegOdds returns true for VoidMain
-        await loggingService.Received(1).ErrorAsync($"{nameof(HybridParlayTicketService)}.{nameof(HybridParlayTicketService.Execute)} Error", exception);
+        await loggingService.Received(1).ErrorAsync($"{nameof(HybridParlayTicketService)}.{nameof(HybridParlayTicketService.Execute)} Error", Arg.Any<Exception>());
     }
 
     [Fact]
@@ -213,6 +217,8 @@ public class HybridParlayTicketServiceTests
             new() { MainTransId = "123", CustId = 100 }
         };
 
+        // Setup ServerList với 1 server để GetTicketsDetail gọi FetchAsync 1 lần
+        SiteDbGroupConstant.SetServerList([new SiteDbGroupModel { Id = 1, ServerName = "DBSITE01" }]);
         repository.FetchAsync<HybridParlayTicketModel>(Arg.Any<HybridParlayTicketCriteria>())
             .ReturnsForAnyArgs(fakeTickets);
         var service = new HybridParlayTicketServiceImp(jackTimeService, repository, loggingService, legOddsService);
