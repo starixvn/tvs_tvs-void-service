@@ -134,9 +134,8 @@ public class HybridParlayTicketServiceTests
         repository.FetchAsync<HybridParlayTicketModel>(Arg.Any<HybridParlayTicketCriteria>())
             .ReturnsForAnyArgs(fakeTickets);
         const int fakeUserId = 1;
-        var successResult = new Result { ErrorCode = 0, ErrorMsg = string.Empty };
         legOddsService.Execute(Arg.Any<int>(), Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<int>(), Arg.Any<int>())
-            .Returns(successResult);
+            .Returns(true);
         var service = new HybridParlayTicketServiceImp(jackTimeService, repository, loggingService, legOddsService);
 
         // Act
