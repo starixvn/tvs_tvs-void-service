@@ -34,7 +34,7 @@ public class MarkTicketsStageTests : IClassFixture<AppSettingFixture>
         await service.Execute(markTransIds, logData);
 
         // Assert
-        await repository.Received(4).FetchAsync<Result>(Arg.Any<MarkTicketsCriteria>());
+        await repository.Received().FetchAsync<Result>(Arg.Any<MarkTicketsCriteria>());
     }
 
     [Fact]

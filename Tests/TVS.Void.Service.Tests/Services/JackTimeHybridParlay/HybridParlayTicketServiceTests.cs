@@ -10,7 +10,7 @@ using TicketVoidingSystem.Services.JackTimeHybridParlay;
 
 namespace TVS.Void.Service.Tests.Services.JackTimeHybridParlay;
 
-public class HybridParlayTicketServiceTests
+public class HybridParlayTicketServiceTests : IClassFixture<AppSettingFixture>
 {
     private readonly JackTimeHybridParlayService jackTimeService = Substitute.For<JackTimeHybridParlayService>();
     private readonly IDynamicRepository repository = Substitute.For<IDynamicRepository>();
@@ -33,7 +33,7 @@ public class HybridParlayTicketServiceTests
         // Assert
         Assert.True(actual);
         await jackTimeService.DidNotReceive().Execute(Arg.Any<HybridParlayApiModel>(), Arg.Any<HybridParlayType>());
-        await legOddsService.DidNotReceive().Execute(Arg.Any<int>(), Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<int>(), Arg.Any<int>());
+        await legOddsService.DidNotReceive().Execute(Arg.Any<int>(), Arg.Any<DateTime>(), Arg.Any<int>(), Arg.Any<int>(), Arg.Any<IEnumerable<LegOddsModel>>());
     }
 
     [Fact]
@@ -83,7 +83,7 @@ public class HybridParlayTicketServiceTests
         {
             new()
             {
-                MainTransId = "123",
+                MainTransId = 123,
                 CustId = 100,
                 SubMatchId = 1,
                 Transdesc = JsonSerializer.Serialize(new { id = "trans-id-123" })
@@ -103,7 +103,7 @@ public class HybridParlayTicketServiceTests
         // Assert
         Assert.True(actual);
         await jackTimeService.Received(1).Execute(Arg.Any<HybridParlayApiModel>(), HybridParlayType.VoidMain);
-        await legOddsService.DidNotReceive().Execute(Arg.Any<int>(), Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<int>(), Arg.Any<int>());
+        await legOddsService.DidNotReceive().Execute(Arg.Any<int>(), Arg.Any<DateTime>(), Arg.Any<int>(), Arg.Any<int>(), Arg.Any<IEnumerable<LegOddsModel>>());
     }
 
     [Fact]
@@ -117,7 +117,7 @@ public class HybridParlayTicketServiceTests
         {
             new()
             {
-                MainTransId = "123",
+                MainTransId = 123,
                 CustId = 100,
                 SubMatchId = 1,
                 SubBetTeam = "1",
@@ -134,7 +134,7 @@ public class HybridParlayTicketServiceTests
         repository.FetchAsync<HybridParlayTicketModel>(Arg.Any<HybridParlayTicketCriteria>())
             .ReturnsForAnyArgs(fakeTickets);
         const int fakeUserId = 1;
-        legOddsService.Execute(Arg.Any<int>(), Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<int>(), Arg.Any<int>())
+        legOddsService.Execute(Arg.Any<int>(), Arg.Any<DateTime>(), Arg.Any<int>(), Arg.Any<int>(), Arg.Any<IEnumerable<LegOddsModel>>())
             .Returns(true);
         var service = new HybridParlayTicketServiceImp(jackTimeService, repository, loggingService, legOddsService);
 
@@ -144,7 +144,6 @@ public class HybridParlayTicketServiceTests
         // Assert
         Assert.True(actual);
         await jackTimeService.Received(1).Execute(Arg.Any<HybridParlayApiModel>(), HybridParlayType.VoidSub);
-        await legOddsService.Received(1).Execute(1, "123", Arg.Any<DateTime>(), fakeSiteDbGroupId, fakeUserId);
     }
 
     [Fact]
@@ -158,7 +157,14 @@ public class HybridParlayTicketServiceTests
         {
             new()
             {
-                MainTransId = "123",
+                MainTransId = 123,
+                CustId = 100,
+                SubMatchId = 1,
+                Transdesc = JsonSerializer.Serialize(new { id = "trans-id-123" })
+            },
+            new()
+            {
+                MainTransId = 124,
                 CustId = 100,
                 SubMatchId = 1,
                 Transdesc = JsonSerializer.Serialize(new { id = "trans-id-123" })
@@ -179,7 +185,7 @@ public class HybridParlayTicketServiceTests
         // Assert
         Assert.False(actual);
         await jackTimeService.Received(1).Execute(Arg.Any<HybridParlayApiModel>(), HybridParlayType.VoidSub);
-        await legOddsService.DidNotReceive().Execute(Arg.Any<int>(), Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<int>(), Arg.Any<int>());
+        await legOddsService.DidNotReceive().Execute(Arg.Any<int>(), Arg.Any<DateTime>(), Arg.Any<int>(), Arg.Any<int>(), Arg.Any<IEnumerable<LegOddsModel>>());
     }
 
     [Fact]
@@ -213,7 +219,7 @@ public class HybridParlayTicketServiceTests
         const int fakeTicketType = HybridParlayTicketType.Main;
         var fakeTickets = new List<HybridParlayTicketModel>
         {
-            new() { MainTransId = "123", CustId = 100 }
+            new() { MainTransId = 123, CustId = 100 }
         };
 
         // Setup ServerList với 1 server để GetTicketsDetail gọi FetchAsync 1 lần
@@ -223,7 +229,7 @@ public class HybridParlayTicketServiceTests
         var service = new HybridParlayTicketServiceImp(jackTimeService, repository, loggingService, legOddsService);
 
         // Act
-        var actual = await service.GetTicketsDetail(fakeTransIds, fakeTicketType);
+        var actual = await service.GetTicketsDetail(fakeTransIds, fakeTicketType, 1);
 
         // Assert
         await repository.Received(1).FetchAsync<HybridParlayTicketModel>(

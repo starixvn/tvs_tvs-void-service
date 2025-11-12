@@ -54,7 +54,7 @@ public class LegOddsServiceTests
         var service = new LegOddsServiceImp(repository, loggingService);
 
         // Act
-        var actual = await service.Execute(fakeMatchId, fakeTransIds, fakeLogDate, fakeSiteDbGroupId, fakeUserId);
+        var actual = await service.Execute(fakeMatchId, fakeLogDate, fakeSiteDbGroupId, fakeUserId, fakeLegOdds);
 
         // Assert
         // Verify RetryForGetLegOdds được gọi (thông qua GetLegOdds)
@@ -135,7 +135,7 @@ public class LegOddsServiceTests
         var service = new LegOddsServiceImp(repository, loggingService);
 
         // Act
-        var actual = await service.Execute(fakeMatchId, fakeTransIds, fakeLogDate, fakeSiteDbGroupId, fakeUserId);
+        var actual = await service.Execute(fakeMatchId, fakeLogDate, fakeSiteDbGroupId, fakeUserId, fakeLegOdds);
 
         // Assert
         if (actual)
@@ -156,18 +156,25 @@ public class LegOddsServiceTests
     {
         // Arrange
         const int fakeMatchId = 1;
-        const string fakeTransIds = "123,456";
         var fakeLogDate = DateTime.Now;
         const int fakeSiteDbGroupId = 1;
         const int fakeUserId = 1;
         var emptyLegOdds = Enumerable.Empty<LegOddsModel>();
-
+        var fakeLegOdds = new List<LegOddsModel>
+        {
+            new()
+            {
+                MatchId = fakeMatchId,
+                TransId = 100,
+                Odds = 1.5m
+            }
+        };
         repository.FetchAsync<LegOddsModel>(Arg.Any<HybridParlayGetLegOddsCriteria>())
             .ReturnsForAnyArgs(emptyLegOdds);
         var service = new LegOddsServiceImp(repository, loggingService);
 
         // Act
-        var actual = await service.Execute(fakeMatchId, fakeTransIds, fakeLogDate, fakeSiteDbGroupId, fakeUserId);
+        var actual = await service.Execute(fakeMatchId, fakeLogDate, fakeSiteDbGroupId, fakeUserId, fakeLegOdds);
 
         // Assert
         Assert.False(actual);
@@ -184,13 +191,21 @@ public class LegOddsServiceTests
         const int fakeSiteDbGroupId = 1;
         const int fakeUserId = 1;
         var exception = new Exception("Test exception");
-
+        var fakeLegOdds = new List<LegOddsModel>
+        {
+            new()
+            {
+                MatchId = fakeMatchId,
+                TransId = 100,
+                Odds = 1.5m
+            }
+        };
         repository.FetchAsync<LegOddsModel>(Arg.Any<HybridParlayGetLegOddsCriteria>())
             .Returns(Task.FromException<IEnumerable<LegOddsModel>>(exception));
         var service = new LegOddsServiceImp(repository, loggingService);
 
         // Act
-        var actual = await service.Execute(fakeMatchId, fakeTransIds, fakeLogDate, fakeSiteDbGroupId, fakeUserId);
+        var actual = await service.Execute(fakeMatchId, fakeLogDate, fakeSiteDbGroupId, fakeUserId, fakeLegOdds);
 
         // Assert
         Assert.False(actual);
@@ -221,7 +236,7 @@ public class LegOddsServiceTests
         // Act & Assert
         try
         {
-            var actual = await service.GetLegOdds(fakeMatchId, fakeTransIds, fakeLogDate);
+            var actual = await service.GetLegOdds(fakeMatchId, fakeLogDate, fakeLegOdds);
             await repository.Received(1).FetchAsync<LegOddsModel>(
                 Arg.Is<HybridParlayGetLegOddsCriteria>(x =>
                     x.MatchId == fakeMatchId && x.TransIds == fakeTransIds && x.LogDate == fakeLogDate));
@@ -278,20 +293,5 @@ public class LegOddsServiceTests
                 x.Creator == fakeUserId &&
                 x.SiteDbGroupId == fakeSiteDbGroupId));
         Assert.True(actual);
-    }
-
-    [Fact]
-    public void BuildErrorResult_ShouldReturnErrorResult()
-    {
-        // Arrange
-        const string errorMsg = "Test error message";
-
-        // Act
-        var actual = LegOddsServiceImp.BuildErrorResult(errorMsg);
-
-        // Assert
-        Assert.NotNull(actual);
-        Assert.Equal(1, actual.ErrorCode);
-        Assert.Equal(errorMsg, actual.ErrorMsg);
     }
 }

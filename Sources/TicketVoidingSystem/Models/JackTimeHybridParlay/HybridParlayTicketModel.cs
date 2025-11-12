@@ -2,9 +2,9 @@
 
 public class HybridParlayTicketModel
 {
-    public string MainTransId { get; set; }
+    public long MainTransId { get; set; }
     public int CustId { get; set; }
-    public string SubTransId { get; set; }
+    public long SubTransId { get; set; }
     public int SubMatchId { get; set; }
     public string SubBetTeam { get; set; }
     public int SubBetTypeId { get; set; }

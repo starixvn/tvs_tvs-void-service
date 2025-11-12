@@ -8,6 +8,7 @@ using Fanex.Data.Repository;
 using TicketVoidingSystem.Constants;
 using TicketVoidingSystem.Criteria.JackTimeHybridParlay;
 using TicketVoidingSystem.Models.JackTimeHybridParlay;
+using TicketVoidingSystem.Utilities;
 
 namespace TicketVoidingSystem.Services.JackTimeHybridParlay;
 
@@ -49,20 +50,19 @@ public class HybridParlayTicketServiceImp(
             }
 
             var ticketType = voidingTypeMainTicket.Contains(voidingTypeId) ? HybridParlayTicketType.Main : HybridParlayTicketType.Sub;
-            var ticketsDetail = await GetTicketsDetail(hybridParlayTransIds, ticketType);
-            var request = CreateRequest(ticketsDetail, ticketType);
+            var ticketsDetail = (await GetTicketsDetail(hybridParlayTransIds, ticketType, siteDbGroupId)).ToList();
+            var (requestApiModel, ticketsWaitToUpdateOdds) = CreateRequest(ticketsDetail, ticketType);
             var logDate = DateTimeOffset.Now.DateTime;
 
-            var isCalled = await jackTimeHybridParlayService.Execute(request, type);
-            if (IsNotUpdateLegOdds(type))
+            var isCalled = await jackTimeHybridParlayService.Execute(requestApiModel, type);
+            if (IsNotUpdateLegOdds(type) || !ticketsWaitToUpdateOdds.Any())
             {
                 return true; // No need to call leg odds service for voiding or recovering main bets & don't care status call JackTime
             }
 
             if (isCalled)
             {
-                var mainTransIds = string.Join(",", ticketsDetail.Select(x => x.MainTransId));
-                var result = await legOddsService.Execute(ticketsDetail.First().SubMatchId, mainTransIds, logDate, siteDbGroupId, userId);
+                var result = await legOddsService.Execute(ticketsDetail[0].SubMatchId, logDate, siteDbGroupId, userId, ticketsWaitToUpdateOdds);
 
                 return result;
             }
@@ -76,67 +76,72 @@ public class HybridParlayTicketServiceImp(
         }
     }
 
-    public async Task<IEnumerable<HybridParlayTicketModel>> GetTicketsDetail(string transIds, int ticketType)
+    public async Task<IEnumerable<HybridParlayTicketModel>> GetTicketsDetail(string transIds, int ticketType, int siteDbGroupId)
     {
-        var tasks = SiteDbGroupConstant.ServerList.Select(x =>
+        var criteria = new HybridParlayTicketCriteria
         {
-            var criteria = new HybridParlayTicketCriteria
-            {
-                TransIds = transIds,
-                TicketType = ticketType,
-                SiteDbGroupId = x.Id
-            };
+            TransIds = transIds,
+            TicketType = ticketType,
+            SiteDbGroupId = siteDbGroupId
+        };
+        var result = await repository.FetchAsync<HybridParlayTicketModel>(criteria);
+        await loggingService.InfoAsync($"Hybrid Parlay - GetTicketsDetail: {transIds} \n" +
+                                       $"ticketType: {ticketType} \n" +
+                                       $"siteDbGroupId: {siteDbGroupId} \n" +
+                                       $"response: {Helper.JsonSerializerUnsafeRelaxed(result)}");
 
-            return repository.FetchAsync<HybridParlayTicketModel>(criteria);
-        });
-
-        var tasksResults = await Task.WhenAll(tasks);
-        return tasksResults.SelectMany(data => data);
+        return result;
     }
 
-    private static HybridParlayApiModel CreateRequest(IEnumerable<HybridParlayTicketModel> ticketsDetail, int ticketType)
+    private static (HybridParlayApiModel ApiModel, List<LegOddsModel> TicketsWaitToUpdateOdds) CreateRequest(
+        IEnumerable<HybridParlayTicketModel> ticketsDetail, int ticketType)
     {
         return ticketType is HybridParlayTicketType.Main
             ? CreateRequestMainTicket(ticketsDetail)
             : CreateRequestSubTicket(ticketsDetail);
     }
 
-    private static HybridParlayApiModel CreateRequestMainTicket(IEnumerable<HybridParlayTicketModel> ticketsDetail)
+    private static (HybridParlayApiModel ApiModel, List<LegOddsModel> TicketsWaitToUpdateOdds) CreateRequestMainTicket(
+        IEnumerable<HybridParlayTicketModel> ticketsDetail)
     {
         var voidBetInfos = ticketsDetail.Select(ticket => new HybridParlayVoidBetInfo
         {
             TransactionId = GetTransactionId(ticket.Transdesc),
-            TransId = ticket.MainTransId,
+            TransId = ticket.MainTransId.ToString(),
             CustId = ticket.CustId,
         });
 
-        return new HybridParlayApiModel
-        {
-            VoidBetInfos = voidBetInfos
-        };
+        return (new HybridParlayApiModel { VoidBetInfos = voidBetInfos }, []);
     }
 
-    private static HybridParlayApiModel CreateRequestSubTicket(IEnumerable<HybridParlayTicketModel> ticketsDetail)
+    private static (HybridParlayApiModel ApiModel, List<LegOddsModel> TicketsWaitToUpdateOdds) CreateRequestSubTicket(
+        IEnumerable<HybridParlayTicketModel> ticketsDetail)
     {
+        var voidBetInfosList = new List<HybridParlayVoidBetInfo>();
+        var ticketsWaitToUpdateOdds = new List<LegOddsModel>();
         var groups = ticketsDetail.GroupBy(ticket => ticket.MainTransId);
-        var voidBetInfos = groups.Select(group =>
+        foreach (var group in groups)
         {
             var firstItem = group.First();
-            return new HybridParlayVoidBetInfo
+            var type = GetType(group.ToList());
+            if (type is HybridParlayActionType.VoidSelections)
+            {
+                ticketsWaitToUpdateOdds.Add(new LegOddsModel { MatchId = firstItem.SubMatchId, TransId = firstItem.MainTransId });
+            }
+            var model = new HybridParlayVoidBetInfo
             {
                 TransactionId = GetTransactionId(firstItem.Transdesc),
-                TransId = firstItem.MainTransId,
+                TransId = firstItem.MainTransId.ToString(),
                 CustId = firstItem.CustId,
                 MatchId = "",
                 Type = GetType(group.ToList()),
                 Selections = group.Select(CreateLegModel)
             };
-        });
 
-        return new HybridParlayApiModel
-        {
-            VoidBetInfos = voidBetInfos
-        };
+            voidBetInfosList.Add(model);
+        }
+
+        return (new HybridParlayApiModel { VoidBetInfos = voidBetInfosList }, ticketsWaitToUpdateOdds);
     }
 
     private static LegModel CreateLegModel(HybridParlayTicketModel item)
@@ -180,7 +185,7 @@ public class HybridParlayTicketServiceImp(
 
     private static string GetWayId(string betTeam)
     {
-        List<string> betTeamsWay1 = ["h", "a"];
+        List<string> betTeamsWay1 = ["h", "o"];
         return betTeamsWay1.Contains(betTeam.ToLowerInvariant()) ? "way1" : "way2";
     }
 
