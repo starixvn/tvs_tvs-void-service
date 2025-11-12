@@ -122,17 +122,13 @@ public class HybridParlayTicketServiceImp(
         var voidBetInfos = groups.Select(group =>
         {
             var firstItem = group.First();
-            //::TODO : Fix isVoidAllSelectInLeg logic
-            //var isVoidAllSelectInLeg = group.ToList().Count == firstItem.SelectionCount;
-            var isVoidAllSelectInLeg = false;
-
             return new HybridParlayVoidBetInfo
             {
                 TransactionId = GetTransactionId(firstItem.Transdesc),
                 TransId = firstItem.MainTransId,
                 CustId = firstItem.CustId,
-                MatchId = isVoidAllSelectInLeg ? firstItem.SubMatchId.ToString() : "",
-                Selections = isVoidAllSelectInLeg ? [] : group.Select(CreateLegModel)
+                MatchId = "",
+                Selections = group.Select(CreateLegModel)
             };
         });
 

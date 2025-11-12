@@ -61,7 +61,7 @@
         <Setting Key="DBSITE02.Nap_SpecialDelete_MarkTickets_Update" SpName="Nap_SpecialDelete_MarkTickets_Update" DbName="DBSITE02.bodb02.wsv_nap" TimeOut="600" />
         <Setting Key="DBSITE03.Nap_SpecialDelete_MarkTickets_Update" SpName="Nap_SpecialDelete_MarkTickets_Update" DbName="DBSITE03.bodb02.wsv_nap" TimeOut="600" />
 
-        <Setting Key="NAP_Admin_HybridParlayLog_Sel" SpName="NAP_Admin_HybridParlayLog_Sel" DbName="DBLOG.bodb_CustomerLog.wsv_nap" TimeOut="600" />
+        <Setting Key="NAP_Admin_HybridParlayLog_Sel" SpName="NAP_Admin_HybridParlayLog_Sel" DbName="DBCTG.bodb02.wsv_nap" TimeOut="600" />
 
         <Setting Key="TicketVoiding_AutoVoidRequest_Ticket_Select" SpName="TicketVoiding_AutoVoidRequest_Ticket_Select" DbName="DBCTG.bodb02.wsv_nap" TimeOut="600" />
         <Setting Key="TicketVoiding_VoidingHistory_Insert" SpName="TicketVoiding_VoidingHistory_Insert" DbName="DBCTG.bodb02.wsv_nap" TimeOut="600" />
