@@ -35,20 +35,30 @@ public class ProcessVoidQueuesStageImp(
         return processResult;
     }
 
+    private static bool IsHybridParlayVoidingType(int voidingTypeId)
+    {
+        List<int> hybridParlayVoidingTypes = [VoidingTypeConstant.HybridParlay
+                , VoidingTypeConstant.MainHybridParlay14
+                , VoidingTypeConstant.SubHybridParlay
+                , VoidingTypeConstant.RecoverHybridParlay
+                , VoidingTypeConstant.RecoverMainHybridParlay14
+                , VoidingTypeConstant.RecoverSubHybridParlay];
+
+        return hybridParlayVoidingTypes.Contains(voidingTypeId);
+    }
+
     private async Task<TicketVoidingQueueModel> ExecuteSingleQueue(int siteDbGroupId, TicketVoidingQueueModel queue)
     {
+        if (IsHybridParlayVoidingType(queue.VoidingTypeId))
+        {
+            return await ExecuteQueueForHybridParlayTickets(siteDbGroupId, queue);
+        }
+
         return queue.VoidingTypeId switch
         {
             VoidingTypeConstant.Cricket => await ExecuteQueueForCricketTickets(siteDbGroupId, queue, NetPositionConstant.ActionVoid),
             VoidingTypeConstant.RecoverCricket => await ExecuteQueueForCricketTickets(siteDbGroupId, queue, NetPositionConstant.ActionRecover),
-            VoidingTypeConstant.HybridParlay
-                or VoidingTypeConstant.MainHybridParlay14
-                or VoidingTypeConstant.SubHybridParlay
-                or VoidingTypeConstant.RecoverHybridParlay
-                or VoidingTypeConstant.RecoverMainHybridParlay14
-                or VoidingTypeConstant.RecoverSubHybridParlay
-                => await ExecuteQueueForHybridParlayTickets(siteDbGroupId, queue),
-            _ => await ticketVoidingQueueService.ProcessVoidQueue(siteDbGroupId, queue.QueueId, null, null)
+            _ => await ticketVoidingQueueService.ProcessVoidQueue(siteDbGroupId, queue.QueueId, null, null),
         };
     }
 

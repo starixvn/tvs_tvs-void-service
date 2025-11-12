@@ -176,7 +176,7 @@ public class HybridParlayTicketServiceImp(
     private static string GetWayId(string betTeam)
     {
         List<string> betTeamsWay1 = ["h", "a"];
-        return betTeamsWay1.Contains(betTeam.ToLower()) ? "way1" : "way2";
+        return betTeamsWay1.Contains(betTeam.ToLowerInvariant()) ? "way1" : "way2";
     }
 
     private static string GetQuarter(string betCheck)
