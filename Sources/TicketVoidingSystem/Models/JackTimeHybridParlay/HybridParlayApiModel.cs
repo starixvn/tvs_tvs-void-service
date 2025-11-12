@@ -13,6 +13,7 @@ public class HybridParlayVoidBetInfo
     public string TransId { get; set; }
     public int CustId { get; set; }
     public string MatchId { get; set; }
+    public byte Type { get; set; }
     public IEnumerable<LegModel> Selections { get; set; }
 }
 

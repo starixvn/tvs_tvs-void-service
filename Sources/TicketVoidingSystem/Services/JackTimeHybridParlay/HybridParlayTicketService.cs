@@ -128,6 +128,7 @@ public class HybridParlayTicketServiceImp(
                 TransId = firstItem.MainTransId,
                 CustId = firstItem.CustId,
                 MatchId = "",
+                Type = GetType(group.ToList()),
                 Selections = group.Select(CreateLegModel)
             };
         });
@@ -148,6 +149,14 @@ public class HybridParlayTicketServiceImp(
             MatchId = item.SubMatchId,
             MarketId = $"{item.SubMatchId}_{item.SubBetTypeId}_{quarter}_{hdp}"
         };
+    }
+
+    private static byte GetType(IEnumerable<HybridParlayTicketModel> legs)
+    {
+        var countTickets = legs.FirstOrDefault()?.SelectionCount ?? 0;
+        return countTickets == 1
+            ? HybridParlayActionType.VoidLegs
+            : HybridParlayActionType.VoidSelections;
     }
 
     private static bool IsNotUpdateLegOdds(HybridParlayType type)
