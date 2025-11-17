@@ -13,4 +13,5 @@ public class HybridParlayTicketModel
     public string SubBetCheck { get; set; }
     public string Transdesc { get; set; }
     public int SelectionCount { get; set; }
+    public int StatusId { get; set; }
 }
