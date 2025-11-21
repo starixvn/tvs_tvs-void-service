@@ -12,6 +12,8 @@ public class AppSettingModel
     public string IgnoreSiteDb { get; init; }
 
     public bool IsPRODEnvironment { get; init; }
+
+    public string JackTimeHybridParlayUrl { get; init; }
 }
 
 public class RedisConfig

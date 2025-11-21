@@ -5,6 +5,7 @@ using Fanex.Logging;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using ONEbook.UM.DependencyInjection;
+using TicketVoidingSystem.Services.JackTimeHybridParlay;
 using TicketVoidingSystem.SignalR;
 using TVS.Void.Service.Website.Utilities;
 
@@ -14,6 +15,7 @@ var configuration = builder.Configuration;
 
 // Add services to the container.
 services.AddTvsConfig(configuration);
+services.AddHttpClient<JackTimeHybridParlayService, JackTimeHybridParlayServiceImp>();
 services.AddControllers();
 services.AddMemoryCache();
 services.AddFanexSql(configuration);

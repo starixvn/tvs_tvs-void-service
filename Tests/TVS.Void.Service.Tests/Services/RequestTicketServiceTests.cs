@@ -1,6 +1,6 @@
 ﻿using Fanex.Data.Repository;
 using NSubstitute;
-using TVS.Void.Service.Constants;
+using TicketVoidingSystem.Constants;
 using TVS.Void.Service.Criteria;
 using TVS.Void.Service.Criteria.MultiSiteDb;
 using TVS.Void.Service.Models;

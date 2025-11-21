@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using TicketVoidingSystem.Constants;
-using TVS.Void.Service.Constants;
 using TVS.Void.Service.Models;
 
 namespace TVS.Void.Service.Services.Notification;

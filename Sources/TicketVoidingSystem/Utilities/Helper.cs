@@ -2,6 +2,7 @@
 using System.Net.Http;
 using System.Net.Mime;
 using System.Text;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Threading.Tasks;
 using TicketVoidingSystem.Constants;
@@ -38,5 +39,15 @@ public static class Helper
     public static bool IsCanSendLetsTalk(int issueTypeId)
     {
         return issueTypeId is not (IssueTypeConstant.ArchivedTicket or IssueTypeConstant.RecoverTicket);
+    }
+
+    public static string JsonSerializerUnsafeRelaxed<T>(T model)
+    {
+        var options = new JsonSerializerOptions
+        {
+            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+        };
+
+        return JsonSerializer.Serialize(model, options);
     }
 }

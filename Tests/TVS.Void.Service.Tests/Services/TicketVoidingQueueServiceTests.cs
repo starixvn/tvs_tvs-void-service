@@ -58,18 +58,23 @@ public class TicketVoidingQueueServiceTests
         // Arrange
         const int fakeSiteDbGroupId = 1;
         const int fakeQueueId = 2;
+        bool? fakeIsCalledNetPosition = true;
+        bool? fakeIsCalledJackTimeHybridParlay = null;
         var fakeQueue = new TicketVoidingQueueModel { RequestId = 111, MatchId = 222 };
         var repository = Substitute.For<IDynamicRepository>();
         repository.GetAsync<TicketVoidingQueueModel>(default).ReturnsForAnyArgs(fakeQueue);
         var service = new TicketVoidingQueueServiceImp(repository);
 
         // Act
-        var actual = await service.ProcessVoidQueue(fakeSiteDbGroupId, fakeQueueId, true);
+        var actual = await service.ProcessVoidQueue(fakeSiteDbGroupId, fakeQueueId, fakeIsCalledNetPosition, fakeIsCalledJackTimeHybridParlay);
 
         // Assert
         await repository.Received(1).GetAsync<TicketVoidingQueueModel>
         (Arg.Is<ProcessVoidQueueCriteria>(x =>
-            x.SiteDbGroupId == fakeSiteDbGroupId && x.QueueId == fakeQueueId));
+            x.SiteDbGroupId == fakeSiteDbGroupId && 
+            x.QueueId == fakeQueueId &&
+            x.IsCalledNetPosition == fakeIsCalledNetPosition &&
+            x.IsCalledJackTimeHybridParlay == fakeIsCalledJackTimeHybridParlay));
 
         Assert.StrictEqual(fakeQueue, actual);
     }

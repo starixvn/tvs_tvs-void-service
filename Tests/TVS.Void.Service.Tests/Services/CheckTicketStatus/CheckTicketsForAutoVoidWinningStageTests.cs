@@ -152,9 +152,9 @@ public class CheckTicketsForAutoVoidWinningStageTests : IClassFixture<AppSetting
         // Arrange
         var groupTickets = new GroupTicketsInRequest
         {
-            SingleTickets = [new() { SiteDbGroupId = 1 }, new() { SiteDbGroupId = 2 }],
-            ParlayTickets = [new() { SiteDbGroupId = 1 }],
-            CricketTickets = [new() { SiteDbGroupId = 2 }]
+            SingleTickets = [new RequestDetailTicketModel { SiteDbGroupId = 1 }, new RequestDetailTicketModel { SiteDbGroupId = 2 }],
+            ParlayTickets = [new RequestDetailTicketModel { SiteDbGroupId = 1 }],
+            CricketTickets = [new RequestDetailTicketModel { SiteDbGroupId = 2 }]
         };
         var logData = new List<string>();
         var checkResult = new CheckStatusTicketInsertAutoVoidQueueOutput

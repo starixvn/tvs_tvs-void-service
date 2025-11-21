@@ -31,6 +31,11 @@
         <Setting Key="DBSITE02.TicketVoiding_Auto_Unmark_ReCalculate" SpName="TicketVoiding_Auto_Unmark_ReCalculate" DbName="DBSITE02.bodb02.wsv_nap" TimeOut="600" />
         <Setting Key="DBSITE03.TicketVoiding_Auto_Unmark_ReCalculate" SpName="TicketVoiding_Auto_Unmark_ReCalculate" DbName="DBSITE03.bodb02.wsv_nap" TimeOut="600" />
 
+        <Setting Key="DBCTG.TicketVoiding_TicketsDetail_Select" SpName="TicketVoiding_TicketsDetail_Select" DbName="DBCTG.bodb02.wsv_nap" TimeOut="600" />
+        <Setting Key="DBSITE01.TicketVoiding_TicketsDetail_Select" SpName="TicketVoiding_TicketsDetail_Select" DbName="DBSITE01.bodb02.wsv_nap" TimeOut="600" />
+        <Setting Key="DBSITE02.TicketVoiding_TicketsDetail_Select" SpName="TicketVoiding_TicketsDetail_Select" DbName="DBSITE02.bodb02.wsv_nap" TimeOut="600" />
+        <Setting Key="DBSITE03.TicketVoiding_TicketsDetail_Select" SpName="TicketVoiding_TicketsDetail_Select" DbName="DBSITE03.bodb02.wsv_nap" TimeOut="600" />
+
         <Setting Key="DBCTG.TicketVoiding_Queue_Select" SpName="TicketVoiding_Queue_Select" DbName="DBCTG.bodb02.wsv_nap" TimeOut="600" />
         <Setting Key="DBSITE01.TicketVoiding_Queue_Select" SpName="TicketVoiding_Queue_Select" DbName="DBSITE01.bodb02.wsv_nap" TimeOut="600" />
         <Setting Key="DBSITE02.TicketVoiding_Queue_Select" SpName="TicketVoiding_Queue_Select" DbName="DBSITE02.bodb02.wsv_nap" TimeOut="600" />
@@ -56,6 +61,8 @@
         <Setting Key="DBSITE02.Nap_SpecialDelete_MarkTickets_Update" SpName="Nap_SpecialDelete_MarkTickets_Update" DbName="DBSITE02.bodb02.wsv_nap" TimeOut="600" />
         <Setting Key="DBSITE03.Nap_SpecialDelete_MarkTickets_Update" SpName="Nap_SpecialDelete_MarkTickets_Update" DbName="DBSITE03.bodb02.wsv_nap" TimeOut="600" />
 
+        <Setting Key="NAP_Admin_HybridParlayLog_Sel" SpName="NAP_Admin_HybridParlayLog_Sel" DbName="DBCTG.bodb02.wsv_nap" TimeOut="600" />
+
         <Setting Key="TicketVoiding_AutoVoidRequest_Ticket_Select" SpName="TicketVoiding_AutoVoidRequest_Ticket_Select" DbName="DBCTG.bodb02.wsv_nap" TimeOut="600" />
         <Setting Key="TicketVoiding_VoidingHistory_Insert" SpName="TicketVoiding_VoidingHistory_Insert" DbName="DBCTG.bodb02.wsv_nap" TimeOut="600" />
         <Setting Key="TicketVoiding_VoidingHistory_Update" SpName="TicketVoiding_VoidingHistory_Update" DbName="DBCTG.bodb02.wsv_nap" TimeOut="600" />
@@ -77,4 +84,21 @@
         <Setting Key="DBCTG.NAP_TicketVoiding_NetPosition" SpName="NAP_TicketVoiding_NetPosition" DbName="DBCTG.bodb02.wsv_nap" TimeOut="600" />
         <Setting Key="DBSITE03.NAP_TicketVoiding_NetPosition" SpName="NAP_TicketVoiding_NetPosition" DbName="DBSITE03.bodb02.wsv_nap" TimeOut="600" />
     </Function>
+
+    <Setting Key="DBCTG.NAP_Admin_HybridParlay_LegOddsUpd" SpName="NAP_Admin_HybridParlay_LegOddsUpd" DbName="DBCTG.bodb02.wsv_nap" TimeOut="600">
+        <Mapping DataField="ErrCode" ObjectProperty="ErrorCode" />
+        <Mapping DataField="ErrMsg" ObjectProperty="ErrorMsg" />
+    </Setting>
+    <Setting Key="DBSITE01.NAP_Admin_HybridParlay_LegOddsUpd" SpName="NAP_Admin_HybridParlay_LegOddsUpd" DbName="DBSITE01.bodb02.wsv_nap" TimeOut="600">
+        <Mapping DataField="ErrCode" ObjectProperty="ErrorCode" />
+        <Mapping DataField="ErrMsg" ObjectProperty="ErrorMsg" />
+    </Setting>
+    <Setting Key="DBSITE02.NAP_Admin_HybridParlay_LegOddsUpd" SpName="NAP_Admin_HybridParlay_LegOddsUpd" DbName="DBSITE02.bodb02.wsv_nap" TimeOut="600">
+        <Mapping DataField="ErrCode" ObjectProperty="ErrorCode" />
+        <Mapping DataField="ErrMsg" ObjectProperty="ErrorMsg" />
+    </Setting>
+    <Setting Key="DBSITE03.NAP_Admin_HybridParlay_LegOddsUpd" SpName="NAP_Admin_HybridParlay_LegOddsUpd" DbName="DBSITE03.bodb02.wsv_nap" TimeOut="600">
+        <Mapping DataField="ErrCode" ObjectProperty="ErrorCode" />
+        <Mapping DataField="ErrMsg" ObjectProperty="ErrorMsg" />
+    </Setting>
 </Functions>

@@ -1,5 +1,5 @@
 ﻿using NSubstitute;
-using TVS.Void.Service.Constants;
+using TicketVoidingSystem.Constants;
 using TVS.Void.Service.Models;
 using TVS.Void.Service.Services;
 using TVS.Void.Service.Services.ScanAutoVoidRequest;

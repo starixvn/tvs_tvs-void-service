@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using TicketVoidingSystem.Constants;
 using TicketVoidingSystem.Services;
@@ -55,8 +56,9 @@ public class AutoInstantProcessStageImp(
             validationResult = new CheckTicketValidationOutput
             {
                 VoidSingleTickets = getTicketsResult.OutputData.SingleTickets,
-                VoidParlayTickets = getTicketsResult.OutputData.ParlayTickets,
-                VoidCricketTickets = getTicketsResult.OutputData.CricketTickets
+                VoidParlayTickets = getTicketsResult.OutputData.ParlayTickets.Where(x => !x.IsHybrid),
+                VoidCricketTickets = getTicketsResult.OutputData.CricketTickets,
+                VoidHybridParlayMainTickets = getTicketsResult.OutputData.ParlayTickets.Where(x => x.IsHybrid)
             };
         }
 
