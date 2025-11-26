@@ -57,7 +57,7 @@ public class HybridParlayTicketServiceImp(
             var (requestApiModel, ticketsWaitToUpdateOdds) = CreateRequest(ticketsDetail, ticketType);
             var logDate = DateTimeOffset.Now.DateTime;
 
-            var isCalled = ticketsWaitToUpdateOdds.Any() && await jackTimeHybridParlayService.Execute(requestApiModel, type);
+            var isCalled = requestApiModel.VoidBetInfos.Any() && await jackTimeHybridParlayService.Execute(requestApiModel, type);
             if (IsNotUpdateLegOdds(type) || !ticketsWaitToUpdateOdds.Any())
             {
                 return true; // No need to call leg odds service for voiding or recovering main bets & don't care status call JackTime
