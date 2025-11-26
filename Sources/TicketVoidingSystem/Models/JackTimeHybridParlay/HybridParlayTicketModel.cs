@@ -14,4 +14,5 @@ public class HybridParlayTicketModel
     public string Transdesc { get; set; }
     public int SelectionCount { get; set; }
     public int StatusId { get; set; }
+    public int SubStatusId { get; set; }
 }
