@@ -32,10 +32,8 @@ public class HybridParlayTicketServiceImp(
         VoidingTypeConstant.RecoverMainHybridParlay14
     ];
 
-    public static readonly int[] MainStatusNotCallJackTime =
-    [
-        TicketStatus.VoidId
-    ];
+    public static readonly int[] MainStatusNotCallJackTime = [TicketStatus.VoidId];
+    public static readonly int[] SubStatusNotCallJackTime = [TicketStatus.DrawId];
 
     public async Task<bool> Execute(string hybridParlayTransIds, int siteDbGroupId, int voidingTypeId, int userId)
     {
@@ -59,7 +57,7 @@ public class HybridParlayTicketServiceImp(
             var (requestApiModel, ticketsWaitToUpdateOdds) = CreateRequest(ticketsDetail, ticketType);
             var logDate = DateTimeOffset.Now.DateTime;
 
-            var isCalled = await jackTimeHybridParlayService.Execute(requestApiModel, type);
+            var isCalled = requestApiModel.VoidBetInfos.Any() && await jackTimeHybridParlayService.Execute(requestApiModel, type);
             if (IsNotUpdateLegOdds(type) || !ticketsWaitToUpdateOdds.Any())
             {
                 return true; // No need to call leg odds service for voiding or recovering main bets & don't care status call JackTime
@@ -122,7 +120,10 @@ public class HybridParlayTicketServiceImp(
     private static (HybridParlayApiModel ApiModel, List<LegOddsModel> TicketsWaitToUpdateOdds) CreateRequestSubTicket(
         IEnumerable<HybridParlayTicketModel> ticketsDetail)
     {
-        var ticketWillBeCallJackTime = ticketsDetail.Where(x => !MainStatusNotCallJackTime.Contains(x.StatusId));
+        var ticketWillBeCallJackTime = ticketsDetail.Where(x
+            => !MainStatusNotCallJackTime.Contains(x.StatusId) &&
+               !SubStatusNotCallJackTime.Contains(x.SubStatusId)
+        );
         var voidBetInfosList = new List<HybridParlayVoidBetInfo>();
         var ticketsWaitToUpdateOdds = new List<LegOddsModel>();
         var groups = ticketWillBeCallJackTime.GroupBy(ticket => ticket.MainTransId);
